@@ -27,10 +27,10 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono');
 // @import url('https://fonts.googleapis.com/css2?family=Ubuntu+Mono');
 
-// $backgroundColor: #fff;
+$backgroundColor: #fff;
 
-// $mainColor: #000;
-// $headingColor: #111;
+$mainColor: #000;
+$headingColor: #111;
 
 $mainFontSize: 2em;
 // $mainFont: 'Roboto', sans-serif;
@@ -71,6 +71,10 @@ section.has-light-background {
 	margin: 1em auto;
 }
 
+.reveal .slides {
+	text-align: left;
+}
+
 .reveal strong,
 .reveal b {
 	font-weight: bold;
@@ -89,6 +93,7 @@ section.has-light-background {
     max-height: 23em;
     height: auto;
 	object-fit: contain;
+	text-align: center;
 }
 
 .reveal code {
@@ -99,6 +104,8 @@ section.has-light-background {
 
 .reveal pre code {
 	color: black;
+	font-size: 1.7em;
+	line-height: 1.6em;
 }
 
 // HEADERS
@@ -267,7 +274,7 @@ kbd {
 }
 
 .reveal .slide-background:after {
-	content: "Authors - Title - Venue Year";
+	content: "Danilo Pianini - Basi di Linux - SCM Campus Year";
 	position: absolute;
 	bottom: 2.5%;
 	right: 6%;

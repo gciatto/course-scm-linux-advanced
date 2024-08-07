@@ -1,8 +1,8 @@
 
 +++
 
-title = "Guide for writing markdown slides"
-description = "A Hugo theme for creating Reveal.js presentations"
+title = "Basi di Linux, parte prima"
+description = "Corso Linux Base @SCM Group"
 outputs = ["Reveal"]
 aliases = [
     "/guide/"
@@ -231,18 +231,484 @@ Notate che appaiono anche le directory `.` e `..` che rappresentano rispettivame
 
 ## Manipolazione di base del file system
 
-### Directory corrente: `pwd`
+### Visione dettagliata: opzione `-l` di `ls`
 
-All'apertura, e in qualunque momento, il terminale si trova in una *directory* (cartella) del file system.
-
-Normalmente, alla sua apertura, si trova nella *home directory* dell'utente.
-
-Possiamo sempre sapere in che directory ci troviamo con il comando `pwd` (print working directory).
+L'opzione `-l` di `ls` mostra anche permessi, dimensione e data di ultima modifica di ogni elemento.
 
 ```bash
-$ pwd                                                  
+$ ls -l
+total 60
+-rw-r--r--  1 danysk danysk 11344 Aug  5 11:19 LICENSE
+drwxr-xr-x  2 danysk danysk  4096 Aug  5 11:19 archetypes
+drwxr-xr-x  2 danysk danysk  4096 Aug  5 11:19 assets
+drwxr-xr-x  8 danysk danysk  4096 Aug  5 11:58 build
+-rw-r--r--  1 danysk danysk  1842 Aug  5 11:27 config.toml
+drwxr-xr-x  3 danysk danysk  4096 Aug  5 11:58 content
+drwxr-xr-x  4 danysk danysk  4096 Aug  5 11:19 layouts
+-rw-r--r--  1 danysk danysk   124 Aug  5 11:19 renovate.json
+drwxr-xr-x  3 danysk danysk  4096 Aug  5 11:45 resources
+-rw-------  1 danysk danysk  2807 Aug  5 11:33 scm.md
+drwxr-xr-x 10 danysk danysk  4096 Aug  5 11:26 shared-slides
+drwxr-xr-x  2 danysk danysk  4096 Aug  5 11:19 static
+drwxr-xr-x  3 danysk danysk  4096 Aug  5 11:19 themes
+```
+
+---
+
+## Manipolazione di base del file system
+
+### Capire i permessi
+
+I permessi sono rappresentati da 10 caratteri, divisi in 4 gruppi:
+* il *primo* carattere indica il *tipo* di file (`d`: directory, `-`: file, `l`: link simbolico)
+* i successivi *tre gruppi* di *tre caratteri* indicano i permessi per, rispettivamente, il proprietario, il gruppo, e tutti gli altri utenti
+
+{{% multicol %}}{{% col %}}
+![images/octal.svg](images/octal.svg)
+{{% /col %}}{{% col %}}
+Esempi:
+* `drwxr-xr-x` directory scrivibile da owner e visibile a tutti
+* `-rw-------` file accessibile e modificabile solo da owner
+* `-rwxr-xr-x` file eseguibile da tutti, modificabile da owner
+* `-rwxrwxrwx` file eseguibile e modificabile da tutti
+{{% /col %}}{{% /multicol %}}
+
+I permessi sono anche detti *ottali*,
+perché possono essere rappresentati come un numero in base 8
+(cifre da zero a 7)
+ottenuto concatenando i permessi dei tre gruppi.
+
+---
+
+## Manipolazione di base del file system
+
+### Formato ottale dei permessi
+
+{{% multicol %}}{{% col %}}
+![images/octal.svg](images/octal.svg)
+
+Esempi:
+* `rw-------` $\Rightarrow$ `600`
+* `rwxr-xr-x` $\Rightarrow$ `755`
+* `rwxrwxrwx` $\Rightarrow$ `777`
+* `rw-r--r--` $\Rightarrow$ `644`
+* `rw-rw-rw-` $\Rightarrow$ `666`
+{{% /col %}}{{% col %}}
+
+| Permesso    | Valore ottale | Valore binario |
+|-------------|---------------|----------------|
+| `---`       | 0             | 000            |
+| `--x`       | 1             | 001            |
+| `-w-`       | 2             | 010            |
+| `-wx`       | 3             | 011            |
+| `r--`       | 4             | 100            |
+| `r-x`       | 5             | 101            |
+| `rw-`       | 6             | 110            |
+| `rwx`       | 7             | 111            |
+
+{{% /col %}}{{% /multicol %}}
+
+---
+
+## Manipolazione di base del file system
+
+### Dimensioni più comprensibili: opzione `-h` di `ls`
+
+L'opzione `-h` di `ls` mostra la dimensione in formato "human-readable",
+e funziona solo assieme a `-l`.
+
+```bash
+$ ls -lh
+total 60K
+-rw-r--r--  1 danysk danysk  12K Aug  5 11:19 LICENSE
+drwxr-xr-x  2 danysk danysk 4,0K Aug  5 11:19 archetypes
+drwxr-xr-x  2 danysk danysk 4,0K Aug  5 11:19 assets
+drwxr-xr-x  8 danysk danysk 4,0K Aug  5 11:58 build
+-rw-r--r--  1 danysk danysk 1,8K Aug  5 11:27 config.toml
+drwxr-xr-x  3 danysk danysk 4,0K Aug  5 11:58 content
+drwxr-xr-x  4 danysk danysk 4,0K Aug  5 11:19 layouts
+-rw-r--r--  1 danysk danysk  124 Aug  5 11:19 renovate.json
+drwxr-xr-x  3 danysk danysk 4,0K Aug  5 11:45 resources
+-rw-------  1 danysk danysk 2,8K Aug  5 11:33 scm.md
+drwxr-xr-x 10 danysk danysk 4,0K Aug  5 11:26 shared-slides
+drwxr-xr-x  2 danysk danysk 4,0K Aug  5 11:19 static
+drwxr-xr-x  3 danysk danysk 4,0K Aug  5 11:19 themes
+```
+
+---
+
+## Manipolazione di base del file system
+
+### Dettagli completi: `ls -ahl`
+
+le tre opzioni `a`, `l`, ed `h` possono (e solitamente sono) utilizzate all'unisono.
+
+```bash
+$ ls -alh
+total 88K
+drwxr-xr-x  13 danysk danysk 4,0K Aug  5 12:05 .
+drwxr-xr-x 108 danysk danysk 4,0K Aug  5 11:19 ..
+drwxr-xr-x   9 danysk danysk 4,0K Aug  6 11:57 .git
+drwxr-xr-x   3 danysk danysk 4,0K Aug  5 11:19 .github
+-rw-r--r--   1 danysk danysk   65 Aug  5 11:19 .gitignore
+-rw-r--r--   1 danysk danysk  217 Aug  5 11:19 .gitmodules
+-rw-r--r--   1 danysk danysk    0 Aug  5 11:45 .hugo_build.lock
+-rw-r--r--   1 danysk danysk   24 Aug  5 11:19 .mergify.yml
+-rw-r--r--   1 danysk danysk  12K Aug  5 11:19 LICENSE
+drwxr-xr-x   2 danysk danysk 4,0K Aug  5 11:19 archetypes
+drwxr-xr-x   2 danysk danysk 4,0K Aug  5 11:19 assets
+drwxr-xr-x   8 danysk danysk 4,0K Aug  5 11:58 build
+-rw-r--r--   1 danysk danysk 1,8K Aug  5 11:27 config.toml
+drwxr-xr-x   3 danysk danysk 4,0K Aug  5 11:58 content
+drwxr-xr-x   4 danysk danysk 4,0K Aug  5 11:19 layouts
+-rw-r--r--   1 danysk danysk  124 Aug  5 11:19 renovate.json
+drwxr-xr-x   3 danysk danysk 4,0K Aug  5 11:45 resources
+-rw-------   1 danysk danysk 2,8K Aug  5 11:33 scm.md
+drwxr-xr-x  10 danysk danysk 4,0K Aug  5 11:26 shared-slides
+drwxr-xr-x   2 danysk danysk 4,0K Aug  5 11:19 static
+drwxr-xr-x   3 danysk danysk 4,0K Aug  5 11:19 themes
+```
+
+---
+
+## Manipolazione di base del file system
+
+### modifica della working directory: `cd`
+
+È possibile spostarsi da una directory all'altra con il comando `cd` (change directory),
+che prende un solo argomento: il percorso della directory di destinazione,
+relativo o assoluto.
+Se non viene specificato un percorso, `cd` porta alla home directory dell'utente corrente
+(directory identificata anche dal simbolo speciale `~`).
+
+```bash
+$ pwd
+/home/danysk/LocalProjects
+$ cd myFolder
+$ pwd
+/home/danysk/LocalProjects/myFolder
+```
+
+Dato che `..` è la directory padre,
+è possibile tornare alla directory precedente con `cd ..`
+
+```bash
+$ pwd
+/home/danysk/LocalProjects/myFolder
+$ cd ..
+$ pwd
 /home/danysk/LocalProjects
 ```
+
+---
+
+## Manipolazione di base del file system
+
+### Aggiornamento della data di ultima modifica: `touch`
+
+Il comando `touch` permette di aggiornare la data di ultima modifica di un file al momento corrente.
+
+```bash
+$ ls -l
+-rw-r--r--  1 danysk danysk  12K Aug  5 11:19 LICENSE
+$ date
+2024-08-06T14:25:21 CEST
+$ touch LICENSE
+$ ls -l
+-rw-r--r--  1 danysk danysk  12K Aug  6 14:25 LICENSE
+```
+
+L'utilizzo più comune di `touch`, però, è la creazione di un file vuoto: è sufficiente "toccare" un file che non esiste.
+
+```bash
+$ ls -alh
+total 8,0K
+drwxr-xr-x  2 danysk danysk 4,0K Aug  6 14:29 .
+drwxr-xr-x 14 danysk danysk 4,0K Aug  6 14:28 ..
+$ touch mynewfile
+$ ls -alh
+total 8,0K
+drwxr-xr-x  2 danysk danysk 4,0K Aug  6 14:29 .
+drwxr-xr-x 14 danysk danysk 4,0K Aug  6 14:28 ..
+-rw-r--r--  1 danysk danysk    0 Aug  6 14:29 mynewfile
+```
+
+---
+
+## Manipolazione di base del file system
+
+### Costruzione di nuove directory: `mkdir`
+
+Il comando `mkdir` (make directory) permette di creare una nuova directory.
+Prende in ingresso un solo argomento: il percorso della directory da creare.
+
+Il comando è in grado di creare anche directory annidate, se viene specificata l'opzione `-p`.
+
+```bash
+$ ls -alh
+total 8,0K
+drwxr-xr-x  2 danysk danysk 4,0K Aug  6 14:30 .
+drwxr-xr-x 14 danysk danysk 4,0K Aug  6 14:28 ..
+$ mkdir ciao
+$ mkdir -p pippo/pluto/paperino
+$ ls -alh
+total 16K
+drwxr-xr-x  4 danysk danysk 4,0K Aug  6 14:32 .
+drwxr-xr-x 14 danysk danysk 4,0K Aug  6 14:28 ..
+drwxr-xr-x  2 danysk danysk 4,0K Aug  6 14:32 ciao
+drwxr-xr-x  3 danysk danysk 4,0K Aug  6 14:32 pippo
+```
+
+---
+
+## Manipolazione di base del file system
+
+### Copia di file e directory: `cp`
+
+Il comando `cp` (copy) permette di copiare file e directory.
+Prende due argomenti: il percorso del file o della directory da copiare, e il percorso di destinazione.
+Nel caso in cui si voglia copiare una directory, è necessario specificare l'opzione `-r` (recursive).
+
+### Rimozione di file e directory: `rm`
+
+Il comando `rm` (remove) permette di rimuovere file e directory.
+Prende un numero arbitrario di argomenti, e li rimuove.
+Per rimuovere una directory ed i suoi contenuti, è necessario specificare l'opzione `-r` (recursive).
+
+
+### Rinominare (spostare) file e directory: `mv`
+
+Il comando `mv` (move) permette di rinominare file e directory
+(equivalente a spostarli in un'altra posizione).
+Prende due argomenti: il percorso del file o della directory da rinominare, e il percorso di destinazione.
+
+---
+
+## Wildcards
+
+Le *wildcards* sono caratteri speciali che permettono di specificare insiemi di file o directory, indicando che al loro posto può essere sostituito un qualunque carattere.
+
+* `?` -- un singolo carattere, escluso `/`
+* `*` -- una sequenza di zero o più caratteri, escluso `/`
+* `**` -- **non standard**: dipendentemente dalla shell,
+potrebbe essere disattivata (è il caso di `bash` ed `sh`),
+e quindi equivalente a `*`
+(perché una sequenza di zero o più caratteri seguita da una sequenza di zero o più caratteri è essa stessa una sequenza di zero o più caratteri),
+oppure indicare che nella sequenza è incluso il carattere `/`,
+ossia che la ricerca avviene ricorsivamente (è il caso di `zsh`).
+
+---
+
+## Strumenti di base del terminale
+
+### Pulizia dello schermo: `clear`
+
+Il comando `clear` permette di pulire il terminale, spostando in alto la schermata.
+
+### Storia dei comandi: `history` e ricerca: <kbd>Ctrl</kbd><kbd>R</kbd>
+
+Le shell UNIX mantengono una storia dei comandi eseguiti.
+Consultare la storia è molto utile,
+consente di richiamare velocemente comandi eseguiti in precedenza.
+Ciascuna shell salva la storia per ogni utente su un file nascosto nella home directory (`.bash_history` per `bash`, `.zhistory` per `zsh`).
+
+Indipendentemente da quale file la contiene,
+la storia può essere visualizzata con il comando `history`.
+
+Inoltre, è possibile cercare rapidamente nella storia con <kbd>Ctrl</kbd><kbd>R</kbd> (reverse search). Gli ultimi comandi possono essere scorsi con <kbd><i class="fa-solid fa-arrow-up"></i></kbd> (previous) e <kbd><i class="fa-solid fa-arrow-down"></i></kbd> (next).
+
+---
+
+## Standard input, output, ed error
+
+I programmi UNIX comunicano con l'ambiente esterno attraverso tre canali standard,
+di cui uno in input e due in output:
+* **standard input** (`stdin`), per comandi lanciati da terminale, di default è l'input che viene dato da tastiera al terminale dopo il lancio del programma
+* **standard output** (`stdout`), per comandi lanciati da terminale, di default è il testo che appare sul terminale stesso
+* **standard error** (`stderr`), usato per i messaggi di errore; di default configurato come standard errror (stampa a terminale)
+
+### Teletypewriter: il terminale come file
+
+In realtà, i tre canali sono *file*:
+poiché il terminale stesso è modellato come *device file*
+(d'altronde, in UNIX, tutto è un file o un processo).
+Il file che rappresenta il terminale può essere recuperato col comando `tty` (teletype),
+e su <i class="fa-brands fa-linux"></i> è tipicamente `/dev/pts/N` (con `N` numero intero positivo che rappresenta l'identificativo del terminale).
+
+Di default, `stdin`, `stdout` e `stderr` sono associati al device file del terminale che li ha lanciati.
+
+---
+
+## Standard input, output, ed error
+
+### Redirezione base
+
+Attraverso la *redirezione* è possibile far puntare i canali a file diversi da quello originale:
+
+* `>` redirige `stdout` verso l'inizio di un file (ossia, lo sovrascrive)
+* `>>` redirige `stdout` verso la fine di un file (ossia, aggiunge elementi in coda)
+* `<` redirige `stdin` da un file
+
+### Redirezione di stream specifici
+
+Abbiamo visto che `>` e `>>` redirigono `stdout`,
+ma come possiamo redirigere `stderr`?
+
+In realtà, l'operatore di redirezione `>` è un'abbreviazione per `1>`: la redirezione comincia con il numero del file descriptor dello stream da ridirezionare.
+Ognuno degli stream standard ha un file descriptor associato:
+* `0` per `stdin`
+* `1` per `stdout`
+* `2` per `stderr`
+
+Dunque `0<` equivale a `<`, `1>` equivale a `>`, e `2>` redirige `stderr`.
+
+Se si volesse che un comando salvasse i messaggi di errore su error.log, e i messaggi di output su output.log, si potrebbe fare così:
+
+```bash
+my_command > output.log 2> error.log
+```
+
+---
+
+## Standard input, output, ed error
+
+### Redirezione unione
+
+L'operatore `>&` permette di unire assieme due canali di output,
+redirezionandone uno su un altro.
+
+
+È possibile, ad esempio, redirigere `stderr` verso `stdout` con `2>&1`,
+ad esempio perché si vuole che entrambi appaiano in un solo file di log:
+
+```bash
+my_command > output.log 2>&1
+```
+
+diversamente, lo stream di errore resterebbe agganciato al device file del terminale!
+
+### Piping
+
+L'operatore `|` permette di concatenare due comandi, facendo sì che l'output di uno diventi l'input dell'altro.
+
+Scrivendo, ad esempio, `ls | my_command`, l'output di `ls` diventa l'input di `my_command`, come se l'avessimo avviato ed avessimo messo in input la stringa prodotta da `ls`.
+
+*Nota*: `|` collega input e output, non passa degli argomenti!
+
+---
+
+## Interazione con la shell
+
+### Stampa di un messaggio: `echo`
+
+Il comando `echo` permette di stampare un messaggio a schermo.
+Prende un numero arbitrario di argomenti, e li stampa separati da uno spazio.
+
+Il comando è molto utile per inizializzare file con un certo contenuto, oppure per aggiungere un messaggio a un file di log.
+
+
+### Concatenazione di file: `cat`
+
+Il comando `cat` (concatenate) permette di concatenare file.
+Prende un numero arbitrario di argomenti, e li restituisce concatenati in uscita.
+
+Il comando è molto utile per visualizzare il contenuto di un file.
+
+```bash
+$ echo "Hello, world!" > hello.txt
+$ cat hello.txt
+Hello, world!
+$ echo "Hello, world! 2" >> hello.txt
+$ cat hello.txt
+Hello, world!
+Hello, world! 2
+```
+
+---
+
+## Interazione con la shell
+
+### Paginazione di un file: `less`
+
+Il comando `less` permette di visualizzare un file a schermo, paginato, ossia,
+mostrando una pagina alla volta e permettendo di scorrere avanti e indietro.
+
+Si esce dalla modalità di visualizzazione premendo <kbd>Q</kbd>.
+
+### Intestazione di un file: `head`
+
+Il comando `head` permette di visualizzare le prime 10 righe di un file.
+
+Il comportamento può essere modificato con l'opzione `-n`, che permette di specificare il numero di righe da visualizzare.
+
+### Coda di un file: `tail`
+
+Il comando `tail` permette di visualizzare le ultime 10 righe di un file.
+
+Anche in questo caso, il comportamento può essere modificato con l'opzione `-n`.
+
+Inoltre, `tail` permette di "seguire" un file,
+ossia di visualizzare le righe che vengono aggiunte in tempo reale.
+La modalità "fetch" di `tail` è attivata con l'opzione `-f`.
+
+---
+
+## Analisi e ricerca nel file system
+
+### Dimensione di una directory: `du`
+
+Il comando `du` (disk usage) permette di calcolare la dimensione di una directory e dei suoi contenuti.
+
+Prende un numero arbitrario di argomenti, e restituisce la dimensione di ciascuno di essi.
+
+L'opzione `-h` permette di visualizzare la dimensione in formato "human-readable".
+
+### Ricerca di file e directory: `find`
+
+Il comando `find` permette di cercare file nel file system.
+
+Prende un numero arbitrario di argomenti, e restituisce i file che soddisfano i criteri di ricerca specificati.
+
+L'opzione `-name` permette di cercare file per nome.
+
+L'opzione `-type` permette di cercare file per tipo.
+
+#### Esempi
+
+```bash
+find /home/utente -type f -name "documento.txt" # Cerca un file col nome esatto "documento.txt"
+find /home/utente -type d -name "progetti" # Cerca una directory col nome esatto "progetti"
+find /home/utente -type f -name "*.txt" # Cerca tutti i file con estensione .txt (si possono usare i glob!)
+```
+
+---
+
+## Analisi e ricerca nel file system
+
+### Ricerca del file che implementa un comando: `which`
+
+Il comando `which` permette di trovare il percorso di un eseguibile.
+
+Prende un numero arbitrario di argomenti,
+e per ciascuno restituisce il percorso dell'eseguibile che implementa il comando specificato
+(se esiste).
+
+```bash
+$ which cat echo intellij-idea-ultimate-edition pippo
+/usr/bin/cat
+echo: shell built-in command
+/usr/bin/intellij-idea-ultimate-edition
+pippo not found
+```
+
+
+---
+
+## Segnali e processi
+
+### Identificatore di processo: PID
+
+Ogni processo in un sistema UNIX-like ha un identificatore numerico univoco, chiamato **PID** (Process IDentifier).
 
 
 
@@ -256,39 +722,8 @@ immagine con struttura file system
 
 ---
 
-
-* Manipolazione di base del file system
-    * Query
-        * pwd
-        * ls [-a]
-        * cd
-    * Modifica
-        * touch
-        * mkdir [-p]
-    * Wildcards: ?, * e **
-
-* Strumenti basilari del terminale
-    * clear
-    * echo
-    * history e ^R
-
-* Spostamento, copia, rimozione, visualizzazione di file e cartelle
-    * cp
-    * mv
-    * rm [-rf]
-    * cat
-    * less
-    * head [-n]
-    * tail [-fn]
-    * du
-    * locate e find
-    * which
-
 * Redirezione
-    * Standard output, input, ed error
-    * standard output redirection con > e >>
-    * standard input redirection con <
-    * process piping (|)
+    * EOF
     * filtraggio con grep [-vnc]
 
 * Manualistica
@@ -297,9 +732,6 @@ immagine con struttura file system
     * apropos
 
 * Utenti e gruppi
-    * gruppi, utenti, permessi
-    * permessi ottali
-    * ls [-ahl]
     * whoami
     * who
     * chmod

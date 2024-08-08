@@ -196,7 +196,7 @@ Normalmente, alla sua apertura, si trova nella *home directory* dell'utente.
 
 Possiamo sempre sapere in che directory ci troviamo con il comando `pwd` (print working directory).
 
-```bash
+```console
 $ pwd                                                  
 /home/danysk/LocalProjects
 ```
@@ -209,7 +209,7 @@ $ pwd
 
 Il comando `ls` (list) permette di elencare il contenuto della directory corrente.
 
-```bash
+```console
 $ ls
 LICENSE     assets  config.toml  layouts        resources  shared-slides  themes
 archetypes  build   content      renovate.json  scm.md     static
@@ -217,7 +217,7 @@ archetypes  build   content      renovate.json  scm.md     static
 
 Di default, *omette i file nascosti*, che possono essere visualizzati con l'opzione `-a` (all).
 
-```bash
+```console
 $ ls -a
 .        .gitignore        LICENSE     config.toml    resources      themes
 ..       .gitmodules       archetypes  content        scm.md
@@ -235,7 +235,7 @@ Notate che appaiono anche le directory `.` e `..` che rappresentano rispettivame
 
 L'opzione `-l` di `ls` mostra anche permessi, dimensione e data di ultima modifica di ogni elemento.
 
-```bash
+```console
 $ ls -l
 total 60
 -rw-r--r--  1 danysk danysk 11344 Aug  5 11:19 LICENSE
@@ -317,7 +317,7 @@ Esempi:
 L'opzione `-h` di `ls` mostra la dimensione in formato "human-readable",
 e funziona solo assieme a `-l`.
 
-```bash
+```console
 $ ls -lh
 total 60K
 -rw-r--r--  1 danysk danysk  12K Aug  5 11:19 LICENSE
@@ -343,7 +343,7 @@ drwxr-xr-x  3 danysk danysk 4,0K Aug  5 11:19 themes
 
 le tre opzioni `a`, `l`, ed `h` possono (e solitamente sono) utilizzate all'unisono.
 
-```bash
+```console
 $ ls -alh
 total 88K
 drwxr-xr-x  13 danysk danysk 4,0K Aug  5 12:05 .
@@ -381,7 +381,7 @@ relativo o assoluto.
 Se non viene specificato un percorso, `cd` porta alla home directory dell'utente corrente
 (directory identificata anche dal simbolo speciale `~`).
 
-```bash
+```console
 $ pwd
 /home/danysk/LocalProjects
 $ cd myFolder
@@ -392,7 +392,7 @@ $ pwd
 Dato che `..` è la directory padre,
 è possibile tornare alla directory precedente con `cd ..`
 
-```bash
+```console
 $ pwd
 /home/danysk/LocalProjects/myFolder
 $ cd ..
@@ -408,7 +408,7 @@ $ pwd
 
 Il comando `touch` permette di aggiornare la data di ultima modifica di un file al momento corrente.
 
-```bash
+```console
 $ ls -l
 -rw-r--r--  1 danysk danysk  12K Aug  5 11:19 LICENSE
 $ date
@@ -420,7 +420,7 @@ $ ls -l
 
 L'utilizzo più comune di `touch`, però, è la creazione di un file vuoto: è sufficiente "toccare" un file che non esiste.
 
-```bash
+```console
 $ ls -alh
 total 8,0K
 drwxr-xr-x  2 danysk danysk 4,0K Aug  6 14:29 .
@@ -444,7 +444,7 @@ Prende in ingresso un solo argomento: il percorso della directory da creare.
 
 Il comando è in grado di creare anche directory annidate, se viene specificata l'opzione `-p`.
 
-```bash
+```console
 $ ls -alh
 total 8,0K
 drwxr-xr-x  2 danysk danysk 4,0K Aug  6 14:30 .
@@ -564,7 +564,7 @@ Dunque `0<` equivale a `<`, `1>` equivale a `>`, e `2>` redirige `stderr`.
 
 Se si volesse che un comando salvasse i messaggi di errore su error.log, e i messaggi di output su output.log, si potrebbe fare così:
 
-```bash
+```console
 my_command > output.log 2> error.log
 ```
 
@@ -581,7 +581,7 @@ redirezionandone uno su un altro.
 È possibile, ad esempio, redirigere `stderr` verso `stdout` con `2>&1`,
 ad esempio perché si vuole che entrambi appaiano in un solo file di log:
 
-```bash
+```console
 my_command > output.log 2>&1
 ```
 
@@ -614,7 +614,7 @@ Prende un numero arbitrario di argomenti, e li restituisce concatenati in uscita
 
 Il comando è molto utile per visualizzare il contenuto di un file.
 
-```bash
+```console
 $ echo "Hello, world!" > hello.txt
 $ cat hello.txt
 Hello, world!
@@ -675,10 +675,10 @@ L'opzione `-type` permette di cercare file per tipo.
 
 #### Esempi
 
-```bash
-find /home/utente -type f -name "documento.txt" # Cerca un file col nome esatto "documento.txt"
-find /home/utente -type d -name "progetti" # Cerca una directory col nome esatto "progetti"
-find /home/utente -type f -name "*.txt" # Cerca tutti i file con estensione .txt (si possono usare i glob!)
+```console
+$ find /home/utente -type f -name "documento.txt" # Cerca un file col nome esatto "documento.txt"
+$ find /home/utente -type d -name "progetti" # Cerca una directory col nome esatto "progetti"
+$ find /home/utente -type f -name "*.txt" # Cerca tutti i file con estensione .txt (si possono usare i glob!)
 ```
 
 ---
@@ -693,7 +693,7 @@ Prende un numero arbitrario di argomenti,
 e per ciascuno restituisce il percorso dell'eseguibile che implementa il comando specificato
 (se esiste).
 
-```bash
+```console
 $ which cat echo intellij-idea-ultimate-edition pippo
 /usr/bin/cat
 echo: shell built-in command
@@ -704,17 +704,286 @@ pippo not found
 
 ---
 
-## Segnali e processi
+## Terminare input e processi da terminale
+
+Se un processo resta in attesa sul terminale,
+i casi più comuni sono:
+1. il processo è in attesa di input
+2. il processo è sospeso in una sleep
+3. il processo è in un loop che non termina
+
+### Inviare una end-of-file
+
+Nel primo caso, si può inviare un carattere speciale detto
+`EOF` (end-of-file) per terminare l'input.
+
+Per farlo, premere <kbd>Ctrl</kbd><kbd>D</kbd>
+
+### Inviare un segnale `SIGINT`
+
+Nel secondo e terzo caso, si può inviare un segnale di interruzione (`SIGINT`) che richiede al processo di terminare.
+
+Il segnale si invia premendo <kbd>Ctrl</kbd><kbd>C</kbd>
+
+---
+
+## Filtri UNIX
+
+In UNIX, i processi che lavorano su input e producono output sono chiamati *filtri*.
+
+Il loro utilizzo tipico è quello di essere usati in *catene*,
+separate da `|` (pipe),
+per trasformare l'output di un comando precedente.
+
+### Filtraggio di base con `grep`
+
+Un esempio di filtro è `grep`, che permette di filtrare righe di testo in base a un pattern.
+
+`grep` prende un pattern da cercare in input, e restituisce le righe che contengono il pattern.
+
+```console
+$ cat commedia.txt | grep Caron 
+  E 'l duca lui: "Caron, non ti crucciare:
+  Caron dimonio, con occhi di bragia,
+e però, se Caron di te si lagna,
+```
+
+* L'opzione `-v` permette di invertire il filtro, mostrando le righe che non contengono il pattern.
+* L'opzione `-n` permette di mostrare il numero di riga.
+* L'opzione `-c` permette di mostrare il numero di occorrenze.
+
+Ad esempio, possiamo scoprire quante righe nel della Divina Commedia non contengono nè la lettera `s` nè la lettera `t`
+(si noti che il comando è case-sensitive):
+
+```console
+$ grep -v s < commedia.txt | grep -v t | grep -v S | grep -v T -c
+559
+```
+
+`grep` supporta il filtraggio utilizzando [Espressioni Regolari (regex)](https://it.wikipedia.org/wiki/Espressione_regolare#Espressioni_regolari_tradizionali_di_UNIX), che non copriamo in questo corso.
+
+---
+
+## Filtri UNIX
+
+### Trasformazione di output in argomenti: `xargs`
+
+Il comando `xargs` permette di trasformare l'output di un comando in *argomenti* di un altro.
+
+Per questo viene utilizzato spesso in combinazione con `find`.
+
+#### Esempio
+
+Stampa a schermo del contenuto di tutti i file che si chiamano info.log nella home directory dell'utente e nelle sue sottodirectory:
+
+```console
+$ find ~ -type f -name "info.log" | xargs cat
+```
+
+---
+
+## Esercizio
+
+Data una directory in `/log/my_app` con struttura non nota,
+stampare tutte le righe di tutti i file `.log` che contengono la parola `ERROR`.
+
+{{% fragment %}}
+Suggerimento: usare `find` e `cat` con `grep`.
+{{% /fragment %}}
+
+{{% fragment %}}
+```console
+$ find /log/my_app -type f -name "*.log" | xargs cat | grep ERROR
+```
+{{% /fragment %}}
+
+---
+
+## Manualistica e informazioni
+
+Ricordarsi a memoria comandi e opzioni è difficile,
+specialmente quando non vengono utilizzati quotidianamente.
+
+Per questo, è importante sapere come ottenere informazioni sui comandi e sulle opzioni.
+Fortunatamente, UNIX ha un sistema di manualistica integrato.
+
+### Cosa fa un comando? `whatis`
+
+Il comando `whatis` permette di ottenere una descrizione molto breve di un comando.
+
+```console
+$ whatis ls
+ls (1)               - list directory contents
+$ whatis whatis
+whatis (1)           - display one-line manual page descriptions
+```
+
+### Manuale completo: `man`
+
+Il comando `man` permette di visualizzare il manuale completo di un comando.
+
+### Ricerca di comandi: `apropos`
+
+Data una parola chiave, il comando `apropos` permette di cercare comandi che la contengono
+(cercando nei titoli dei manuali).
+
+---
+
+## Utenti, gruppi, e permessi
+
+Come abbiamo visto,
+in UNIX ogni file e processo ha un utente "owner",
+ed ogni file e directory ha, in aggiunta dei permessi di lettura, scrittura, ed esecuzione
+per possessore, gruppo possessore, e per tutti gli altri.
+
+Riuscire a manipolare gruppi, utenti, e permessi è quindi fondamentale per gestire un sistema UNIX.
+
+### Chi è loggato? `who`
+
+Il comando `who` permette di ottenere la lista degli utenti loggati nel sistema.
+
+### Cambiare il possessore di un file: `chown`
+
+Il comando `chown` (change owner) permette di cambiare il possessore di un file.
+
+L'opzione `-R` permette di cambiare il possessore di una directory e di tutti i suoi contenuti.
+
+Utilizzo: `chown [opzioni] nuovo_possessore file`
+
+---
+
+## Utenti, gruppi, e permessi
+
+### Cambiare permessi: `chmod`
+
+{{% multicol %}}{{% col %}}
+
+Abbiamo visto in precedenza come sono strutturati i permessi di un file, e ne abbiamo visto la rappresentazione *ottale*.
+
+Il comando `chmod` (change mode) permette di cambiare questi permessi (ammesso che l'utente abbia diritti di scrittura sul file in esame).
+
+{{% /col %}}{{% col %}}
+
+![images/octal.svg](images/octal.svg)
+
+{{% /col %}}{{% /multicol %}}
+
+Utilizzo: `chmod [opzioni] permessi_ottali file`
+
+L'opzione `-R` permette di cambiare i permessi di una directory e di tutti i suoi contenuti.
+
+**NOTA:** per le cartelle, il permesso di esecuzione è necessario per poterla attraversare.
+
+#### Esempi:
+
+* Rendere un file eseguibile da chiunque: `chmod 777 file`
+* Rendere un file eseguibile da tutti e scrivibile solo da owner: `chmod 755 file`
+* Rendere il file leggibile e scrivibile solo da owner: `chmod 600 file`
+
+
+---
+
+## Utenti, gruppi, e permessi
+
+### Privilege escalation: `sudo`
+
+Il comando `sudo` (superuser do) permette di eseguire un comando come un altro utente (di default, `root`).
+
+Perché un utente possa usare `sudo`, deve essere incluso nel file `/etc/sudoers` (o in un file incluso da esso).
+
+A meno che non sia configurato diversamente in `/etc/sudoers`, `sudo` richiede la password dell'utente corrente.
+
+È possibile anche lanciare un terminale come utente `root` con `sudo -i`.
+
+Da questo momento, negli specchietti col codice il simbolo `$` indicherà comandi lanciati da un utente normale,
+mentre `#` indicherà che il comando è eseguito come `root`
+(e quindi o è premesso da `sudo`, oppure è eseguito in un terminale privilegiato).
+
+---
+
+## Utenti, gruppi, e permessi
+
+### Creare un nuovo utente: `useradd`
+
+Il comando `useradd` permette di creare un nuovo utente.
+Utilizzo: `useradd [opzioni] nome_utente`
+
+L'opzione `-m` permette di creare la home directory per l'utente, copiandola da `/etc/skel`.
+
+L'opzione `-G` permette di aggiungere l'utente a uno o più gruppi, separati da `,` (senza spazi).
+
+L'opzione `-s` permette di specificare la shell di default per l'utente.
+
+#### Esempio:
+
+Creazione di un utente `pluto`, appartenente ai gruppi
+`lp` (stampanti),
+`audio` (audio),
+`docker` (uso di Docker),
+e `wheel` (amministratori),
+con shell di default `bash`
+e home directory popolata a partire dal contenuto di `/etc/skel`:
+
+```console
+# useradd -m -G lp,audio,docker,wheel -s /bin/bash pluto
+```
+
+---
+
+## Utenti, gruppi, e permessi
+
+### Settare o cambiare la password di un utente: `passwd`
+
+Alla creazione, un utente non ha una password,
+il che significa che non può fare il login.
+
+Per alcuni utenti "di servizio" (come `nobody` o `daemon`) questo è desiderabile,
+ma per account che richiedono un effettivo login è necessario settare una password.
+
+Il comando `passwd` permette di settare o cambiare la password di un utente.
+Il comando prende un solo argomento opzionale,
+che è il nome dell'utente di cui cambiare la password.
+Se viene omesso, `passwd` cambia la password dell'utente corrente.
+
+Per cambiare la password di un utente, è necessario essere `root` o l'utente stesso.
+
+`passwd` chiederà la vecchia password (se l'utente è diverso da `root`),
+e poi chiederà due volte la nuova password,
+cambiandola solo se le due corrispondono.
+
+---
+
+## Utenti, gruppi, e permessi
+
+### Impersonificare un utente: `su`
+
+Il comando `su` (switch user) permette di impersonare un altro utente.
+
+Il comando prende un solo argomento, che è il nome dell'utente da impersonare.
+Se viene omesso, `su` impersona l'utente `root`.
+
+`su` chiederà la password dell'utente da impersonare,
+a meno che l'utente corrente sia `root`,
+quindi, aprirà un nuovo terminale con l'utente impersonato.
+
+### Chi sono? `whoami`
+
+Dacchè è possibile impersonare altri utenti,
+potrebbe essere non chiaro chi sia l'utente corrente.
+
+Il comando `whoami` permette di ottenere il nome dell'utente corrente.
+
+---
+
+Dato che tutto è un file, *anche i dispositivi sono rappresentati come file*, e sono *"montati"* in una directory del file system.
 
 ### Identificatore di processo: PID
 
 Ogni processo in un sistema UNIX-like ha un identificatore numerico univoco, chiamato **PID** (Process IDentifier).
 
+Il PID è un numero intero positivo, e viene assegnato in ordine crescente ad ogni processo che viene creato.
 
-
----
-
-Dato che tutto è un file, *anche i dispositivi sono rappresentati come file*, e sono *"montati"* in una directory del file system.
+Il PID del processo corrente può essere ottenuto con il comando `echo $$`.
 
 ---
 
@@ -722,21 +991,7 @@ immagine con struttura file system
 
 ---
 
-* Redirezione
-    * EOF
-    * filtraggio con grep [-vnc]
-
-* Manualistica
-    * whatis
-    * man
-    * apropos
-
 * Utenti e gruppi
-    * whoami
-    * who
-    * chmod
-    * chown
-    * useradd
     * usermod
     * visudo
 

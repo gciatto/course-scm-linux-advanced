@@ -975,7 +975,27 @@ Il comando `whoami` permette di ottenere il nome dell'utente corrente.
 
 ---
 
-Dato che tutto è un file, *anche i dispositivi sono rappresentati come file*, e sono *"montati"* in una directory del file system.
+## Utenti, gruppi, e permessi
+
+### Creare un nuovo gruppo: `groupadd`
+
+Il comando `groupadd` permette di creare un nuovo gruppo.
+
+Utilizzo: `groupadd nome_gruppo`
+
+### Modifica di utenti: `usermod`
+
+Il comando `usermod` permette di modificare le proprietà di un utente.
+
+Utilizzo: `usermod [opzioni] nome_utente`
+
+Le opzioni sono simili a quelle di `useradd`.
+
+Per *aggiungere* gruppi all'utente, si può usare l'opzione `-aG`: usare `-G` invece sostituisce i gruppi esistenti con i nuovi.
+
+---
+
+## Processi, segnali, e loro gestione
 
 ### Identificatore di processo: PID
 
@@ -985,30 +1005,76 @@ Il PID è un numero intero positivo, e viene assegnato in ordine crescente ad og
 
 Il PID del processo corrente può essere ottenuto con il comando `echo $$`.
 
+### Stato corrente dei processi: `ps`
+
+Il comando `ps` (Process Status) permette di ottenere informazioni sui processi attivi.
+
+Di default, `ps` mostra i processi attivi dell'utente corrente.
+
+`ps` senza opzioni mostri i processi dell'utente corrente associati al terminale su cui ps viene lanciato.
+
+`ps a` mostra i processi di tutti gli utenti.
+
+`ps u` mostra le informazioni in formato user-oriented.
+
+`ps x` mostra informazioni sui processi che non hanno un terminale di controllo (background, demoni, servizi)
+
+Le tre opzioni vengono tipicamente combinate: `ps aux`
+
 ---
 
-immagine con struttura file system
+## Processi, segnali, e loro gestione
+
+### Segnali in UNIX
+
+UNIX consente ai processi di inviare segnali ad altri processi.
+
+I segnali sono numerici, e ciascuno ha un significato specifico.
+
+Quelli più rilevanti per noi sono:
+
+1. `SIGINT` (2) -- segnale che viene inviato alla pressione di <kbd>Ctrl</kbd><kbd>C</kbd>, che chiede al processo di terminare ordinatamente (simile a `SIGTERM`)
+1. `SIGTERM` (15) -- segnale di terminazione, che chiede al processo di terminare ordinatamente
+2. `SIGKILL` (9) -- segnale di terminazione forzata, che termina il processo immediatamente
+4. `SIGSTOP` (19) -- segnale di pausa del processo, che lo sospende senza terminarlo
+5. `SIGCONT` (18) -- segnale di continuazione del processo, che lo fa ripredere se attualmente sospeso
 
 ---
 
-* Utenti e gruppi
-    * usermod
-    * visudo
+## Processi, segnali, e loro gestione
 
-Processi, segnali, e loro gestione
-    * PID
-    * ps
-    * top e htop
-    * backgrounding (& e ^Z)
-    * kill
-    * killall
+### Invio di segnali ai processi: `kill`
+
+A dispetto del nome, il comando `kill` non "uccide" i processi, ma permette di inviare loro segnali.
+
+Sintassi: `kill [opzioni] PID`.
+Se nessuna opzione viene specificata, al processo target viene inviato un segnale `SIGTERM`.
+
+Può essere inviato un segnale diverso sostituendo `SIG` con `-`, per esempio: `kill -KILL 6754` manda un `SIGKILL` al processo con PID 6754.
+
+Con l'opzione `-s`, è possibile inviare un segnale in base al suo numero.
+Il comando precedente è equivalente a `kill -s 9 6754`
+
+### Invio di segnali a processi usando il nome: `killall`
+
+Il comando `killall` è simile a `kill`, ma invece di prendere un PID,
+prende un nome di processo e invia il segnale a tutti i processi che corrispondono a quel nome
+
+---
+
+
+## Processi, segnali, e loro gestione
+
+
+
+---
 
 * Secure Shell
     * ssh
--    * autenticazione a chiavi assimetriche
--    * ssh-keygen
--    * il demone ssh
--    * ssh.conf e sshd.conf
+    * autenticazione a chiavi assimetriche
+    * ssh-keygen
+    * il demone ssh
+    * ssh.conf e sshd.conf
     * scp
     * filezilla
 
@@ -1019,6 +1085,16 @@ Rudimenti di programmazione bash
     * iterazione (for, while)
     * sort
     * sed
+
+---
+
+Marti potresti partire da qui quando fai il file system UNIX
+
+Dato che tutto è un file, *anche i dispositivi sono rappresentati come file*, e sono *"montati"* in una directory del file system.
+
+immagine con struttura file system
+
+---
 
 ### Parte 2 -- Martina Baiardi
 
@@ -1083,69 +1159,6 @@ Rudimenti di programmazione bash
 
 https://info-ee.surrey.ac.uk/Teaching/Unix/
 
-
-# Short guide to Markdown slides
-
----
-
-# Headers
-
-# H1
-## H2
-### H3
-#### H4
-
----
-
-# Text
-
-normal text
-
-`inline code`
-
-*italic*
-
-**bold**
-
-**_emphasized_**
-
-*__emphasized alternative__*
-
-~~strikethrough~~
-
-[link](http://www.google.com)
-
----
-
-# Lists and enums
-
-1. First ordered list item
-1. Another item
-    * Unordered sub-list.
-    * with two items
-        * another sublist
-            1. With a sub-enum
-            1. yay!
-1. Actual numbers don't matter, just that it's a number
-  1. Ordered sub-list
-1. And another item.
-
----
-
-# Inline images
-
-![Alternative text](https://upload.wikimedia.org/wikipedia/commons/6/6c/Scavolino_innevata.jpg)
-
----
-
-## Fallback to shortcodes for resizing
-
-Autoresize specifying
-
-* `max-w` (percent of parent element width) and/or `max-h` (percent of viewport height) as max sizes , and
-* `width` and/or `height` as *exact* sizes (as percent of viewport size)
-
-{{< figure src="https://upload.wikimedia.org/wikipedia/commons/6/6c/Scavolino_innevata.jpg" height="20">}}
 
 ---
 

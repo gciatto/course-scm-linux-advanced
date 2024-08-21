@@ -79,7 +79,7 @@ Sistemi operativi che rispettano POSIX sono detti *POSIX-compliant*
 che *insieme costituiscono un sistema operativo*. Sebbene non certificato POSIX, aderisce in larga parte allo standard.
 
 Una **Distribuzione Linux** (
-<i class="fa-brands fa-ubuntu"></i>, 
+<i class="fa-brands fa-ubuntu"></i>,
 <i class="fa-brands fa-debian"></i>,
 <i class="fa-brands fa-suse"></i>,
 <i class="fa-brands fa-redhat"></i>,
@@ -197,7 +197,7 @@ Normalmente, alla sua apertura, si trova nella *home directory* dell'utente.
 Possiamo sempre sapere in che directory ci troviamo con il comando `pwd` (print working directory).
 
 ```console
-$ pwd                                                  
+$ pwd
 /home/danysk/LocalProjects
 ```
 
@@ -515,7 +515,29 @@ Ciascuna shell salva la storia per ogni utente su un file nascosto nella home di
 Indipendentemente da quale file la contiene,
 la storia può essere visualizzata con il comando `history`.
 
-Inoltre, è possibile cercare rapidamente nella storia con <kbd>Ctrl</kbd><kbd>R</kbd> (reverse search). Gli ultimi comandi possono essere scorsi con <kbd><i class="fa-solid fa-arrow-up"></i></kbd> (previous) e <kbd><i class="fa-solid fa-arrow-down"></i></kbd> (next).
+Inoltre, è possibile cercare rapidamente nella storia con <kbd>Ctrl</kbd><kbd>R</kbd> (reverse search).
+Gli ultimi comandi possono essere scorsi con
+<kbd><i class="fa-solid fa-arrow-up"></i></kbd> (previous) e <kbd><i class="fa-solid fa-arrow-down"></i></kbd> (next).
+
+I comandi possono essere modificati a piacimento, e lanciati con <kbd><?xml version="1.0" encoding="UTF-8"?><svg width="1em" height="1em" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="#000000"><path d="M10.25 19.25L6.75 15.75L10.25 12.25" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M6.75 15.75H12.75C14.9591 15.75 16.75 13.9591 16.75 11.75V4.75" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</kbd>.
+
+---
+
+## Strumenti di base del terminale
+
+### Copia-incolla col mouse
+
+Sugli emulatore di terminale moderni, è possibile copiare e incollare con il mouse:
+1. selezionare il testo usando il mouse, tasto sinistro
+2. posizionare il cursore dove si vuole incollare usando la tastiera
+3. premere il tasto centrale del mouse per incollare
+
+**ATTENZIONE**: <kbd>Ctrl</kbd><kbd>C</kbd> e <kbd>Ctrl</kbd><kbd>V</kbd> **non** funzionano in terminale!
+Specialmente, il primo fa tutt'altro, vedremo poi.
+Molti emulatori di terminale supportano però il copia-incolla tramite tastiera usando:
+* <kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>C</kbd> dopo aver selezionato il testo col mouse, e
+* <kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>V</kbd> per incollare.
 
 ---
 
@@ -701,6 +723,31 @@ echo: shell built-in command
 pippo not found
 ```
 
+---
+
+## Struttura del file system Linux
+
+![ROOT.svg](images/ROOT.svg)
+
+---
+
+## Collegamenti simbolici
+
+Un *collegamento simbolico* (o *link simbolico*) è un file speciale che punta ad un altro file o directory.
+
+Il comportamento è analogo a quello di un collegamento in Windows (file `.lnk`), ma è più potente:
+* è gestito a livello di file system, mentre su Windows i file `.lnk` sono tipicamente scorciatoie per il file manager
+* non ha obbligo di estensione, è un *alias* e non una *scorciatoia*
+
+### Creazione di un collegamento simbolico: `ln -s`
+
+Il comando `ln` (link) permette di creare collegamenti simbolici.
+L'opzione `-s` (symbolic) permette di creare un collegamento simbolico.
+
+Sintassi: `ln -s file-target file-link` crea un nuovo collegamento simbolico `file-link` che punta a `file-target`.
+
+Quando si utilizza `ls -l`,
+i collegamenti simbolici sono riconoscibili dal fatto che il nome del file è preceduto da `->`.
 
 ---
 
@@ -742,7 +789,7 @@ Un esempio di filtro è `grep`, che permette di filtrare righe di testo in base 
 `grep` prende un pattern da cercare in input, e restituisce le righe che contengono il pattern.
 
 ```console
-$ cat commedia.txt | grep Caron 
+$ cat commedia.txt | grep Caron
   E 'l duca lui: "Caron, non ti crucciare:
   Caron dimonio, con occhi di bragia,
 e però, se Caron di te si lagna,
@@ -1011,7 +1058,7 @@ Il comando `ps` (Process Status) permette di ottenere informazioni sui processi 
 
 Di default, `ps` mostra i processi attivi dell'utente corrente.
 
-`ps` senza opzioni mostri i processi dell'utente corrente associati al terminale su cui ps viene lanciato.
+`ps` senza opzioni mostra i processi dell'utente corrente associati al terminale su cui ps viene lanciato.
 
 `ps a` mostra i processi di tutti gli utenti.
 
@@ -1062,25 +1109,312 @@ prende un nome di processo e invia il segnale a tutti i processi che corrispondo
 
 ---
 
+## Secure shell
 
-## Processi, segnali, e loro gestione
+Secure Shell (SSH) è un protocollo di rete che permette di accedere a un computer remoto in maniera sicura.
 
+Permette di:
+* aprire una shell remota, e quindi fare amministrazione da remoto
+  * incluso l'inoltro di informazioni grafiche
+* trasferire file in maniera sicura
+* costruire un tunnel sicuro per trasferire traffico non sicuro
+
+È composto di due parti:
+* Un *server*, `sshd`, che ascolta di default sulla porta 22 (ma può essere configurato per usarne un'altra)
+* Un *client*, `ssh`, che permette di aprire una shell remota su un sistema dove `sshd` sia in esecuzione
+
+In questo corso base, ci concentreremo sul client.
+
+---
+
+## Secure shell
+
+### Connessione a un server remoto: `ssh`
+
+Il comando `ssh` permette di aprire una shell remota su un server.
+
+Sintassi: `ssh utente@indirizzo-server`
+* L'utente è opzionale. Se non specificato, viene usato il nome dell'utente corrente.
+* L'indirizzo del server può essere un nome di dominio o un indirizzo IP
+* Se il server remoto è in ascolto su una porta diversa dalla `22`, occorre specificarla con l'opzione `-p`
+    * Esempio: `ssh -p 2222 utente@indirizzo-server`
+
+All'arrivo di una richiesta di apertura di una sessione,
+il server tenterà di autenticare l'utente.
+
+La configurazione del server può cambiare, normalmente i metodi di autenticazione sono:
+1. chiave pubblica/privata
+2. password
+
+Il primo metodo è considerato, più sicuro, ma può essere meno pratico.
+
+---
+
+## Secure shell
+
+### Crittografia a chiavi asimmetriche
+
+L'autenticazione a chiavi asimmetriche è un meccanismo di riconoscimento che si basa su due codici (chiavi):
+* una **chiave pubblica**, che può essere *distribuita liberamente*
+* una **chiave privata**, che deve essere mantenuta *segreta*
+
+Il meccanismo funziona come segue:
+* Un'informazione può essere cifrata con ciascuna delle due chiavi
+* L'informazione cifrata con una delle due chiavi può essere decifrata solo con l'*altra* chiave
+
+Utilizzando opportunamente le due chiavi, la crittazione asimmetrica consente di implementare:
+* invio di messaggi firmati (autenticazione)
+* invio di messaggi segreti
+* invio di messaggi segreti e firmati
+
+---
+
+## Secure shell
+
+### Esempi con crittografia a chiavi asimmetriche
+
+Alcuni esempi, usando la notazione seguente:
+* <box-icon name='spreadsheet'></box-icon> rappresenta i dati non cifrati,
+* <box-icon name='key' type='solid' rotate='45'></box-icon>
+e
+<box-icon name='key' flip='horizontal' rotate='180'></box-icon> rappresentano le chiavi pubblica e privata rispettivamente,
+* i simboli
+<box-icon type='solid' name='lock-alt'></box-icon>
+e
+<box-icon name='lock-alt'></box-icon>
+i dati cifrati con le medesime.
+
+Valgono le seguenti proprietà:
+
+* <box-icon name='spreadsheet'></box-icon> +
+<box-icon name='key' type='solid' rotate='45'></box-icon> =
+<box-icon type='solid' name='lock-alt'></box-icon>
+<i class="fa-solid fa-right-long"></i>
+*messaggio segreto* per il possessore della chiave <box-icon name='key' flip='horizontal' rotate='180'></box-icon>
+* <box-icon name='spreadsheet'></box-icon> +
+<box-icon name='key' flip='horizontal' rotate='180'></box-icon> =
+<box-icon name='lock-alt'></box-icon>
+<i class="fa-solid fa-right-long"></i>
+*messaggio firmato* dal possessore della chiave <box-icon name='key' flip='horizontal' rotate='180'></box-icon>
+* <box-icon type='solid' name='lock-alt'></box-icon> +
+<box-icon name='key' flip='horizontal' rotate='180'></box-icon> =
+<box-icon name='spreadsheet'></box-icon>
+<i class="fa-solid fa-right-long"></i>
+*decrittazione* di un messaggio segreto
+* <box-icon name='lock-alt'></box-icon> +
+<box-icon name='key' type='solid' rotate='45'></box-icon> =
+<box-icon name='spreadsheet'></box-icon>
+<i class="fa-solid fa-right-long"></i>
+*verifica della firma* (chiunque può controllare )
+
+Si noti che utilizzando solo la chiave pubblica <box-icon name='key' type='solid' rotate='45'></box-icon>
+è possibile mandare messaggi al possessore di <box-icon name='key' flip='horizontal' rotate='180'></box-icon>
+e verificare che l'autore di un certo messaggio sia proprio il possessore di <box-icon name='key' flip='horizontal' rotate='180'></box-icon>,
+ma **non** è possibile leggere messaggi crittati con <box-icon name='key' type='solid' rotate='45'></box-icon>:
+la crittografia è quindi detta **asimmetrica**,
+perché le due chiavi sono complementari, e l'unico che può fare tutte le operazioni è chi le possiede entrambe
+(ossia, chi possiede la chiave privata <box-icon name='key' flip='horizontal' rotate='180'></box-icon>,
+dato che <box-icon name='key' type='solid' rotate='45'></box-icon> è nota a tutti)
+
+---
+
+## Secure shell
+
+### Configurazione delle chiavi asimmetriche
+
+Lo strumento per generare le chiavi asimmetriche è `ssh-keygen`.
+
+**Nota**: qui si mostra la generazione di una chiave con impostazioni di default.
+Per un uso sicuro, si consiglia di seguire le [moderne pratiche di sicurezza](https://archive.is/3Pn0L).
+
+Una chiave di default può essere generata lanciando semplicemente `ssh-keygen`,
+confermando i default proposti.
+Se viene inserita una password, la chiave privata sarà cifrata e richiederà la password per essere utilizzata.
+È possibile creare chiavi prive di password semplicemente non inserendola.
+
+Al termine dell'operazione, la chiave pubblica <box-icon name='key' type='solid' rotate='45'></box-icon> sarà salvata in `~/.ssh/id_rsa.pub`.
+Nella stessa cartella si troverà la chiave privata <box-icon name='key' flip='horizontal' rotate='180'></box-icon>, `~/.ssh/id_rsa`.
+
+La chiave privata **non va mai condivisa**, mentre quella pubblica può essere distribuita agli amministratori dei sistemi cui dobbiamo avere accesso.
+
+Per autorizzare una chiave SSH all'ingresso di un server, è sufficiente aggiungerla al file `~/.ssh/authorized_keys` *del server*
+<br>
+(va quindi fatta da qualcuno che abbia accesso alla macchina server con diritti amministrativi).
+
+Una volta fatto, sarà possibile accedere al server senza alcuna password
+(eccetto quella necessaria a decrittare la propria chiave privata, se è stata inserita in fase di configurazione).
+
+---
+
+## Secure shell
+
+### Autenticazione tramite password
+
+L'autenticazione tramite password non richiede alcuna configurazione.
+
+Se l'autenticazione tramite chiavi, che viene tentata per prima perché più sicura,
+non ha successo,
+allora viene chiesto l'inserimento della password dell'utente remoto.
+
+La password che va inserita è quella dell'utente remoto, esattamente come verrebbe chiesta se ci si loggasse direttamente sul server.
+
+```console
+[pluto@notebook ~]$ whoami
+pluto
+[pluto@notebook ~]$ ssh pippo@my-server.my-domain.com
+Password: ******** # Password di pippo, non di pluto
+[pippo@server ~]$ whoami
+pippo
+```
+
+---
+
+## Secure shell
+
+### Configurazione di SSH
+
+SSH ed il demone `sshd` sono configurabili tramite file di configurazione che si trovano in `/etc/ssh`.
+* `ssh_config` è il file di configurazione del client
+* `sshd_config` è il file di configurazione del server
+
+I file sono ben commentati, e la configurazione di default è generalmente sufficiente per la maggior parte degli utilizzi.
+
+Per modificare la configurazione, è necessario avere i diritti di amministratore.
+
+### X forwarding
+
+Se il server è configurato per supportarlo (impostazione disattivata di default),
+è possibile lanciare programmi grafici remotamente e visualizzarli localmente.
+
+Per farlo, si deve lanciare `ssh` con l'opzione `-X` o `-Y` (si raccomanda la seconda).
+
+![images/x11-forwarding.png](images/x11-forwarding.png)
+
+---
+
+## Secure shell
+
+### Copia di file tramite SSH: `scp`
+
+Un utilizzo molto comune di SSH è la copia di file da e verso un server remoto
+tramite il protocollo SFTP (Secure File Transfer Protocol).
+
+Il comando `scp` (secure copy) permette di copiare file da e verso un server remoto
+passando attraverso una connessione sicura SSH.
+
+Sintassi: `scp [opzioni] file_origine file_destinazione`
+
+dove `file_origine` e `file_destinazione` possono essere:
+* file locali (quindi percorsi assoluti o relativi) o
+* file remoti, con formato `utente@server:percorso`
+    * In questo caso, `percorso` deve essere assoluto, oppure relativo a partire dalla home directory dell'utente remoto
+
+#### Esercizio
+
+1. Ispezionare localmente la configurazione sshd del server remoto `my-server.my-domain.com`,
+dove sono configurati gli utenti `user` e `root`,
+dei quali si conosce la password.
+copiando localmente il file che la contiene.
+2. Assumendo che la configurazione sia stata modificata, copiare il file modificato sul server remoto.
+
+{{% fragment %}}
+```console
+$ scp user@my-server.my-domain.com:/etc/ssh/sshd_config server_sshd_config
+$ # Modifica il file
+$ scp server_sshd_config root@my-server.my-domain.com:/etc/ssh/sshd_config
+```
+{{% /fragment %}}
+
+
+* {{% fragment %}} Perché sono stati usati due utenti diversi? {{% /fragment %}}
+* {{% fragment %}} Cosa sarebbe successo se si fosse usato sempre `root`? {{% /fragment %}}
+* {{% fragment %}} Cosa sarebbe successo se si fosse usato `user` per entrambe le operazioni? {{% /fragment %}}
 
 
 ---
 
-* Secure Shell
-    * ssh
-    * autenticazione a chiavi assimetriche
-    * ssh-keygen
-    * il demone ssh
-    * ssh.conf e sshd.conf
-    * scp
-    * filezilla
+## Secure shell
+
+### Client grafico multipiattaforma per SFTP: FileZilla
+
+FileZilla consente il trasferimento di file da e verso server SSH in modo grafico.
+È gratuito ed open source, e funziona su <i class="fa-brands fa-windows"></i>, <i class="fa-brands fa-linux"></i>, e <i class="fa-brands fa-apple"></i>.
+
+![filezilla_snapshot.png](images/filezilla_snapshot.png)
+
+---
+
+## Secure shell
+
+### FileZilla: configurazione di un accesso a server SFTP
+
+![filezilla_sftp.png](images/filezilla_sftp.png)
+
+---
+
+## Bash scripting
+
+Il terminale è in realtà una Read-Eval-Print Loop (REPL) per il linguaggio di programmazione `bash`,
+che significa che:
+1. è possibile scrivere script in `bash` e lanciarli da terminale
+2. è possibile utilizzare istruzioni di programmazione (definizione di variabile, cicli, condizionali, ecc.) direttamente nel terminale
+
+### Scripting in bash
+
+Uno *script* è un file di testo contenente una sequenza di comandi che possono essere eseguiti in sequenza.
+
+La prima riga di uno script bash ben formato deve essere la *shebang line*,
+che indica il percorso dell'interprete da usare per eseguire lo script.
+
+```bash
+#!/bin/bash
+```
+
+Si noti che, cambiando la shebang line, è possibile scrivere script in altri linguaggi, ad esempio Python, Ruby, Kotlin, eccetera.
+* `#!/usr/bin/env python`
+* `#!/usr/bin/env ruby`
+* `#!/usr/bin/env kotlin`
+
+Perché sia eseguibile direttamente, lo script deve avere i permessi di esecuzione, che possono essere assegnati con
+* `chmod +x script_file`
+
+---
+
+## Bash scripting
+
+### Variabili
+
+Le variabili in bash sono definite senza dichiarazione di tipo, e sono sempre stringhe.
+
+Per assegnare un valore a una variabile, si usa l'operatore `=`, che va usato senza spazi:
+```bash
+nome_variable="valore"
+```
+
+La variabile può essere letta prefiggendo al nome il simbolo `$`:
+```console
+$ echo $nome_variable
+valore
+```
+
+#### String interpolation
+
+Le variabili possono essere interpolate in stringhe con le doppie virgolette:
+```console
+$ echo "Il valore della variabile è $nome_variable"
+Il valore della variabile è valore
+```
+
+Al contrario, le singole virgolette non interpolano le variabili:
+```console
+$ echo 'Il valore della variabile è $nome_variable'
+Il valore della variabile è $nome_variable
+```
+
+---
 
 Rudimenti di programmazione bash
     * variabili
-    * script, shebang line
     * condizionali (if, until)
     * iterazione (for, while)
     * sort

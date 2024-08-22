@@ -1397,10 +1397,20 @@ $ echo $nome_variable
 valore
 ```
 
-#### String interpolation
+I nomi di variabili possono contenere lettere, numeri, e `_`, ma non devono iniziare con un numero
+* in altre parole, devono fare match con la RegEx `[a-zA-Z_][a-zA-Z0-9_]*`
 
-Le variabili possono essere interpolate in stringhe con le doppie virgolette:
+Convenzionalmente, si usano nomi di variabili in maiuscolo per le *costanti* e in minuscolo per *variabili*.
+
+---
+
+## Bash scripting
+
+### String expansion: variabili
+
+Le variabili possono essere interpolate (*espanse*) in stringhe con le doppie virgolette:
 ```console
+$ nome_variable="valore"
 $ echo "Il valore della variabile è $nome_variable"
 Il valore della variabile è valore
 ```
@@ -1411,14 +1421,275 @@ $ echo 'Il valore della variabile è $nome_variable'
 Il valore della variabile è $nome_variable
 ```
 
+**ATTENZIONE**: l'espansione di una variabile non assegnata non è un errore
+(comportamento modificabile),
+ma la stringa vuota `''''`!
+
+```console
+$ echo "Il valore della variabile è $nome_varbaile" # Notare l'errore di battitura
+Il valore della variabile è
+```
+
+È possibile utilizzare le parentesi graffe per identificare il nome di una variabile ed evitare casi di ambiguità:
+```console
+$ variabile="prova"
+$ echo "Stasera sono ${variabile}to"
+Stasera sono provato
+$ echo "Stasera sono $variabileto"
+Stasera sono
+```
+
 ---
 
-Rudimenti di programmazione bash
-    * variabili
-    * condizionali (if, until)
-    * iterazione (for, while)
-    * sort
-    * sed
+## Bash scripting
+
+In bash, è possibile interpolare come stringhe l'output di comandi e e di operazioni aritmetiche.
+
+### Command output expansion
+
+Per eseguire un comando e usare il suo output come stringa, si usa la *command output expansion*,
+che si ottiene racchiudendo il comando tra parentesi tonde:
+```console
+$ echo "Oggi è $(date)"
+Oggi è Mon 25 Oct 2021 10:00:00 AM CEST
+```
+
+### Arithmetic expansion
+
+Per eseguire operazioni aritmetiche, si usa la *arithmetic expansion*,
+che si ottiene racchiudendo l'operazione tra parentesi tonde e precedendo la parentesi aperta con `$((`:
+```console
+$ echo "2 + 2 fa $((2 + 2))"
+2 + 2 fa 4
+```
+
+**NOTA:** il design di queste operazioni è per numeri interi.
+Sebbene `zsh` supporti operazioni in virgola mobile, `bash` ed `sh` non lo fanno.
+
+---
+
+## Bash scripting
+
+### Condizionali
+
+I condizionali in bash sono simili a quelli in altri linguaggi di programmazione.
+
+La sintassi di base è:
+```bash
+if comandi; then comando1; comando2; ...; comandoN; fi
+```
+
+I `;` possono essere sostituiti da degli a capo negli script per rendere il codice più leggibile:
+
+```bash
+if condizione; then
+    comando1
+    comando2
+    ...
+    comandoN
+fi
+```
+
+La `condizione` deve essere un comando che restituisce un valore di uscita (exit status)
+uguale a 0 per essere considerata vera
+* si noti che è l'opposto di quello che succede in C, dove `0` è considerato falso e qualunque altro numero è vero.
+Questo perché, per convenzione, lo stato di uscita `0` di un processo indica che il processo è terminato correttamente.
+
+Esistono due comandi built-in `true` e `false` che restituiscono rispettivamente 0 e 1.
+
+---
+
+## Bash scripting
+
+### Condizionali
+
+
+Prima di `fi`, è possibile inserire un blocco `else`:
+```bash
+if comandi; then
+    ...
+else
+    ...
+fi
+```
+
+È possibile concatenare più condizioni con `elif`:
+```bash
+if condizione1; then
+    ...
+elif condizione2; then
+    ...
+else
+    ...
+fi
+```
+
+---
+
+## Bash scripting
+
+### Il comando `test`
+
+Il comando più frequentemente utilizzato come condizione nei branch è `test`.
+Il comando ha due sintassi distinte ed equivalenti, la seconda delle quali è più comune:
+* `test condizione`
+* `[ condizione ]`
+
+è interessante notare che `[` è un comando a sé stante, e `]` è un argomento di esso.
+
+Le condizioni più comuni sono:
+* `-e file` -- il file esiste
+* `-f file` -- il file esiste ed è un file
+* `-d file` -- il file esiste ed è una directory
+* `-z stringa` -- la stringa è vuota
+* `-n stringa` -- la stringa non è vuota
+* `stringa1 = stringa2` -- le stringhe sono uguali
+* `stringa1 != stringa2` -- le stringhe sono diverse
+* `n1 -eq n2` -- i numeri sono uguali
+* `n1 -ne n2` -- i numeri sono diversi
+* `n1 -lt n2` -- il primo numero è minore del secondo
+* `n1 -le n2` -- il primo numero è minore o uguale al secondo
+* `n1 -gt n2` -- il primo numero è maggiore del secondo
+* `n1 -ge n2` -- il primo numero è maggiore o uguale al secondo
+
+---
+
+## Bash scripting
+
+### Iterazione: `while` e `until`
+
+Il ciclo `while` esegue un blocco di comandi fintanto che una condizione è vera,
+similmente a quanto accade in molti linguaggi di programmazione.
+La sintassi è simila a quella di `if`:
+```bash
+while condizione; do comando1; comando2; done
+# Alternativa
+while condizione; do
+    comando1
+    comando2
+done
+```
+
+La `condizione` funziona esattamente come in `if`.
+
+Il ciclo `until` è simile a `while`, ma esegue il blocco fintanto che la condizione è falsa,
+e può essere utile per scrivere script idiomatici.
+
+---
+
+## Bash scripting
+
+### Iterazione: `for`
+
+Il ciclo `for` esegue un blocco di comandi per ciascun elemento di una lista.
+
+```bash
+for variabile in elemento0 elemento1 elemento2; do comando1; comando2; done
+```
+
+Ad ogni iterazione, a `variabile` viene assegnato il valore dell'elemento corrente.
+
+Un uso interessante di for è iterare su un insieme di file.
+Ad esempio, se volessimo stampare il contenuto di tutti i file `txt` il cui nome comincia per `2024`,
+potremmo scrivere:
+
+```bash
+for file in 2024*.txt; do
+  cat $file;
+done
+```
+
+---
+
+## Bash scripting
+
+### Ordinamento: `sort`
+
+Il comando `sort` permette di ordinare le righe di un file lessicograficamente,
+oppure, con l'opzione `-n`.
+
+Per ordinare un file `file.txt` e stamparne il contenuto ordinato, si può usare:
+```bash
+sort file.txt
+```
+
+`sort` funziona anche come filtro, quindi può essere usato in pipe.
+
+L'ordinamento inverso può essere ottenuto con l'opzione `-r`.
+
+### Identificazione di linee ripetute: `uniq`
+
+Il comando `uniq` permette di identificare e rimuovere linee ripetute *consecutivamente* in un file.
+
+Un'opzione particolarmente utile è `-c`, che conta le occorrenze di ciascuna linea.
+
+Può essere usato assieme con `sort` per identificare le linee identiche,
+dato che anch'esso funziona come filtro.
+
+Ad esempio, il seguente esempio conta le occorrenze di ciascuna linea in un file `file.txt`,
+e le mostra dalla meno alla più frequente:
+```bash
+sort file.txt | uniq -c | sort -n
+```
+
+---
+
+## Bash scripting
+
+### Sostituzione di testo: `sed`
+
+Il comando `sed` (stream editor) permette di sostituire testo in un flusso di testo.
+
+Prende due argomenti:
+1. una stringa che identifica il tipo di modifica da effettuare
+    * il formato è `s/pattern/replacement/flags`
+    * il carattere `/` può essere sostituito con qualsiasi altro carattere,
+    se necessario usarlo in pattern o replacement
+    (ad esempio, `s@pattern@replacement@flags`)
+    * l'utilizzo più semplice è quello di sostituire la prima occorrenza di `pattern` con `replacement`: `s/pattern/replacement/`
+    * per sostituire tutte le occorrenze, si aggiunge il flag `g`: `s/pattern/replacement/g`
+2. il file da cui leggere le linee
+
+Il risultato non viene scritto sul file, ma stampato sullo standard output.
+
+Se si desidera invece modificare il file originale, è possibile usare l'opzione `-i` (modifica "in place").
+
+Per esempio, per sostituire tutte le occorrenze di `debito` con `credito` all'interno di un file `tasse.txt`:
+```bash
+sed -i 's/debito/credito/g' tasse.txt
+```
+
+---
+
+## Esercizio: hacking session
+
+L'esercizio di riferimento per noi sarà il gioco "Bandit" di [OverTheWire](https://overthewire.org/wargames/),
+una community di hacking.
+
+Per tutta la durata degli esercizi, è consentito l'uso del materiale didattico,
+di Internet, e ovviamente dei comandi di documentazione come `man`.
+
+Lo scopo del gioco è quello di violare la sicurezza degli utenti sul server `bandit.labs.overthewire.org`,
+che si chiamano `banditN`, dove `N` è un numero intero.
+Violeremo per prima cosa la sicurezza dell'utente `bandit0`,
+che è stato sprovveduto e ha inserito il proprio nome utente come password.
+
+Ogni utente di cui riusciremo a violare la sicurezza
+avrà accesso alle informazioni necessarie per violare la sicurezza dell'utente successivo
+(ad esempio, dall'account di `bandit3`, operando col terminale, potremo trovare la password di `bandit4`).
+
+1. Si entri nel server `bandit.labs.overthewire.org` impersonando l'utente `bandit0`
+2. Collegarsi a https://overthewire.org/wargames/bandit/bandit1.html.
+Dato un qualunque utente, questo sito web ci fornisce informazioni su dove trovare la password di quello successivo
+    * In caso di problemi (anche con la lingua) interpellare il docente
+3. Nel caso in cui non si riesca a trovare la password in modo autonomo, si interpelli il docente per una spiegazione o aiuto
+4. Una volta che la password è stata trovata, si contatti il docente per una verifica dell'approccio adottato
+5. Si proceda a violare la sicurezza dell'utente successivo, ripetendo i passaggi da 3 a 5, fino a raggiungere il livello 10
+
+**ATTENZIONE**: a partire dal livello 10, saranno necessarie conoscenze ulteriori rispetto a quelle fornite in questo corso,
+che sarete però in grado di acquisire a partire da quanto conosciamo già!
+
+Il mondo cambia continuamente, *imparare a imparare* è più importante che imparare <i class="fa-solid fa-face-smile-wink"></i>
 
 ---
 

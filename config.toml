@@ -1,6 +1,6 @@
 baseURL = "https://danysk.github.io/course-scm-linux-base"
 languageCode = "en-us"
-title = "Linux Base, parte 1"
+title = "Linux Base"
 disableKinds = ["sitemap", "RSS"]
 theme = "reveal-hugo"
 publishDir = "build"

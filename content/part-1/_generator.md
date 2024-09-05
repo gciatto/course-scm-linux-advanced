@@ -3,6 +3,9 @@
 title = "Basi di Linux, parte prima"
 description = "Corso Linux Base @SCM Group"
 outputs = ["Reveal"]
+aliases = [
+  "1"
+]
 
 +++
 
@@ -1686,76 +1689,3 @@ Dato un qualunque utente, questo sito web ci fornisce informazioni su dove trova
 che sarete però in grado di acquisire a partire da quanto conosciamo già!
 
 Il mondo cambia continuamente, *imparare a imparare* è più importante che imparare <i class="fa-solid fa-face-smile-wink"></i>
-
----
-
-Marti potresti partire da qui quando fai il file system UNIX
-
-Dato che tutto è un file, *anche i dispositivi sono rappresentati come file*, e sono *"montati"* in una directory del file system.
-
-immagine con struttura file system
-
----
-
-### Parte 2 -- Martina Baiardi
-
-- Basic Linux Networking
-  - LAN vs WAN
-  - ISO OSI
-- Layer 2
-  - mac address
-  - Loopback interface
-  - Ethernet/Wi-Fi interfaces
-- Layer 3
-  - TCP/IPv4 addresses
-    - format
-    - netmasks
-  - DHCP
-  - NAT
-  - DNS
-  - NTP
-  - Network manager
-- Network configuration
-    - ip command
-    - systemd/networkd
-    - nmcli command
-    - /etc/network/interfaces
-    - ping command
-    - traceroute
-    - nslookup
-    - netstat
-    - configurazione rete tramite dhcp
-    - configurazione rete WPA2/WPA3
-        - wpa_cli command
-- Network tools
-  - /etc/hosts
-  - curl
-  - wget
-
-## Strumenti per analisi processi
-- Foreground and Background processes
-- Process states
-- load average
-- ps command
-- top/htop command
-- kill command
-
-## Strumenti per analisi risorse di sistema
-
-## Log di sistema
-- log rotate e gestione dei log di systemctl (size, persistence time)
-- /var/log
-- journalctl
-
-
-* Gestione di file systems
-    * df
-    * montaggio e smontaggio di partizioni (mount, umount)
-
-## Utilizzo periferiche (es: porte USB) su Linux
-- Rintracciare dispositivi esterni
-- montare il percorso di tali dispositivi
-- lsusb
-- lspci
-
-https://info-ee.surrey.ac.uk/Teaching/Unix/

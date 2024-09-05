@@ -1,6 +1,6 @@
 +++
 
-title = "Basi di Linux"
+title = "Basi di Linux, parte second"
 description = "Corso Linux Base @SCM Group"
 outputs = ["Reveal"]
 

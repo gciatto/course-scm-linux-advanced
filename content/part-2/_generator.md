@@ -3,6 +3,9 @@
 title = "Basi di Linux, secondo modulo"
 description = "Corso Linux Base @SCM Group"
 outputs = ["Reveal"]
+aliases = [
+  "1"
+]
 
 +++
 

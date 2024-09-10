@@ -25,7 +25,7 @@ custom_theme_compile = true
 
 ## 1. Gestione periferiche
 
-## 2. Analisi e gestione dei processi
+## 2. Strumenti di analisi e gestione dei processi
 
 ## 3. Networking
 
@@ -35,7 +35,6 @@ custom_theme_compile = true
 
 ---
 
-## Connessione delle periferiche
 
 <div class='multiCol'>
 <div class='col text-center'>
@@ -44,6 +43,8 @@ custom_theme_compile = true
 
 </div>
 <div class='col'>
+
+### Connessione delle periferiche
 
 - Tutte le periferiche sono connesse tramite un bus standard *PCI* (*Peripheral Component Interconnect*)
 - Alcune di esse comunicano direttamente con il bus, altre tramite i *controller*
@@ -58,7 +59,7 @@ altri invece consentono di utilizzare protocolli standard per connettersi a peri
 
 ---
 
-## Analisi delle periferiche connesse al bus PCI
+### Analisi delle periferiche connesse al bus PCI
 
 ### `lspci`
 
@@ -139,15 +140,38 @@ Bus 002 Device 003: ID 152d:0578 JMicron Technology Corp. / JMicron USA Technolo
 
 ---
 
-## Gestione delle periferiche in Linux
+
 
 <div class='multiCol'>
 <div class='col text-center'>
 
-![../images/linux-device-drivers.svg](../images/linux-device-drivers.svg)
+<img src="../images/linux-device-drivers.svg" width=80% />
 
 </div>
 <div class='col'>
+
+### Driver 
+
+I *driver* sono moduli software di basso livello che consentono al sistema operativo di pilotare un dispositivo hardware. 
+Un insieme di driver standard sono già previsti all'interno del sistema operativo, per dispositivi particolari potrebbe essere necessario installare driver aggiuntivi.
+
+Il sistema operativo espone poi delle interfacce standard per interagire con i dispositivi in modo **trasparente** per l'applicazione utente.
+
+</div>
+</div>
+
+---
+
+
+<div class='multiCol'>
+<div class='col text-center'>
+
+<img src="../images/linux-device-drivers.svg" width=80% />
+
+</div>
+<div class='col'>
+
+### File dispositivo
 
 La filosofia *"everything is a file"* si applica anche per le periferiche connesse alla macchina,
 infatti esistono dei file speciali nella cartella */dev* che sono la rappresentazione nel file system dei dispositivi.
@@ -160,7 +184,18 @@ però essi rappresentano delle interfacce di basso livello che le applicazioni u
 
 ---
 
-## Gestione dei dispositivi in Linux
+
+<div class='multiCol'>
+<div class='col text-center'>
+
+### File dispositivo
+
+All'interno della cartella */dev* risiedono due categorie di file: 
+- **Character special files (c)**: I/O basato sullo scambio di singoli caratteri (di dimensione 1 byte). Fanno parte di questa categoria dispotivi come *mouse*, *tastiere* e *schede audio*.
+- **Block special files (b)**: I/O basato sullo scambio di *blocchi* di dati. Fanno parte di questa categoria *usb* e *hard disk*.
+
+</div>
+<div class='col'>
 
 ```console
 $ ls -alh /dev
@@ -188,9 +223,27 @@ brw-rw----   1 root disk     8,     2  2 set 14.47 sda2
 [...]
 ```
 
-All'interno della cartella */dev* risiedono due categorie di file: 
-- **Character special files (c)**: I/O basato sullo scambio di singoli caratteri (di dimensione 1 byte). Fanno parte di questa categoria dispotivi come *mouse*, *tastiere* e *schede audio*.
-- **Block special files (b)**: I/O basato sullo scambio di *blocchi* di dati. Fanno parte di questa categoria *usb* e *hard disk*.
+</div>
+</div>
+
+---
+
+### Character device
+
+Per comprendere meglio che cos'è un device che comunica tramite un *character special file*, consideriamo il mouse.
+
+Tutti i file all'interno della directory `/dev/input` consentono la comunicazione con le periferiche di input del nostro sistema (ad esempio: tastiera, mouse, webcam, ...).
+
+All'interno della directory `/dev/input/by-path` è possibile esplorare i dispositivi in maniera "user-friendly". 
+
+<br />
+
+**Domanda**: Cosa succede eseguendo il comando `cat /dev/input/mice`?
+
+{{% fragment %}}
+Sto visualizzando i byte che il mio mouse invia al sistema operativo ad ogni movimento!
+{{% /fragment %}}
+
 
 ---
 
@@ -216,7 +269,29 @@ All'interno della cartella */dev* è possibile distinguere:
 - Il block device `/dev/nvme0n1` rappresenta il namespace 1 all'interno del primo disco NVMe. 
 - Il block device `/dev/nvme0n1p[1-15]` rappresenta la partizione [1-15] all'interno del namespace 1 del primo disco NMVe.
 
-> Il *namespace* di un disco NMVe è una suddivisione logica dei dati, gestita direttamente dal *controller* del disco stesso. I namespace vengono impiegati in computer con esigenze di sicurezza particolari. Comunemente nei pc desktop si utilizza il namespace di default, ovvero il numero 1. Più dettagli riguardo ai namespace sono riportati sul sito di NVMe: https://nvmexpress.org/resource/nvme-namespaces/.
+---
+
+
+
+<div class='multiCol'>
+<div class='col'>
+
+### Namespace di un disco NVMe
+
+I *namespace* di un disco NMVe sono una suddivisione logica dei dati, gestita direttamente dal *controller* del disco stesso. Ogni namespace consente di essere trattato come un "disco" separato, consentendo un accesso concorrente rispetto gli altri namespace. I namespace vengono impiegati in computer con esigenze particolari, comunemente nei pc desktop si utilizza il namespace di default, ovvero il numero 1. Più dettagli riguardo ai namespace sono riportati sul sito di NVMe: https://nvmexpress.org/resource/nvme-namespaces/.
+
+### Partizioni di un disco
+
+Una partizione del disco definisce delle aree separate di memoria che possono essere gestite separatamente dal sistema operativo, ad ognuna di essere può essere associato un tipo di file system differente. 
+
+
+</div>
+<div class='col text-center'>
+
+<img src="../images/nvme-namespaces.svg" width=80% />
+
+</div>
+</div>
 
 ---
 
@@ -295,13 +370,9 @@ nvme0n1     259:0    0 476,9G  0 disk
 └─nvme0n1p3 259:3    0    17G  0 part [SWAP]
 ```
 
-#### Partizioni di un disco
-
-Una partizione del disco definisce delle aree separate di memoria che possono essere gestite separatamente dal sistema operativo.
-
 Come mostra l'output del comando `lsblk` il disco in utilizzo sul pc presenta 3 partizioni, ciascuna delle quali ha un *punto di mount*.
 
-Un *punto di mount* è una directory del file system che è logicamente connessa ad un altro file system, in questo esempio proveniente dal disco primario. 
+Un *punto di mount* è una directory del file system che è logicamente connessa ad un altro file system, in questo esempio proveniente dal disco primario.
 
 ---
 
@@ -375,13 +446,8 @@ $ ls -alh $HOME/usb
 
 ---
 
+## 2. Strumenti di analisi e gestione dei processi
 
-
-Marti potresti partire da qui quando fai il file system UNIX
-
-Dato che tutto è un file, *anche i dispositivi sono rappresentati come file*, e sono *"montati"* in una directory del file system.
-
-immagine con struttura file system
 
 ---
 

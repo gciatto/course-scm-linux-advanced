@@ -448,6 +448,265 @@ $ ls -alh $HOME/usb
 
 ## 2. Strumenti di analisi e gestione dei processi
 
+---
+
+### Processi
+
+Ogni programma eseguito in un sistema linux ha il suo *processo*.
+
+I processi hanno una struttura gerarchica, la radice comune a tutti è il processo *init* responsabile dell'esecuzione di tutti i software all'interno del sistema.
+
+Ogni processo:
+- Ha un suo identificativo univoco *PID*.
+- È indipendente dagli altri, consentendo di eseguire simultaneamente.
+- Ha il suo spazio di indirizzi in memoria (RAM), consentendo al processo di eseguire, scrivere e leggere liberamente in quella porzione di memoria senza sovrascrivere i dati di altri processi.
+
+---
+
+### Stati di un processo
+
+Lo stato di un processo può essere:
+- *In esecuzione* (*Running*): il processo è attualmente in esecuzione e sta svolgendo il suo compito.
+- *In attesa* (*Sleeping*): il processo è in attesa di un evento per continuare la sua esecuzione, ad esempio l'attesa di un input da parte dell'utente. 
+- *Sospeso* (*Stopped*): il processo ha ricevuto un segnale di terminazione, attraverso l'utilizzo dei comandi `kill` o `killall` e non sta eseguendo nessuna operazione, ma **la sua esecuzione può essere riesumata**.
+- *Zombie*: Il processo ha terminato la sua esecuzione e rilasciato tutte le risorse di sistema, ma non è stato rimosso dall'elenco dei processi attivi. Questo accade perchè l'*exit-code* non è stato letto dal processo padre, operazione necessaria per rimuoverlo dall'elenco. 
+
+<br/>
+<br/>
+
+L'*exit-code* è un valore numerico (0-255) restituito al processo padre nel momento in cui un processo termina. 
+La convenzione per gli exit-code è:
+- `0` significa che il processo è terminato correttamente
+- `1-255` il processo è terminato con un errore. Idealmente ogni valore identifica un errore differente, ma il significato che ad essi è associato può variare.
+
+---
+
+### Tipi di processo
+
+Un processo in esecuzione può essere di tre tipi: 
+- *Foreground*: Richiedono che un utente li faccia partire e/o che interagisca con loro durante l'esecuzione. Di default tutti i comandi eseguono come processi in foreground. Un esempio di interazione con l'utente è la visualizzazione degli output di un comando lanciato da terminale: finchè esso non termina, infatti, l'utente non può eseguire un altro comando nello stesso terminale perchè "occupato" dal processo in esecuzione.
+- *Background*: Eseguono senza necessità di interagire con l'utente.
+- *Daemon*: Sono processi costantemente in esecuzione all'interno del sistema, alcuni in esecuzione e alcuni sospesi (stopped). Essi consentono di fornire servizi di sistema. Verranno approfonditi nel modulo corso di linux avanzato.
+
+---
+
+È possibile eseguire un processo in background post-ponendo `&` al comando su terminale. Ad esempio:
+
+```console
+$ sh -c 'sleep 5 && echo Terminato!' &
+[1] 131593
+$ jobs
+[1]  + 131593 running    sh -c 'sleep 5 && echo Terminato!'
+$ Terminato!
+[1]  + 131593 done       sh -c 'sleep 5 && echo Terminato!'
+```
+
+Questo comando esegue uno script shell che attende 5 secondi poi scrive sullo standard output "Terminato!".
+
+Se non lo eseguissi in background (rimuovendo `&`) dovrei attendere 5 secondi prima di poter interagire nuovamente con il terminale da cui l'ho lanciato, perchè di default è un processo in foreground. 
+
+Per gestire i processi in background **figli del processo corrente** posso eseguire:
+- `jobs` consente di visualizzare l'elenco dei sotto-processi in background
+- `fg` comando che consente di spostare l'esecuzione in foreground di un processo in background. Se non viene specificato l'id, viene prelevato l'ultimo che è stato posto in background.    
+
+---
+
+### Visualizzazione dei processi in esecuzione (`top` / `htop`)
+
+`top` Consente di avere una visione real-time dei processi in esecuzione, insieme ad una preziosa panoramica delle risorse utilizzate rispetto alle totali.
+
+```console
+$ top
+top - 15:33:59 up  4:42,  2 users,  load average: 2,70, 6,53, 4,70
+Tasks: 339 total,   1 running, 338 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  3,4 us,  1,5 sy,  0,0 ni, 94,4 id,  0,1 wa,  0,5 hi,  0,2 si,  0,0 st 
+MiB Mem :  15808,3 total,    847,4 free,  10927,9 used,   5369,8 buff/cache     
+MiB Swap:  17397,4 total,  17341,2 free,     56,2 used.   4880,4 avail Mem 
+
+    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+ 137878 anitvam   20   0 1239992 231768 211956 S   6,6   1,4   0:00.83 konsole
+    847 root      20   0 1182360 207444 141000 S   5,0   1,3  12:04.65 Xorg
+   1728 anitvam   20   0 2534772 279132 130920 S   4,7   1,7  10:47.28 kwin_x11
+   2716 anitvam   20   0   33,2g 658404 324392 S   4,3   4,1  19:14.92 chrome
+   2763 anitvam   20   0   32,4g 165380 110848 S   3,0   1,0   4:21.39 chrome
+  77629 anitvam   20   0 1156,0g 401540 139904 S   2,0   2,5   4:31.55 chrome
+    679 root      20   0   22992  16612   6500 S   1,7   0,1   1:08.24 python3
+   1769 anitvam   20   0 3644448 417728 166268 S   1,3   2,6   5:16.92 plasmashell
+   4771 101       20   0 1555036 155724  46304 S   1,0   1,0   1:37.89 mongod
+    435 root     -51   0       0      0      0 S   0,7   0,0   0:16.40 irq/109-ELAN1401:00
+   1878 anitvam   20   0  246104  35724  30604 S   0,7   0,2   1:15.28 ksystemstats
+  78013 anitvam   20   0 1155,9g 173896 110072 S   0,7   1,1   0:27.40 chrome
+ 138113 anitvam   20   0 1131,9g 369660  93528 S   0,7   2,3   0:22.63 code
+ 140042 anitvam   20   0   11072   8060   5884 R   0,7   0,0   0:00.07 top
+    171 root       0 -20       0      0      0 I   0,3   0,0   0:01.47 kworker/2:1H-events_highpri
+    678 root      20   0  413844  25020  20668 S   0,3   0,2   0:16.80 NetworkManager
+   1725 anitvam   20   0  772716  64736  53452 S   0,3   0,4   0:04.25 ksmserver
+   1963 anitvam   20   0 5887584 285932  41824 S   0,3   1,8   1:16.35 jetbrains-toolb
+  77659 anitvam   20   0 1219,6g 319376 111132 S   0,3   2,0   4:21.60 chrome
+...
+```
+
+---
+
+<div class='multiCol'>
+<div class='col'>
+
+`top` è un comando interattivo, che aggiorna le informazioni ogni intervallo di tempo prestabilito.
+
+Una volta individuato un processo critico che sta utilizzando un numero inaspettatamente superiore delle risorse previste, è possibile mandargli il segnale di terminazione direttamente mentre `top` è in esecuzione, premendo il tasto `k` sulla tastiera.
+
+Una volta premuto k posso indicare a direttamente l'id e il segnale da mandare al processo.
+
+</div>
+<div class='col text-center'>
+
+Esiste anche una versione più semplice da navigare con anche una presentazione a colori, chiamata `htop`. 
+
+<img src="../images/htop.png" />
+
+</div>
+</div>
+
+---
+
+### Load average
+
+La prima riga di output del comando `top` riporta delle informazioni importanti per un amministratore di sistema,
+infatti, esse mostrano da quanto tempo il computer è in esecuzione, quanti utenti sono attivi in un determinato momento e qual è il *load average* del sistema.
+
+```console
+$ top
+top - 15:33:59 up  4:42,  2 users,  load average: 2,70, 6,53, 4,70
+```
+
+Il *load average* non è altro che la media del numero di processi in attesa di essere eseguiti dal processore.
+
+La metrica mostra tre valori in quanto rappresentano la media per gli ultimi 1, 5 e 15 minuti d'esecuzione.
+
+<br />
+
+**Si può ottenere la stessa informazione eseguendo il comando `uptime`**
+
+```console 
+$ uptime
+ 16:06:02 up  5:14,  2 users,  load average: 1,02, 1,19, 1,77
+```
+---
+
+### Amministrazione dei processi
+
+I processi in esecuzione, scrivono importanti informazioni sull'andamento della loro esecuzione in file di `log`.
+
+I file di log sono fondamentali per gestire un processo fallito in modo inaspettato e identificare una soluzione.
+
+I file di log sono memorizzati nella cartella `/var/log` e possono essere di due formati: *log di sistema* (in binario) e *log di testo normale*. 
+
+Gran parte delle applicazioni memorizzano utilizzando il servizio di log di sistema, per interagire con essi è necessario passare dall'utility di `journalctl`. 
+
+---
+
+### `journalctl`
+
+<br />
+
+#### `journalctl -b`
+Filtra i log a partire dal riavvio più recente. Altrimenti l'output parte dai log più vecchi memorizzati.
+È possibile specificare di quanti riavvii il journal deve filtrare gli output con degli indici negativi; 
+se `0` indica il riavvio corrente, `-1` indica quello precedente e così via.
+
+#### `journalctl -p err`
+Filtra i log per livello di gravità "err".
+
+#### `journalctl -k`
+Filtra i log relativi al kernel.
+
+#### `journalctl --since yesterday`
+Filtra i log a partire dal giorno precedente.
+
+#### `journalctl --since "2024-01-09" --until "2024-09-09"`
+Filtra i log appartenenti ad un intervallo di tempo prestabilito, specificato con lo standard ISO 8601 (*YYYY-MM-DD*).  
+
+#### `journalctl -f`
+Mostra i log correnti e mostra i log in tempo reale nel terminale.
+
+---
+
+
+
+
+<div class='multiCol'>
+<div class='col'>
+
+#### Ma questi dati non saturano il disco a lungo termine?
+
+{{% fragment %}}
+
+**Potenzialmente sì**.
+
+Per questo motivo, a intervalli di tempo stabiliti, i file di log vengono *ruotati*, ovvero:
+1. Rinominati 
+2. Sostituiti da nuovi file di log
+3. Compressi con gzip
+
+Grazie alla rotazione dei log è quindi possibile ottimizzare lo spazio occupato da essi, seppur mantenendo la possibilità di analizzarli in futuro. 
+`logrotate` è il comando che si occupa della rotazione dei file di log, configurato con il file di sistema `/etc/logrotate.conf`.
+
+{{% /fragment %}}
+
+</div>
+<div class='col'>
+
+{{% fragment %}}
+
+```console
+$ cat /etc/logrotate.conf
+# see "man logrotate" for details
+# rotate log files weekly
+weekly
+
+# keep 4 weeks worth of backlogs
+rotate 4
+
+# restrict maximum size of log files
+#size 20M
+
+# create new (empty) log files after rotating old ones
+create
+
+# uncomment this if you want your log files compressed
+#compress
+
+# Logs are moved into directory for rotation
+# olddir /var/log/archive
+
+# Ignore pacman saved files
+tabooext + .pacorig .pacnew .pacsave
+
+# Arch packages drop log rotation information into this directory
+include /etc/logrotate.d
+
+/var/log/wtmp {
+    monthly
+    create 0664 root utmp
+    minsize 1M
+    rotate 1
+}
+
+/var/log/btmp {
+    missingok
+    monthly
+    create 0600 root utmp
+    rotate 1
+}
+```
+
+{{% /fragment %}}
+
+</div>
+</div>
+
+
+
 
 ---
 
@@ -486,20 +745,3 @@ $ ls -alh $HOME/usb
   - curl
   - wget
 
-## Strumenti per analisi processi
-- Foreground and Background processes
-- Process states
-- load average
-- ps command
-- top/htop command
-- kill command
-
-## Strumenti per analisi risorse di sistema
-
-## Log di sistema
-- log rotate e gestione dei log di systemctl (size, persistence time)
-- /var/log
-- journalctl
-
-
-https://info-ee.surrey.ac.uk/Teaching/Unix/

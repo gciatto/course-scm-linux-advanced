@@ -631,9 +631,6 @@ Mostra i log correnti e mostra i log in tempo reale nel terminale.
 
 ---
 
-
-
-
 <div class='multiCol'>
 <div class='col'>
 
@@ -705,6 +702,718 @@ include /etc/logrotate.d
 </div>
 </div>
 
+---
+
+## 3. Networking
+
+---
+
+### Che cos'è Internet
+
+*Internet* è una *rete* che interconnette *dispositivi* provenienti da tutto il mondo.
+
+> Ci sono 5,16 miliardi utenti di Internet, il 64,4% della popolazione mondiale è ora online. 
+> <br/> [Fonte](https://wearesocial.com/it/blog/2023/01/digital-2023-i-dati-globali/)
+
+
+---
+
+<div class='multiCol'>
+<div class='col'>
+
+### Host / End System
+
+Tutti i dispositivi connessi ad internet sono chiamati *host* (o *end system*). 
+*Host* perchè essi "ospitano" le applicazioni che utilizzano internet, *end system* perchè risiedono "ai bordi" rispetto alla vasta infrastruttura Internet. Sono host:
+- pc desktop, 
+- server, 
+- dispositivi mobile (laptop, smartphone, tablet), 
+- *"cose"* / *"things"* (smartwatch, smartfridge, ...) 
+
+<br />
+<br />
+
+Gli host sono suddivisi in due categorie:
+- *Server*: Computer ad alte prestazioni che conservano e distribuiscono dati / servizi in internet (pagine web, stream video, e-mail, ...)
+- *Client*: Tutti gli altri dispositivi, che usufruiscono dei dati / servizi offerti dai server.
+
+</div>
+<div class='col text-center'>
+
+<img src="../images/internet-architecture.png" />
+
+</div>
+</div>
+
+---
+
+<div class='multiCol'>
+<div class='col'>
+
+### Packet Switches
+
+Gli host sono connessi tra loro grazie a:
+- Una *rete di connessioni* (*communication links*)
+- Un insieme di *commutatori di pacchetti* (*packet switches*), grazie ai quali le informazioni (*pacchetti* di dati) vengono instradate verso la destinazione.
+
+<br />
+<br />
+
+Esistono due principali tipi di commutatori di pacchetti:
+- *Routers*: Connette dispositivi appartenenti a reti diverse
+- *Switch*: Connette dispositivi appartenenti alla stessa rete
+
+</div>
+<div class='col text-center'>
+
+<img src="../images/internet-architecture.png" >
+
+  <small>
+
+  Fonte: Computer Networking: A top-down approach - Kurose, Ross
+
+  </small>
+</img>
+
+</div>
+</div>
+
+---
+
+### Rete
+
+È possibile distinguere due tipologie di rete:
+- *Reti geografiche* (*Wide Area Network*, o *WAN*): coprono ampie distanze geografiche, consentendo la connessione tra siti distanti tra loro. Per farlo si connettono alle infrastrutture fornite dagli *Internet Service Provider* (*ISP*).
+- *Reti locali* (*Local Area Network*, o *LAN*): progettate per coprire aree limitate (come aziende, abitazioni e campus).
+
+---
+
+<div class='multiCol'>
+<div class='col'>
+
+### Internet Service Provider (ISP)
+
+Gli *ISPs* sono aziende che possiedono parte della complessa infrastruttura di rete, essi consentono agli utenti finali di stipulare contratti per accedere a Internet.
+
+Esistono tre tipologie di ISP:
+- *ISP di livello 1*: Sono in cima alla gerarchia e non pagano per il traffico che transita nella loro rete. Per coprire la più vasta area possibile geografica, questi fornitori di ISP si connettono tra loro, consentendo gratuitamente il traffico che transita da uno all'altro. Sono in tutto il mondo una dozzina di ISP.
+- *ISP di livello 2*: Si connettono agli ISP di livello 1, pagando un canone per far transitare il loro traffico da una geolocalizzazione ad un'altra. Hanno una portata regionale/nazionale.
+- *ISP di livello 3*: Sono quelli più vicini agli utenti finali, consentono ad essi l'accesso alla rete addebitando una somma di denaro. Questi ISP pagano gli ISP di livello 2 in base al traffico che fanno transitare. 
+
+</div>
+<div class='col text-center'>
+
+<img src="../images/isp.jpg" width=100% >
+
+  <small>
+
+  [Fonte](https://orhanergun.net/tier-1-tier-2-and-tier-3-service-providers)
+
+  </small>
+</img>
+</div>
+</div>
+
+---
+
+### Protocolli di rete
+
+Compresa la complessa architettura della rete internet, si comprende quanto sia necessario che il transito delle informazioni al suo interno debba essere regolato. A questo scopo servono i *protocolli di rete*.
+
+<br/>
+<br/>
+
+> Un protocollo definisce il formato e l'ordine dei messaggi scambiati tra due o più entità comunicanti, 
+> come anche le azioni che bisogna intraprendere nel momento in cui si invia e/o riceve un messaggio.
+> <br/> Computer Networking: A top-down approach - Kurose, Ross
+
+---
+
+<div class='multiCol'>
+<div class='col'>
+
+### TCP/IP
+
+I protocolli di rete sono organizzati a *livelli* (*layers*). 
+
+Ogni protocollo appartiene ad uno specifico livello, che può essere implementato via hardware, via software o una combinazione dei precedenti.
+
+Internet si compone di uno *stack* di 5 livelli di protocolli, dall'alto:
+- *Fisico*
+- *Connessione*
+- *Rete*
+- *Trasporto*
+- *Applicazione*
+
+</div>
+<div class='col text-center'>
+
+<img src="../images/tcpip.svg" width=50%/>
+
+</div>
+</div>
+
+---
+
+### TCP/IP: Livello Fisico
+
+Il ruolo del livello fisico è di far transitare le informazioni bit per bit sui canali che portano il messaggio a destinazione.
+
+I protocolli che fanno parte di questo livello sono strettamente legati al mezzo utilizzato per far transitare le informazioni:
+- *Doppino telefonico*: Uno dei mezzi di trasmissione più vecchi, proveniente dalle linee telefoniche fisse ma ancora molto utilizzato. È chiamato doppino perchè composto da due fili di rame intrecciati tra loro. 
+- *Cavo coassiale*: Mezzo proveniente dalla trasmissione per la TV via cavo, sono più schermati dei doppini telefonici. Per questo motivo furono largamente utilizzati anche dalle compagnie telefoniche per le comunicazioni tra lunghe distanze. Sebbene per la TV via cavo è ancora molto utilizzato, le compagnie telefoniche sono transitate all'uso di tecnologie più performanti come *fibre ottiche*.
+- *Fibra ottica*: Questa tecnologia si basa sul transito di un raggio di luce e viene impiegata per le trasmissioni a lunga distanza nelle dorsali di rete, nelle reti locali ad alta velocita (come alternativa al rame) e in alcuni casi anche per l'accesso ad alta velocità a Internet (*FTTH*, *Fiber To The Home*).
+- *Onde radio*: Si basa sulla trasmissione tramite onde radio. Adatte per trasmissioni a medio raggio. Tecnologia alla base di *WiFi* e *Reti mobili*.
+
+---
+
+### Le dorsali 
+
+<div class="multiCol">
+<div class='col text-center'>
+
+<img src="../images/dorsali-fibra.webp" width=100% > 
+
+  <small> 
+  
+  [Fonte](https://www.popinga.it/i-cavi-sottomarini-in-fibra-ottica-889f579d4049)
+  
+  </small>
+</img>
+
+</div>
+
+<div class='col text-center'>
+
+<img src="../images/fibra-italia.jpg" width=100% > 
+
+  <small> 
+  
+  [Fonte](https://www.garr.it/it/infrastrutture/rete-nazionale/rete-garr-t)
+  
+  </small> 
+</img>
+
+</div>
+</div>
+
+---
+
+### TCP/IP: Livello di Collegamento
+
+<div class="multiCol">
+<div class='col'>
+
+Si occupa di instradare un pacchetto ricevuto da un livello di rete trasmettendolo al livello di rete dell'host destinatario. 
+Per farlo, comunica bit per bit l'informazione che deve essere trasmessa.
+
+A livello concettuale si può considerare che la comunicazione avviene tra due livelli di rete, anche se il percorso reale che l'informazione percorre passa dal livello fisico.
+
+Il livello di collegamento inoltre verifica che non siano avvenuti *errori di trasmissione* e regola il *flusso* tra sorgente e destinatario.
+
+Fanno parte di questo livello protocolli *Ethernet* (*IEEE 802.3*) e *WiFi* (*IEEE 802.11*).  
+
+<br />
+<br />
+
+I pacchetti che transitano in questo livello di rete sono chiamati *frame*.
+
+</div>
+<div class='col text-center'>
+
+<img src="../images/host-communication-internet-protocol.png" width=70%>
+
+  <small> Fonte: Computer Networking: A top-down approach - Kurose, Ross </small>
+</img>
+
+</div>
+</div>
+
+---
+
+<div class="multiCol">
+<div class='col'>
+
+#### Dov'è implementato il livello di collegamento?
+
+Il livello di collegamento rappresenta il punto in cui i protocolli dello stack tcp/ip passano dall'essere implementati via software ad essere hardware (e viceversa). Infatti sono generalmente implementati da una combinazione di componenti hardware e software.
+
+La maggior parte delle operazioni di questo livello risiede all'interno della scheda di rete di un host (*Network Interface Card* o *NIC*). 
+
+</div>
+<div class='col text-center'>
+
+<img src="../images/NIC.png" >
+
+  <small> Fonte: Computer Networking: A top-down approach - Kurose, Ross </small>
+</img>
+
+</div>
+</div>
+
+---
+
+#### Indirizzi MAC
+
+Gli host e i router nella rete hanno assegnato un indirizzo a livello di collegamento, chiamato *MAC* (*Media Address Control* address). Gli switch invece no, perchè essi hanno solamente il compito di inoltrare il pacchetto da host a router (e viceversa) in modo trasparente.
+
+*MAC* è un indirizzo di 6 byte, in notazione esadecimale, assegnato univocamente dai produttori delle schedere di rete al singolo dispositivo. 
+Non esistono al mondo due schede di rete con lo stesso indirizzo *MAC*, perchè la loro distribuzione è regolamentata dalla *IEEE*.
+
+Per trasportare le informazioni verso la destinazione corretta viene utilizzato l'indirizzo *MAC* di destinazione.
+
+---
+
+### TCP/IP: Livello Rete
+
+Si occupa di: *inoltro* (*forwarding*) e *instradamento* (*routing*) corretto di un pacchetto verso l'host di destinazione, collocato in una rete differente.
+
+L'inoltro è l'operazione per la quale viene ricevuto un pacchetto su una porta e viene ritrasmesso su un'altra.
+L'instradamento invece si occupa di determinare il percorso migliore per raggiungere la destinazione.
+Queste operazioni sono svolte dai *Router* e dagli *Switch di livello 3*.
+
+Il protocollo *IP* (*Internet Protocol*) appartiene a questo livello, esso definisce non solo il formato dei messaggi che vengono trasmessi, ma anche l'indirizzo IP a livello di rete dell'interfaccia di rete dell'host destinatario di un certo messaggio. 
+**Questo significa che un pc connesso a più reti avrà più indirizzi IP**.
+
+<br />
+<br />
+
+I pacchetti che transitano in questo livello di rete sono chiamati *datagrammi*.
+
+---
+
+### Indirizzi IP (v4)
+
+Al contrario degli indirizzi a livello di collegamento (MAC), gli indirizzi IP seguono una struttura gerarchica.
+
+Gli indirizzi hanno una lunghezza di *32 bit* e si compongono di due parti:
+- Una di *rete* di lunghezza variabile a partire dai bit a sinistra. 
+- Una di *host* con i bit rimanenti.  
+
+La parte di rete assume lo stesso valore per tutti gli host appartenenti alla stessa rete (ad esempio una LAN).
+I dispositivi di una LAN quindi assumeranno uno degli ip appartenenti al blocco di indirizzi fissato dalla parte di rete (*sottorete*): tale blocco si chiama *prefisso*.
+
+Gli indirizzi ip sono scritti in notazione decimale per ognuno dei 4 byte, intervallati da un punto, ad esempio: **128.208.2.151**.
+
+I prefissi sono indicati fornendo l'indirizzo IP più basso del blocco di indirizzi e la dimensione bel blocco, intesa come numero di bit a partire da sinistra che lo identificano.
+Per convenzione, la grandezza del blocco è scritta dopo l'indirizzo IP separata da uno slash ("/").
+
+La lunghezza del prefisso non è altro che una *maschera* di bit che consente di estrarre l'indirizzo della rete dato un qualsiasi indirizzo ip con l'operazione di AND logico. 
+
+---
+
+### Maschera di rete
+
+<img src="../images/subnetmask.webp" width=100% />
+
+---
+
+### ESERCIZIO 1
+
+#### Quante sottoreti ci sono in questa topologia?
+
+<div class="text-center">
+<img src="../images/esercizioreti1.png" >
+
+<small> Fonte: Reti di calcolatori - Sesta Edizione - A. S. Tanenbaum et.al.  </small> 
+</img>
+</div>
+
+---
+
+### ESERCIZIO 1
+
+#### Quante sottoreti ci sono in questa topologia?
+
+<div class="text-center">
+<img src="../images/esercizioreti2.png" >
+
+<small> Fonte: Reti di calcolatori - Sesta Edizione - A. S. Tanenbaum et.al.  </small> 
+</img>
+</div>
+
+---
+
+### ESERCIZIO 2
+
+#### Qual è l'indirizzo che identifica ciascuna sottorete presente?
+
+<div class="text-center">
+<img src="../images/esercizioreti1.png" >
+
+<small> Fonte: Reti di calcolatori - Sesta Edizione - A. S. Tanenbaum et.al.  </small> 
+</img>
+</div>
+
+---
+
+### ESERCIZIO 2
+
+{{% fragment %}}
+
+Partiamo da una sottorete, composta dagli indirizzi IP: $ 223.1.1.1, 223.1.1.2, 223.1.1.3, 223.1.1.4 $
+
+**Qual è la parte di indirizzo che determina la sottorete?**
+
+{{% /fragment %}}
+
+{{% fragment %}}
+
+  $ 223.1.1.X $
+
+{{% /fragment %}}
+
+{{% fragment %}}
+
+**Quale maschera di rete consente di identificare questa sottorete?**
+
+{{% /fragment %}}
+
+{{% fragment %}}
+
+  $ 255.255.255.0 $
+
+Ovvero, **24 bit**.
+
+{{% /fragment %}}
+
+{{% fragment %}}
+
+La rappresentazione della sottorete, di conseguenza sarà: $ 223.1.1.0/24 $
+
+Lo stesso ragionamento si applica per le altre sottoreti.
+
+{{% /fragment %}}
+
+---
+
+### Esercizio 2
+
+<div class="text-center">
+<img src="../images/esercizioreti3.png" >
+
+<small> Fonte: Reti di calcolatori - Sesta Edizione - A. S. Tanenbaum et.al.  </small> 
+</img>
+</div>
+
+---
+
+### Indirizzi IP (v4)
+
+<div class="text-center">
+
+$$ 2^{32} = 4294967296 \approx ~4,3 bil $$ 
+
+</div>
+
+
+Negli anni '80, quando è stato ideato il protocollo, si penso' fosse un numero più che sufficiente di indirizzi.
+
+{{% fragment %}}
+
+**Spoiler: non sono bastati.**
+
+La soluzione è quella di transitare verso l'utilizzo dell'aggiornato protocollo *IPv6*, la cui adozione è più lenta del previsto e ci vorranno anni prima di mandare in pensione IPv4.
+
+{{% /fragment %}}
+
+---
+
+### NAT
+
+Gli indirizzi IP sono distribuiti da un ente no-profit chiamato *ICANN* (*Internet Corporation for Assigned Names and Numbers*).
+ICANN ha affidato la gestione di blocchi di indirizzi a enti regionali, che distribuiscono con parsimonia gli indirizzi gli ISP e alle aziende.
+
+Una tecnica per poter utilizzare con parsimonia gli indirizzi IP è il *NAT* (*Network Address Translation*).
+Ogni dispositivo connesso ad una rete locale riceve un indirizzo IP unico, valido solamente all'interno della rete locale.
+
+Quando un dispositivo comunica verso l'esterno, il suo indirizzo ip viene tradotto dal NAT in quello pubblico assegnato dall'ISP.
+Nel momento in cui viene inziata questa connessione, il NAT memorizza quale sorgente (della rete interna) e quale destinazione stanno comunicando, in modo da poter restituire alla sorgente la risposta ottenuta.
+
+Sono consentiti solamente tre intervalli di indirizzi in una rete NAT:
+- **192.168.0.0/16** (65.536 host)
+- **172.16.0.0/12** (1.048.576 host)
+- **10.0.0.0/8** (16.777.216 host)
+
+---
+
+### NAT
+
+<div class="text-center">
+<img src="../images/NAT.png" width=50%>
+
+<small> Fonte: Reti di calcolatori - Sesta Edizione - A. S. Tanenbaum et.al.  </small> 
+</img>
+</div>
+
+{{% fragment %}}
+
+**Ma... non manca qualcosa?**
+
+{{% /fragment %}}
+
+{{% fragment %}}
+
+Utilizzando il NAT **non** è possibile iniziare una comunicazione dall'esterno verso una macchina all'interno della rete locale.
+
+Esistono tool per farlo, chiamati *NAT traversal*, che non vedremo in questo corso.
+
+{{% /fragment %}}
+
+---
+
+### TCP/IP: Livello Trasporto
+
+Si occupa di trasportare i messaggi provenienti dal livello applicazione verso destinazione.
+
+I principali protocolli appartenenti a questo livello sono:
+- *Transmission Control Protocol* o *TCP*: Fornisce un servizio *orientato alla connessione* al livello applicazione. TCP consente di garantire che il messaggio arrivi a destinazione e controllo del traffico dati e di congestione della rete. Per farlo suddivide il messaggio in segmenti più corti.
+- *User Datagram Protocol* o *UDP*: Fornisce un servizio *senza connessione*, non fornisce garanzie che il messaggio arrivi a destinazione, non controlla il traffico dei dati e nemmeno la congestione della rete. Siccome non fornisce questi servizi, è un protocollo *veloce* e infatti viene adoperato in applicazioni critiche in termini di tempo: *gaming online*, *streaming video*, ...   
+
+<br />
+<br />
+
+I pacchetti che transitano in questo livello di rete sono chiamati *segmenti*.
+
+---
+
+### TCP/IP: Livello Applicazione
+
+Contiene tutti i protocolli utilizzati dalle applicazioni sugli host per comunicare tra loro. 
+
+Fanno parte di questo livello: 
+- *Hypertext Transfer Protocol* o *HTTP*: Utilizzato per il trasferimento di pagine web.
+- *Simple Mail Transfer Protocol* o *SMTP*: Utilizato per il trasferimento di messaggi e-mail.
+- *File Transfer Protocol* o *FTP*: Consente il trasferimento dei dati tra due hosts.
+- *Dynamic Host Configuration Protocol* o *DHCP*: Protocollo che consente di assegnare in automatico un indirizzo IP ad un host.
+- *Domain Name System* o *DNS*: Si occupa dell'assegnazione di nomi di dominio "user friendly" a indirizzi ip.
+- *Network Time Protocol* o *NTP*: Protocollo che si occupa della sincronizzazione dell'orologio del computer. 
+
+<br />
+<br />
+
+I pacchetti che transitano in questo livello di rete sono chiamati *messaggi*.
+
+---
+
+<div class="multiCol">
+<div class='col'>
+
+### DHCP
+
+È un protocollo molto utile per gli amministratori di rete perchè consente di evitare la configurazione manuale di ogni dispositivo che vuole accedere ad una rete. 
+DHCP, infatti, assegna un indirizzo IP a fronte di una richiesta.
+Si tratta di un protocollo client-server, quindi di livello applicativo, che però configura l'interfaccia di rete del dispositivo, quindi la sua collocazione sullo stack TCP/IP varia in base alla fonte.
+
+</div>
+<div class='col text-center'>
+
+<img src="../images/DHCP.png" width=100%x>
+
+  <small> Fonte: Computer Networking: A top-down approach - Kurose, Ross </small>
+</img>
+
+</div>
+</div>
+
+---
+
+<div class="multiCol">
+<div class='col'>
+
+### DHCP
+
+Si compone di 4 fasi:
+1. *DHCP Server discovery*: Un dispositivo si connette alla rete e manda un messaggio DHCP broadcast a tutti i dispositivi nella sottorete.
+2. *DHCP Server offer*: Il server DHCP riceve il messaggio di discovery e manda anch'esso in broadcast una proposta di IP.
+3. *DHCP Request*: Il client sceglie una delle offerte ricevute dal server DHCP e lo comunica al server.
+4. *DHCP Ack*: Il server DHCP conferma l'assegnazione.  
+
+</div>
+<div class='col text-center'>
+
+<img src="../images/DHCP.png" width=100%x>
+
+  <small> Fonte: Computer Networking: A top-down approach - Kurose, Ross </small>
+</img>
+
+</div>
+</div>
+
+---
+
+### DNS
+
+Gli host che offrono servizi possiedono un IP pubblicamente accessibile.
+
+È complesso ricordare l'IP di ciascun sito web che si intende visitare, per questo motivo esistono gli *hostname* (come *www.google.com*).
+
+Il compito del servizio *DNS* è quello di risolvere l'indirizzo IP di un determinato hostname.
+
+<div class="text-center">
+
+<img src="../images/dns.webp" width=100% >
+  <small> 
+
+[Fonte](https://gcore.com/learning/dns-records-explained/) 
+    
+  </small>
+
+</img>
+</div>
+
+---
+
+### DNS
+
+In realtà, *hostname* è una definizione generica. Un *Fully Qualified Domain Name* (*FQDN*) è il termine non ambiguo che identifica l'hostname destinazione che voglio contattare. 
+
+<div class="text-center">
+
+<img src="../images/hostname-domain.webp" width=100% >
+  <small> 
+
+[Fonte](https://www.scaleway.com/en/docs/network/domains-and-dns/concepts/) 
+    
+  </small>
+
+</img>
+</div>
+
+---
+
+### DNS
+
+<div class="multiCol">
+<div class='col'>
+
+
+Un *FQDN* ha una *struttura gerarchica*, che riflette l'infrattuttura del servizio DNS.
+
+Per fornire un servizio adeguato al numero di richieste, esistono oltre 400 root server dislocati in tutto il mondo. 
+Un elevato numero di repliche del servizio esiste anche per i top level domain.
+
+DNS offre anche un servizio di *load balancing*, ovvero, per gli hostname a cui sono associati più server (quindi più indirizzi IP) per gestire le richieste, restituisce un IP differente per bilanciare il numero di richieste ad ogni host finale.
+
+</div>
+<div class='col text-center'>
+
+<img src="../images/DNS-hierarchy.png" width=100%x>
+
+  <small> Fonte: Computer Networking: A top-down approach - Kurose, Ross </small>
+</img>
+
+</div>
+</div>
+
+---
+
+### NTP
+
+L’*NTP* time server fornisce meccanismi di protocollo fondamentali, necessari per sincronizzare l’ora di diversi sistemi con una precisione esatta al nanosecondo. 
+Questo protocollo contiene anche dettagli sull’accuratezza e sulle probabili fonti d’errore dell'ora del sistema locale, oltre che sulle proprietà dell'orologio di riferimento. 
+
+
+Per il processo di sincronizzazione NTP utilizza il *tempo coordinato universale* (*UTC*) adottato dai singoli client e server secondo un sistema gerarchico.
+
+Come DNS, anche NTP presenta una struttura gerarchica, basata sulla presenza di *orologi atomici* sparsi in tutto il mondo.
+L'orologio atomico è un tipo di orologio in cui la base del tempo è determinata dalla frequenza di risonanza di un atomo, che genera un segnale periodico di frequenza estremamente stabile e affidabile.
+
+---
+
+<div class='multiCol'>
+<div class='col'>
+
+### NTP
+
+Nell'infrastruttura NTP ci sono server appartenenti al primo strato che sincronizzano il proprio tempo direttamente con gli orologi universali.
+
+I server del secondo strato sincronizzano l'ora con i server appartenenti al primo livello, e così via, fino ad arrivare agli utenti finali.
+
+</div>
+<div class='col text-center'>
+
+<img src="../images/NTP.png" width=100% >
+  <small> 
+
+[Fonte](https://it.wikipedia.org/wiki/Network_Time_Protocol) 
+    
+  </small>
+
+</img>
+
+</div>
+</div>
+
+
+---
+
+<div class='multiCol'>
+<div class='col'>
+
+### ISO OSI
+
+Lo stack di protocolli TCP/IP non è l'unico esistente, negli anni '70 la International Organization of Standardisation (*ISO*) ha proposto uno stack composto da 7 livelli, chiamato *Open Systems Interconnection* (*OSI*).
+
+Questo protocollo è stato proposto quando ancora TCP/IP era agli albori, quindi ha preso piede nella didattica e ancora oggi molti documenti fanno riferimento a questo stack. 
+
+Lo stack ISO OSI estende la proposta TCP/IP con due layer aggiuntivi: 
+- *Presentazione*: Ha il ruolo di "tradurre" il contenuto di messaggi scambiati tra due applicazioni. Fanno parte di questo layer protocolli di *cifratura* e *compressione*. 
+- *Sessione*: Ha il ruolo di sincronizzare e delimitare temporalmente il traffico.
+
+</div>
+<div class='col text-center'>
+
+<img src="../images/isoosi.svg" width=50%/>
+
+</div>
+</div>
+
+---
+
+<div class='multiCol'>
+<div class='col'>
+
+**Perchè questi layer non sono presenti nello stack TCP/IP? Non servono?**
+
+{{% fragment %}}
+
+Per il protocollo TCP/IP l'implementazione di questi protocolli è a _discrezione dell'utente_. 
+Questo significa che se è necessaria, verrà implementata direttamente nel livello di applicazione.
+
+{{% /fragment %}}
+
+</div>
+<div class='col text-center'>
+
+<img src="../images/comparison-internet-stack.svg" width=70%/>
+
+</div>
+</div>
+
+---
+
+### Networking in Linux
+
+
+---
+#### Interfacce
+- ip link
+- ip addr
+
+- ip link down/up
+- ip route
+
+
+- Network MAnager vs ip command
+
+- /etc/network/interfaces
+
+
+
+- traceroute
+
+-
 
 
 
@@ -712,25 +1421,22 @@ include /etc/logrotate.d
 
 ### Parte 2 -- Martina Baiardi
 
-- Basic Linux Networking
-  - LAN vs WAN
-  - ISO OSI
 - Layer 2
-  - mac address
-  - Loopback interface
-  - Ethernet/Wi-Fi interfaces
+  - mac address               OK
+  - Loopback interface        TODO
+  - Ethernet/Wi-Fi interfaces OK
 - Layer 3
-  - TCP/IPv4 addresses
-    - format
-    - netmasks
-  - DHCP
-  - NAT
+  - TCP/IPv4 addresses        OK
+    - format                  OK
+    - netmasks                OK
+  - DHCP                      
+  - NAT                       OK
   - DNS
   - NTP
-  - Network manager
 - Network configuration
     - ip command
-    - systemd/networkd
+  - nmngr che cos'è
+    - systemd/networkd (?)
     - nmcli command
     - /etc/network/interfaces
     - ping command

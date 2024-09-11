@@ -457,7 +457,7 @@ Ogni programma eseguito in un sistema linux ha il suo *processo*.
 I processi hanno una struttura gerarchica, la radice comune a tutti è il processo *init* responsabile dell'esecuzione di tutti i software all'interno del sistema.
 
 Ogni processo:
-- Ha un suo identificativo univoco *PID*.
+- Ha un identificatore numerico univoco, chiamato **PID** (Process IDentifier). Il PID è un numero intero positivo, e viene assegnato in ordine crescente ad ogni processo che viene creato. Il PID del processo corrente può essere ottenuto con il comando `echo $$`.
 - È indipendente dagli altri, consentendo di eseguire simultaneamente.
 - Ha il suo spazio di indirizzi in memoria (RAM), consentendo al processo di eseguire, scrivere e leggere liberamente in quella porzione di memoria senza sovrascrivere i dati di altri processi.
 
@@ -487,6 +487,24 @@ Un processo in esecuzione può essere di tre tipi:
 - *Foreground*: Richiedono che un utente li faccia partire e/o che interagisca con loro durante l'esecuzione. Di default tutti i comandi eseguono come processi in foreground. Un esempio di interazione con l'utente è la visualizzazione degli output di un comando lanciato da terminale: finchè esso non termina, infatti, l'utente non può eseguire un altro comando nello stesso terminale perchè "occupato" dal processo in esecuzione.
 - *Background*: Eseguono senza necessità di interagire con l'utente.
 - *Daemon*: Sono processi costantemente in esecuzione all'interno del sistema, alcuni in esecuzione e alcuni sospesi (stopped). Essi consentono di fornire servizi di sistema. Verranno approfonditi nel modulo corso di linux avanzato.
+
+---
+
+### Stato corrente dei processi: `ps`
+
+Il comando `ps` (Process Status) permette di ottenere informazioni sui processi attivi.
+
+Di default, `ps` mostra i processi attivi dell'utente corrente.
+
+`ps` senza opzioni mostra i processi dell'utente corrente associati al terminale su cui ps viene lanciato.
+
+`ps a` mostra i processi di tutti gli utenti.
+
+`ps u` mostra le informazioni in formato user-oriented.
+
+`ps x` mostra informazioni sui processi che non hanno un terminale di controllo (background, demoni, servizi)
+
+Le tre opzioni vengono tipicamente combinate: `ps aux`
 
 ---
 
@@ -566,6 +584,44 @@ Esiste anche una versione più semplice da navigare con anche una presentazione 
 
 </div>
 </div>
+
+---
+
+
+### Processi, segnali, e loro gestione
+
+
+UNIX consente ai processi di inviare segnali ad altri processi.
+
+I segnali sono numerici, e ciascuno ha un significato specifico.
+
+Quelli più rilevanti per noi sono:
+
+1. `SIGINT` (2) -- segnale che viene inviato alla pressione di <kbd>Ctrl</kbd><kbd>C</kbd>, che chiede al processo di terminare ordinatamente (simile a `SIGTERM`)
+1. `SIGTERM` (15) -- segnale di terminazione, che chiede al processo di terminare ordinatamente
+2. `SIGKILL` (9) -- segnale di terminazione forzata, che termina il processo immediatamente
+4. `SIGSTOP` (19) -- segnale di pausa del processo, che lo sospende senza terminarlo
+5. `SIGCONT` (18) -- segnale di continuazione del processo, che lo fa ripredere se attualmente sospeso
+
+---
+
+
+### Invio di segnali ai processi: `kill`
+
+A dispetto del nome, il comando `kill` non "uccide" i processi, ma permette di inviare loro segnali.
+
+Sintassi: `kill [opzioni] PID`.
+Se nessuna opzione viene specificata, al processo target viene inviato un segnale `SIGTERM`.
+
+Può essere inviato un segnale diverso sostituendo `SIG` con `-`, per esempio: `kill -KILL 6754` manda un `SIGKILL` al processo con PID 6754.
+
+Con l'opzione `-s`, è possibile inviare un segnale in base al suo numero.
+Il comando precedente è equivalente a `kill -s 9 6754`
+
+### Invio di segnali a processi usando il nome: `killall`
+
+Il comando `killall` è simile a `kill`, ma invece di prendere un PID,
+prende un nome di processo e invia il segnale a tutti i processi che corrispondono a quel nome
 
 ---
 
@@ -1395,59 +1451,341 @@ Questo significa che se è necessaria, verrà implementata direttamente nel live
 
 ### Networking in Linux
 
+Il networking di un sistema Linux si basa sulla configurazione delle *interfacce*.
 
----
-#### Interfacce
-- ip link
-- ip addr
+Linux supporta diversi tipi di interfacce, dove le più comuni sono quelle fisiche, che tratteremo in questo modulo.
 
-- ip link down/up
-- ip route
-
-
-- Network MAnager vs ip command
-
-- /etc/network/interfaces
-
-
-
-- traceroute
-
--
-
-
+Esistono anche interfacce di rete virtuali (*VLAN*) e interfacce *bridge* che possono essere configurate per scopi particolari, come ad esempio la virtualizzazione.
 
 ---
 
-### Parte 2 -- Martina Baiardi
+### Comando `ip`
 
-- Layer 2
-  - mac address               OK
-  - Loopback interface        TODO
-  - Ethernet/Wi-Fi interfaces OK
-- Layer 3
-  - TCP/IPv4 addresses        OK
-    - format                  OK
-    - netmasks                OK
-  - DHCP                      
-  - NAT                       OK
-  - DNS
-  - NTP
-- Network configuration
-    - ip command
-  - nmngr che cos'è
-    - systemd/networkd (?)
-    - nmcli command
-    - /etc/network/interfaces
-    - ping command
-    - traceroute
-    - nslookup
-    - netstat
-    - configurazione rete tramite dhcp
-    - configurazione rete WPA2/WPA3
-        - wpa_cli command
-- Network tools
-  - /etc/hosts
-  - curl
-  - wget
+<br />
 
+#### `ip link list`
+Consente di visualizzare la lista delle interfacce di rete configurate all'interno della macchina, insieme al loro *stato*.
+
+```console
+$ ip link list
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: wlo1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DORMANT group default qlen 1000
+    link/ether f4:d1:08:a5:11:bc brd ff:ff:ff:ff:ff:ff
+    altname wlp0s20f3
+```
+
+Le parentesi angolari danno informazioni immediate riguardo alle interfacce che sto analizzando:
+- *UP*: Significa che l'interfaccia è abilitata
+- *DOWN*: Significa che l'interfaccia **non** è abilitata
+- *LOWER_UP*: Significa che il collegamento dell'interfaccia è attivo
+- *NO_CARRIER*: Significa che l'interfaccia è abilitata, ma non ha nessun collegamento 
+
+Un'altra informazione importante visibile in questo output è l'indirizzo *MAC* associato a ciascuna interfaccia.
+
+---
+
+### Comando `ip`
+
+<br />
+
+#### `ip addr list`
+
+Oltre a mostrare le informazioni legate allo stato delle interfacce di rete disponibili, mostra quali sono gli IP (v4 e v6) associati a tali interfacce.
+
+```console
+$ ip addr list
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host noprefixroute 
+       valid_lft forever preferred_lft forever
+2: wlo1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+    link/ether f4:d1:08:a5:11:bc brd ff:ff:ff:ff:ff:ff
+    altname wlp0s20f3
+    inet 172.20.10.5/28 brd 172.20.10.15 scope global dynamic noprefixroute wlo1
+       valid_lft 86133sec preferred_lft 86133sec
+    inet6 fe80::2171:37c:1573:7e67/64 scope link noprefixroute 
+       valid_lft forever preferred_lft forever
+```
+
+---
+
+### Interfaccia di loopback
+
+È una scheda di rete virtuale, sempre presente e sempre *UP*, anche se il pc non è connesso ad internet, che consente di gestire una porzione di traffico senza passare dalla scheda di rete.
+
+Nelle reti di computer, l'interfaccia di loopback permette la comunicazione tra processi, ma esclusivamente tra processi che sono eseguiti nella stessa macchina. 
+
+Un esempio tipico di utilizzo è quello in cui si deve testare il funzionamento di un server web, realizzando una connessione con un client eseguito sulla stessa macchina su cui è eseguito anche il server.
+
+---
+
+### Abilitare/Disabilitare una interfaccia
+
+#### `ip link set <interface> <status>`
+```console
+$ ip link list wlo1
+2: wlo1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DORMANT group default qlen 1000
+    link/ether f4:d1:08:a5:11:bc brd ff:ff:ff:ff:ff:ff
+    altname wlp0s20f3
+$ ip link set wlo1 down
+$ ip link list wlo1
+2: wlo1: <BROADCAST,MULTICAST> mtu 1500 qdisc noqueue state DOWN mode DORMANT group default qlen 1000
+    link/ether f4:d1:08:a5:11:bc brd ff:ff:ff:ff:ff:ff
+    altname wlp0s20f3
+$ ip link set wlo1 up
+2: wlo1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DORMANT group default qlen 1000
+    link/ether f4:d1:08:a5:11:bc brd ff:ff:ff:ff:ff:ff
+    altname wlp0s20f3
+
+```
+
+L'assenza del *NO_CARRIER* quando l'interfaccia è *DOWN* mi consente si sapere che l'interfaccia è *amministrativamente* disabilitata, e non è un problema di collegamento.
+
+
+---
+
+### Assegnare un IP ad una interfaccia di rete
+
+#### `ip addr add <ip>/<subnet_mask> dev <interface>`
+
+```console
+$ ip addr list wlo1
+2: wlo1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+    link/ether f4:d1:08:a5:11:bc brd ff:ff:ff:ff:ff:ff
+    altname wlp0s20f3
+    inet 172.20.10.5/28 brd 172.20.10.15 scope global dynamic noprefixroute wlo1
+       valid_lft 86085sec preferred_lft 86085sec
+    inet6 fe80::2171:37c:1573:7e67/64 scope link noprefixroute 
+       valid_lft forever preferred_lft forever
+$ ip addr add 172.20.10.6/28 dev wlo1
+2: wlo1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+    link/ether f4:d1:08:a5:11:bc brd ff:ff:ff:ff:ff:ff
+    altname wlp0s20f3
+    inet 172.20.10.5/28 brd 172.20.10.15 scope global dynamic noprefixroute wlo1
+       valid_lft 86019sec preferred_lft 86019sec
+    inet 172.20.10.6/28 scope global secondary wlo1
+       valid_lft forever preferred_lft forever
+    inet6 fe80::2171:37c:1573:7e67/64 scope link noprefixroute 
+       valid_lft forever preferred_lft forever
+```
+
+Siccome la mia interfaccia aveva già assegnato un indirizzo, il comando eseguito non cancella quello precedente, ma aggiunge semplicemente un IP alternativo a quello principale. Per rimuoverlo posso utilizzare il comando `ip addr del 172.20.10.6/28 dev wlo1`.
+
+---
+
+### Come rendere le configurazioni permanenti
+
+Tutto ciò che viene eseguito con il comando `ip` in un terminale non è *persistente*. 
+Questo significa che al riavvio della macchina tutte le modifiche saranno eliminate.
+
+Storicamente nei sistemi *Ubuntu* una configurazione di rete persistente al riavvio richiedeva la modifica manuale del file `/etc/network/interfaces`, il cui contenuto descrive tutte le informazioni necessarie per configurare le interfacce di rete.
+
+I sistemi più recenti, però, hanno sostituito la gestione della rete con nuovi strumenti come:
+ - *NetworkManager* per installazioni linux Desktop
+ - *systemd-networkd* per installazioni linux Server
+
+---
+
+
+#### /etc/network/interfaces
+
+```console
+# The loopback interface.
+
+auto lo
+iface lo inet loopback
+ 
+# An example ethernet card setup: (broadcast and gateway are optional)
+
+auto eth0
+iface eth0 inet static
+     address 192.168.0.42
+     network 192.168.0.0
+     netmask 255.255.255.0
+     broadcast 192.168.0.255
+     gateway 192.168.0.1
+
+auto eth1
+iface eth1 inet dhcp
+
+```
+
+---
+
+### Tabella di instradamento degli ip nel mio host
+
+#### `ip route list`
+```console
+$ ip route list
+default via 172.20.10.1 dev wlo1 proto dhcp src 172.20.10.5 metric 600 
+172.20.10.0/28 dev wlo1 proto kernel scope link src 172.20.10.5 metric 600 
+```
+
+So che il mio *default gateway* è `172.20.10.1`, che è l'indiririzzo del router nella mia sotto-rete che mi consente la comunicazione verso l'esterno.
+
+La comunicazione di default avverrà con l'interfaccia di rete `wlo1`, al quale è associato l'ip `172.20.10.5`.
+
+Tutte le comunicazioni per la sottorete `172.20.10.0/28` passeranno per l'interfaccia di rete `wlo1`.
+
+---
+
+### wpa_supplicant
+
+Per connettersi ad una rete WiFi (*IEEE 802.11X*) è necessario utilizzare il protocollo di sicurezza *WPA*.
+
+*wpa supplicant* è un demone di sistema che consente di gestire proprio questo tipo di connesioni.
+
+#### `iwlist scan`
+
+Consente di effettuare una scansione per individuare gli `SSID` raggiungibili dalla connessione WiFi del mio computer.
+
+```console 
+$ iwlist scan
+...
+lo        Interface doesn't support scanning.
+
+wlo1      Scan completed :
+          Cell 01 - Address: 16:41:A5:B5:E5:0F
+                    Channel:6
+                    Frequency:2.437 GHz (Channel 6)
+                    Quality=63/70  Signal level=-47 dBm  
+                    Encryption key:on
+                    ESSID:"iPhone di Martina"
+                    Bit Rates:1 Mb/s; 2 Mb/s; 5.5 Mb/s; 11 Mb/s; 18 Mb/s
+                              24 Mb/s; 36 Mb/s; 54 Mb/s
+                    Bit Rates:6 Mb/s; 9 Mb/s; 12 Mb/s; 48 Mb/s
+[...]
+ Cell 03 - Address: D8:44:89:27:7F:42
+                    Channel:1
+                    Frequency:2.412 GHz (Channel 1)
+                    Quality=45/70  Signal level=-65 dBm  
+                    Encryption key:on
+                    ESSID:"anitvam-home"
+                    Bit Rates:1 Mb/s; 2 Mb/s; 5.5 Mb/s; 11 Mb/s; 9 Mb/s
+                              18 Mb/s; 36 Mb/s; 54 Mb/s
+                    Bit Rates:6 Mb/s; 12 Mb/s; 24 Mb/s; 48 Mb/s
+
+[...]
+
+```
+
+---
+
+### Generazione di un file di autenticazione
+
+#### `wpa_passphrase <SSID> <PASSWORD> > wpa.conf`
+#### `wpa_passphrase <SSID> > wpa.conf`
+Consentono di generare un file di configurazione chiamato `wpa.conf` che conterrà l'SSID dell'access point al quale voglio connettermi e la mia password hashata.
+
+È possibile omettere la password per poterla inserire da standard input
+
+### Associazione ad una rete WiFi
+
+#### `wpa_supplicant -i<interfaccia> -c<percorso_assoluto>/wpa.conf`
+Il processo non viene fatto di default in background, per farlo bisogna passare il flag `-B`
+
+### Ottenere un indirizzo ip tramite DHCP
+#### `dhclient wlo1`
+Ottengo così un indirizzo ip sfruttando DHCP installato nel mio router.
+
+---
+
+### Devo fare tutte le volte questi passaggi?
+
+In realtà no, perchè queste configurazioni di basso livello sono già fornite all'interno dei tool di più alto livello citati in precedenza, ovvero *NetworkManager* e *systemd-networkd*. 
+
+<div class="multiCol">
+<div class='col'>
+
+#### Systemd-networkd
+Questo tool è fornito solitamente con le distribuzioni server, si configura interamente attraverso file di configurazione che risiedono nel file `/etc/systemd/network`.
+
+
+</div>
+<div class='col'>
+
+#### Network Manager
+Tool fornito nelle distribuzioni Desktop di Linux. 
+
+Tipicamente si configura utilizzando direttamente l'interfaccia grafica, però esso fornisce una utility da linea di comando che consente di effettuare le operazioni di `ip`, `wpa_cli` e `dhclient` sopra citate.
+
+</div>
+</div>
+
+---
+
+### Come testare la mia connettività di rete
+
+#### `ping` <host>
+L'utility `ping` manda a raffica dei pacchetti all'host destinazione. 
+Quando la destinazione riceve un messaggio di ping risponde al mittente, e il comando tiene traccia del tempo che il specifico messaggio ha impiegato per andare a destinazione e tornare indietro.
+
+Il monitoraggio del tempo di transito di questo pacchetto consente di verificare l'efficienza della comunicazione di rete.
+
+Posso specificare come host un indirizzo ip o un hostname.
+
+```console
+$ ping google.com
+ping google.com
+PING google.com (142.251.209.46) 56(84) bytes of data.
+64 bytes from mil04s51-in-f14.1e100.net (142.251.209.46): icmp_seq=1 ttl=116 time=29.3 ms
+64 bytes from mil04s51-in-f14.1e100.net (142.251.209.46): icmp_seq=2 ttl=116 time=70.7 ms
+64 bytes from mil04s51-in-f14.1e100.net (142.251.209.46): icmp_seq=3 ttl=116 time=67.6 ms
+64 bytes from mil04s51-in-f14.1e100.net (142.251.209.46): icmp_seq=4 ttl=116 time=64.1 ms
+[...]
+```
+
+---
+
+### Altri strumenti di diagnostica utili
+
+<div class="multiCol">
+<div class='col'>
+
+#### `traceroute`
+Fornisce una mappa del percorso compiuto dai dati su Internet dall’origine alla destinazione, mostrando il percorso compiuto dal pacchetto.
+
+```console
+$ traceroute 8.8.8.8
+traceroute to 8.8.8.8 (8.8.8.8), 30 hops max, 60 byte packets
+1  _gateway (172.20.10.1)  6.582 ms  6.438 ms  6.377 ms
+2  * * *
+3  192.168.9.46 (192.168.9.46)  72.874 ms * *
+4  192.168.255.19 (192.168.255.19)  73.690 ms  73.645 ms  73.601 ms
+5  ppp176-paris2.isdnet.net (194.149.182.176)  80.137 ms * *
+6  * * 194.149.189.58 (194.149.189.58)  70.836 ms
+7  * * *
+8  * * *
+9  dns.google (8.8.8.8)  74.866 ms  76.534 ms  37.069 ms
+```
+
+</div>
+<div class='col'>
+
+#### `nslookup`
+Consente di effettuare delle query DNS per ottenere l'indirizzo ip associato ad un hostname.
+
+```console
+$ nslookup google.com
+Server:         172.20.10.1
+Address:        172.20.10.1#53
+
+Non-authoritative answer:
+Name:   google.com
+Address: 142.251.209.46
+Name:   google.com
+Address: 2a00:1450:4002:414::200e
+```
+
+L'indirizzo verso il quale rivolgo le mie query DNS in questo caso è il gateway appartenente alla mia rete locale, che a sua volta instraderà il messaggio verso il DNS di destinazione. 
+
+È possibile modificare il server a cui porre le query modificando il file di sistema `/etc/resolv.conf`
+
+</div>
+</div>
+
+È possibile configurare una tabella di risoluzione di ip locale, che il pc consulta prima di inoltrare la richiesta al DNS server, utile in caso si hanno degli ip noti nella rete locale ai quali si vuole associare un hostname valido solo nel mio pc.
+Per farlo posso aggiungere delle entry al file `/etc/hosts`.

@@ -390,15 +390,15 @@ Encapsulated components have a clear <strong>interface</strong> which is the onl
 </section><section>
 <h2 id="why-containers-pt-1">Why containers? (pt. 1)</h2>
 
-<div class="container w-100 m-0 p-0">
+<div class="div w-100">
     <div class="row ">
 
 
-<div class="col "><p><img src="https://raw.githubusercontent.com/DanySK/shared-slides/6824b93d3d52b841386a744f57953a73ccb67378/containerization/works-on-my-machine.jpeg" alt=""></p>
+<div class="col " style="text-align: center;"><p><img src="https://raw.githubusercontent.com/DanySK/shared-slides/6824b93d3d52b841386a744f57953a73ccb67378/containerization/works-on-my-machine.jpeg" alt=""></p>
 </div>
 
 
-<div class="col "><p><img src="https://raw.githubusercontent.com/DanySK/shared-slides/6824b93d3d52b841386a744f57953a73ccb67378/containerization/docker-born.jpeg" alt=""></p>
+<div class="col " style="text-align: center;"><p><img src="https://raw.githubusercontent.com/DanySK/shared-slides/6824b93d3d52b841386a744f57953a73ccb67378/containerization/docker-born.jpeg" alt=""></p>
 </div>
 </div>
 </div>
@@ -604,9 +604,9 @@ Encapsulated components have a clear <strong>interface</strong> which is the onl
 </ul>
 </section><section>
 <h2 id="content-of-the-pathtomynodejsproject-directory">Content of the <code>path/to/my/nodejs/project</code> DIRECTORY</h2>
-<div class="container w-100 m-0 p-0">
+<div class="div w-100">
     <div class="row ">
-<div class="col col-4"><ol>
+<div class="col col-4" style="text-align: center;"><ol>
 <li>
 <p><code>Dockerfile</code> as for the previous slide</p>
 </li>
@@ -616,7 +616,7 @@ Encapsulated components have a clear <strong>interface</strong> which is the onl
 </ol>
 <pre tabindex="0"><code class="nohighlight" data-noescape="">node_modules/
 </code></pre></div>
-<div class="col col-4"><ol start="3">
+<div class="col col-4" style="text-align: center;"><ol start="3">
 <li>File <code>package.json</code></li>
 </ol>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#000;font-weight:bold">{</span>
@@ -634,7 +634,7 @@ Encapsulated components have a clear <strong>interface</strong> which is the onl
 </span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">"license"</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">"ISC"</span>
 </span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
 </span></span></code></pre></div></div>
-<div class="col col-4"><ol start="4">
+<div class="col col-4" style="text-align: center;"><ol start="4">
 <li>File <code>index.mjs</code></li>
 </ol>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000;font-weight:bold">{</span> <span style="color:#000">env</span> <span style="color:#000;font-weight:bold">}</span> <span style="color:#000">from</span> <span style="color:#4e9a06">'process'</span>
@@ -1044,9 +1044,9 @@ drwx-----x 3 root root 4096  2 nov 11.13 ..
 <h2 id="sudo-powered-containers">Sudo-powered containers</h2>
 <ul>
 <li>
-<p>Sometimes one may be willing to let a container access the Docker daemon of its host</p>
+<p>Sometimes one may be willing to let a container access the <em>Docker daemon</em> <strong>of its host</strong></p>
 <ul>
-<li>this is useful for running containers that can: create/delete other containers, handle images, etc.</li>
+<li>this is useful for running containers that will: <em>create/delete</em> other containers, handle images, etc.</li>
 </ul>
 </li>
 <li>
@@ -1056,10 +1056,10 @@ drwx-----x 3 root root 4096  2 nov 11.13 ..
 </ul>
 </li>
 <li>
-<p>Explanation</p>
+<p>Explanation:</p>
 <ul>
-<li>on the host, the Docker daemon is just a service listening for commands on a <a href="https://en.wikipedia.org/wiki/Unix_domain_socket">Unix socket</a></li>
-<li>the socket is usually reified as a file on the host’s file system, at <code>/var/run/docker.sock</code></li>
+<li>on the host, the Docker daemon is just a <em>service</em> listening for commands on a <a href="https://en.wikipedia.org/wiki/Unix_domain_socket">Unix socket</a></li>
+<li>the socket is usually reified as a <em>file</em> on the host’s file system, at <code>/var/run/docker.sock</code></li>
 <li>the <code>docker</code> command is just a CLI program writing/reading to/from the socket to govern the daemon</li>
 </ul>
 </li>
@@ -1444,11 +1444,11 @@ f034da93c476   my-service   "/bin/sh -c 'npm run…"   4 seconds ago   Up 3 seco
 </section><section>
 <h2 id="docker-compose-syntax-by-example-pt-2">Docker Compose syntax by example (pt. 2)</h2>
 
-<div class="container w-100 m-0 p-0">
+<div class="div w-100">
     <div class="row ">
 
 
-<div class="col "><div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">version</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">3.9</span><span style="color:#f8f8f8;text-decoration:underline">                    </span><span style="color:#8f5902;font-style:italic"># version of the specification</span><span style="color:#f8f8f8;text-decoration:underline">
+<div class="col " style="text-align: center;"><div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">version</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">3.9</span><span style="color:#f8f8f8;text-decoration:underline">                    </span><span style="color:#8f5902;font-style:italic"># version of the specification</span><span style="color:#f8f8f8;text-decoration:underline">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">services</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">                       </span><span style="color:#8f5902;font-style:italic"># section defining services composing the stack</span><span style="color:#f8f8f8;text-decoration:underline">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">frontend</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">                     </span><span style="color:#8f5902;font-style:italic"># name of the first service (frontend)</span><span style="color:#f8f8f8;text-decoration:underline">
@@ -1496,7 +1496,7 @@ f034da93c476   my-service   "/bin/sh -c 'npm run…"   4 seconds ago   Up 3 seco
 </span></span></span></code></pre></div></div>
 
 
-<div class="col "><div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">volumes</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">                   </span><span style="color:#8f5902;font-style:italic"># section for volumes to be created in the stack</span><span style="color:#f8f8f8;text-decoration:underline">
+<div class="col " style="text-align: center;"><div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">volumes</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">                   </span><span style="color:#8f5902;font-style:italic"># section for volumes to be created in the stack</span><span style="color:#f8f8f8;text-decoration:underline">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">db-data</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">                 </span><span style="color:#8f5902;font-style:italic"># name of the volume, to be referenced by services</span><span style="color:#f8f8f8;text-decoration:underline">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#204a87;font-weight:bold">driver_opts</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span><span style="color:#204a87;font-weight:bold">type</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">"none"</span><span style="color:#f8f8f8;text-decoration:underline">
@@ -1789,11 +1789,11 @@ f034da93c476   my-service   "/bin/sh -c 'npm run…"   4 seconds ago   Up 3 seco
 </section><section>
 <h2 id="working-example-pt-1">Working example (pt. 1)</h2>
 
-<div class="container w-100 m-0 p-0">
+<div class="div w-100">
     <div class="row ">
 
 
-<div class="col "><div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">version</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">"3.9"</span><span style="color:#f8f8f8;text-decoration:underline">
+<div class="col " style="text-align: center;"><div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">version</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">"3.9"</span><span style="color:#f8f8f8;text-decoration:underline">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">services</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">db</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
@@ -1841,7 +1841,7 @@ f034da93c476   my-service   "/bin/sh -c 'npm run…"   4 seconds ago   Up 3 seco
 </span></span></span></code></pre></div></div>
 
 
-<div class="col "><blockquote>
+<div class="col " style="text-align: center;"><blockquote>
 <p><strong>Beware</strong>: this is unsafe as passwords are in clear text!</p>
 </blockquote>
 <br>
@@ -1925,11 +1925,11 @@ b304d1ae5404   bridge               bridge    local
 </section><section>
 <h2 id="working-example-pt-3">Working example (pt. 3)</h2>
 
-<div class="container w-100 m-0 p-0">
+<div class="div w-100">
     <div class="row ">
 
 
-<div class="col "><h3 id="lets-make-the-stack-more-secure">Let’s make the stack more secure</h3>
+<div class="col " style="text-align: center;"><h3 id="lets-make-the-stack-more-secure">Let’s make the stack more secure</h3>
 <ol>
 <li>
 <p>Let’s create a file containing the DB root password, say <code>db-root-password.txt</code>:</p>
@@ -1950,7 +1950,7 @@ b304d1ae5404   bridge               bridge    local
 </div>
 
 
-<div class="col "><div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">version</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">"3.9"</span><span style="color:#f8f8f8;text-decoration:underline">
+<div class="col " style="text-align: center;"><div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">version</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">"3.9"</span><span style="color:#f8f8f8;text-decoration:underline">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">services</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">db</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
@@ -2124,11 +2124,11 @@ package "java sql" {
 </section><section>
 <h2 id="example-docker-compose-for-testing--junit-pt-3">Example: Docker Compose for testing + JUnit (pt. 3)</h2>
 
-<div class="container w-100 m-0 p-0">
+<div class="div w-100">
     <div class="row ">
 
 
-<div class="col "><div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">TestMariaDBCustomerRepository</span> <span style="color:#000;font-weight:bold">{</span>
+<div class="col " style="text-align: center;"><div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">TestMariaDBCustomerRepository</span> <span style="color:#000;font-weight:bold">{</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">companion</span> <span style="color:#204a87;font-weight:bold">object</span> <span style="color:#000;font-weight:bold">{</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#5c35cc;font-weight:bold">@BeforeClass</span> <span style="color:#5c35cc;font-weight:bold">@JvmStatic</span> <span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000">setUpMariaDb</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#000;font-weight:bold">{</span> <span style="color:#000">TODO</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">"start MariaDB via Docker Compose"</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">}</span>
@@ -2177,7 +2177,7 @@ package "java sql" {
 </span></span></code></pre></div></div>
 
 
-<div class="col "><ul>
+<div class="col " style="text-align: center;"><ul>
 <li>
 <p>Unit thest for the <code>SqlCustomerRepository</code> class</p>
 </li>
@@ -2404,11 +2404,11 @@ To add a manager to this swarm, run 'docker swarm join-token manager' and follow
 </section><section>
 <h2 id="stack-deploy-example-portainerhttpswwwportainerio">Stack Deploy Example: <a href="https://www.portainer.io/">Portainer</a></h2>
 
-<div class="container w-100 m-0 p-0">
+<div class="div w-100">
     <div class="row ">
 
 
-<div class="col "><div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">version</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">'3.2'</span><span style="color:#f8f8f8;text-decoration:underline">
+<div class="col " style="text-align: center;"><div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">version</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">'3.2'</span><span style="color:#f8f8f8;text-decoration:underline">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">services</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">agent</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
@@ -2449,7 +2449,7 @@ To add a manager to this swarm, run 'docker swarm join-token manager' and follow
 </span></span></span></code></pre></div></div>
 
 
-<div class="col "><ul>
+<div class="col " style="text-align: center;"><ul>
 <li>
 <p>Portainer is a Web-based dashboard for cluster administration</p>
 <ul>
@@ -2587,11 +2587,11 @@ To add a manager to this swarm, run 'docker swarm join-token manager' and follow
 </section><section>
 <h2 id="example-of-placement-constraints">Example of placement constraints</h2>
 
-<div class="container w-100 m-0 p-0">
+<div class="div w-100">
     <div class="row ">
 
 
-<div class="col "><div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">version</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">"3.9"</span><span style="color:#f8f8f8;text-decoration:underline">
+<div class="col " style="text-align: center;"><div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">version</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">"3.9"</span><span style="color:#f8f8f8;text-decoration:underline">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">services</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">db</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
@@ -2620,7 +2620,7 @@ To add a manager to this swarm, run 'docker swarm join-token manager' and follow
 </span></span></span></code></pre></div></div>
 
 
-<div class="col "><ul>
+<div class="col " style="text-align: center;"><ul>
 <li>
 <p>Let’s define a stack for Wordpress, with <strong>placement constraints</strong></p>
 <ul>
@@ -2707,11 +2707,11 @@ To add a manager to this swarm, run 'docker swarm join-token manager' and follow
 </section><section>
 <h2 id="example-of-placement-preferences">Example of placement preferences</h2>
 
-<div class="container w-100 m-0 p-0">
+<div class="div w-100">
     <div class="row ">
 
 
-<div class="col "><div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">version</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">"3.9"</span><span style="color:#f8f8f8;text-decoration:underline">
+<div class="col " style="text-align: center;"><div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">version</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">"3.9"</span><span style="color:#f8f8f8;text-decoration:underline">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">services</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">ws</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
@@ -2756,7 +2756,7 @@ To add a manager to this swarm, run 'docker swarm join-token manager' and follow
 </div>
 
 
-<div class="col "><ol>
+<div class="col " style="text-align: center;"><ol>
 <li>
 <p>Serval replicas of the same service are created:</p>
 <p><img src="./portainer-replicated-service.png" alt="Deployment with replicas"></p>
@@ -2772,11 +2772,11 @@ To add a manager to this swarm, run 'docker swarm join-token manager' and follow
 </section><section>
 <h2 id="docker-swarm-and-volumes">Docker Swarm and Volumes</h2>
 
-<div class="container w-100 m-0 p-0">
+<div class="div w-100">
     <div class="row ">
 
 
-<div class="col "><blockquote>
+<div class="col " style="text-align: center;"><blockquote>
 <p>Volumes are <strong>always local</strong> w.r.t. the node the current container is deployed onto</p>
 </blockquote>
 <br>
@@ -2801,7 +2801,7 @@ To add a manager to this swarm, run 'docker swarm join-token manager' and follow
 </span></span></span></code></pre></div></div>
 
 
-<div class="col "><ol>
+<div class="col " style="text-align: center;"><ol>
 <li>
 <p>Several replicas of the simulation are created…</p>
 <p><img src="./portainer-fake-simulation.png" alt="Deployment with replicas"></p>

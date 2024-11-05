@@ -1,4 +1,4 @@
-baseURL = "https://danysk.github.io/course-scm-linux-base"
+baseURL = "https://gciatto.github.io/course-scm-linux-advanced"
 languageCode = "en-us"
 title = "Linux Base"
 disableKinds = ["sitemap", "RSS"]
@@ -11,7 +11,7 @@ ignoreFiles = ['.*generator.md$']
 # uglyURLs = true
 
 [author]
-name = "Danilo Pianini"
+name = "Giovanni Ciatto"
 
 # currently only the unsafe mode for goldmark is supported
 [markup.goldmark.renderer]

@@ -1,152 +1,34 @@
-# Corso Linux @SCM Group
 
-## Base
+1. Argomento: Containerizzazione ed Orchestrazione con Docker (4 ore)
+Obiettivi formativi:
+    - Acquisizione di nozioni di base per la containerizzazione: 
+        + differenza tra VM e container
+        + immagini vs. Container
+        + volumi e reti
+    - Creazioni di immagini (aka containerizzazione di applicazioni)
+    - Esecuzione di container (aka deploy di applicazioni containerizzate)
+    - Acquisizione di nozioni di base per l’orchestrazione:
+    + stack, servizi, orchestrazione, etc
+    - Deploy e gestione di stack di servizi con Docker compose
 
-### Parte 1 -- Danilo Pianini
+2. Argomento: Servizi e timer di sistema con systemd (2 ore)
+Obiettivi formativi:
+    - Acquisizione di nozioni di base per systemd:
+        + architettura di system e suo ruolo all’interno dell’OS linux
+        + funzionamento di massima di systemd
+        + definizione di unità e timer
+    - Acquisire familiarità con i comandi base per la gestione dei servizi systemd: systemctl enable / disable / start / stop / restart / status
+    - Esempi di configurazione di demoni comuni (sshd, ssh-agent, etc)
+    - Definizione di demoni custom
+    - Definizioni di timer custom
 
-* Rudimenti di sistemi operativi
-* UNIX, POSIX, e il sistema operativo GNU/Linux
-* Distribuzioni Linux
-* Rudimenti del file system UNIX
-    * Struttura del file system
-
-* Terminali per sistemi POSIX: sh, bash, zsh
-
-* Manipolazione di base del file system
-    * Query
-        * pwd
-        * ls [-a]
-        * cd
-    * Modifica
-        * touch
-        * mkdir [-p]
-    * Wildcards: ?, * e **
-
-* Strumenti basilari del terminale
-    * clear
-    * echo
-    * history e ^R
-
-* Spostamento, copia, rimozione, visualizzazione di file e cartelle
-    * cp
-    * mv
-    * rm [-rf]
-    * cat
-    * less
-    * head [-n]
-    * tail [-fn]
-    * du
-    * locate e find
-    * which
-
-* Redirezione
-    * Standard output, input, ed error
-    * standard output redirection con > e >>
-    * standard input redirection con <
-    * process piping (|)
-    * filtraggio con grep [-vnc]
-
-* Manualistica
-    * whatis
-    * man
-    * apropos
-
-* Utenti e gruppi
-    * gruppi, utenti, permessi
-    * permessi ottali
-    * ls [-ahl]
-    * whoami
-    * who
-    * chmod
-    * chown
-    * useradd
-    * usermod
-    * visudo
-
-Processi, segnali, e loro gestione
-    * PID
-    * ps
-    * top e htop
-    * backgrounding (& e ^Z)
-    * kill
-    * killall
-
-* Secure Shell
-    * ssh
--    * autenticazione a chiavi assimetriche
--    * ssh-keygen
--    * il demone ssh
--    * ssh.conf e sshd.conf
-    * scp
-    * filezilla
-
-Rudimenti di programmazione bash
-    * variabili
-    * script, shebang line
-    * condizionali (if, until)
-    * iterazione (for, while)
-    * sort
-    * sed
-
-### Parte 2 -- Martina Baiardi
-
-- Basic Linux Networking
-  - LAN vs WAN
-  - ISO OSI
-- Layer 2
-  - mac address
-  - Loopback interface
-  - Ethernet/Wi-Fi interfaces
-- Layer 3
-  - TCP/IPv4 addresses
-    - format
-    - netmasks
-  - DHCP
-  - NAT
-  - DNS
-  - NTP
-  - Network manager
-- Network configuration
-    - ip command
-    - systemd/networkd
-    - nmcli command
-    - /etc/network/interfaces
-    - ping command
-    - traceroute
-    - nslookup
-    - netstat
-    - configurazione rete tramite dhcp
-    - configurazione rete WPA2/WPA3
-        - wpa_cli command
-- Network tools
-  - /etc/hosts
-  - curl
-  - wget
-
-## Strumenti per analisi processi
-- Foreground and Background processes
-- Process states
-- load average
-- ps command
-- top/htop command
-- kill command
-
-## Strumenti per analisi risorse di sistema
-
-## Log di sistema
-- log rotate e gestione dei log di systemctl (size, persistence time)
-- /var/log
-- journalctl
-
-
-* Gestione di file systems
-    * df
-    * montaggio e smontaggio di partizioni (mount, umount)
-
-## Utilizzo periferiche (es: porte USB) su Linux
-- Rintracciare dispositivi esterni
-- montare il percorso di tali dispositivi
-- lsusb
-- lspci
-
-https://info-ee.surrey.ac.uk/Teaching/Unix/
+3. Argomento: Regole di routing con iptables (2 ore)
+Obiettivi formativi:
+    - Acquisizione di nozioni di base per networking
+        + richiami di protocolli di rete, porte, regole di firewall, etc
+        + architettura di iptables
+    - Scrittura di regole di iptables
+    - Configurazione del firewall con iptables
+    - Gestione del traffico e della banda di rete con iptables
+        + redirezione traffico
+        + limitazioni di velocità

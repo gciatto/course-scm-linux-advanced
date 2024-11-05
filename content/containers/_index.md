@@ -891,15 +891,15 @@ Volumes are NOT automatically _cleaned up_ when containers are _deleted_
 
 ## Sudo-powered containers
 
-- Sometimes one may be willing to let a container access the Docker daemon of its host
-    * this is useful for running containers that can: create/delete other containers, handle images, etc.
+- Sometimes one may be willing to let a container access the _Docker daemon_ __of its host__
+    * this is useful for running containers that will: _create/delete_ other containers, handle images, etc.
 
 - To achieve that one may exploit __bind mounts__
     * to share the Docker daemon's socket with the container
 
-- Explanation
-    * on the host, the Docker daemon is just a service listening for commands on a [Unix socket](https://en.wikipedia.org/wiki/Unix_domain_socket)
-    * the socket is usually reified as a file on the host's file system, at `/var/run/docker.sock`
+- Explanation:
+    * on the host, the Docker daemon is just a _service_ listening for commands on a [Unix socket](https://en.wikipedia.org/wiki/Unix_domain_socket)
+    * the socket is usually reified as a _file_ on the host's file system, at `/var/run/docker.sock`
     * the `docker` command is just a CLI program writing/reading to/from the socket to govern the daemon
 
 - One may simply create a Docker container with the Docker CLI tool installed on it

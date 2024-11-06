@@ -517,7 +517,7 @@ Encapsulated components have a clear <strong>interface</strong> which is the onl
 <h2 id="running-containers">Running containers</h2>
 <ol>
 <li>Pull an image: <code>docker pull adoptopenjdk</code></li>
-<li>Run a container! <code>docker run adoptopenjdk</code></li>
+<li>Run a container: <code>docker run adoptopenjdk</code></li>
 </ol>
 <p>Every image provides a <em>default command</em>, running without options runs such default in a <em>non-interactive</em> terminal.</p>
 <p>Running in interactive mode can be achieved with the <code>-i</code> option</p>
@@ -1349,7 +1349,7 @@ drwx-----x 3 root root 4096  2 nov 11.13 ..
 </li>
 </ol>
 </section><section>
-<h2 id="exposing-ports">Exposing ports</h2>
+<h2 id="exposing-ports-pt-1">Exposing ports (pt. 1)</h2>
 <ul>
 <li>
 <p>When a container wraps a <strong>service</strong> listening on <strong>layer-4 port</strong>…</p>
@@ -1373,6 +1373,10 @@ drwx-----x 3 root root 4096  2 nov 11.13 ..
 7a14f3bf95cc   my-service   "/bin/sh -c 'npm run…"   1 second ago   Up Less than a second   8080/tcp   wonderful_goldwasser
 </code></pre><p>(look at the <code>PORTS</code> column)</p>
 </li>
+</ul>
+</section><section>
+<h2 id="exposing-ports-pt-2">Exposing ports (pt. 2)</h2>
+<ul>
 <li>
 <p>When <em>running</em> a Docker <em>container</em>, the exposed port can be mapped to host’s ports via <code>-P</code> option</p>
 <ul>
@@ -1448,7 +1452,7 @@ f034da93c476   my-service   "/bin/sh -c 'npm run…"   4 seconds ago   Up 3 seco
     <div class="row ">
 
 
-<div class="col " style="text-align: center;"><div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">version</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">3.9</span><span style="color:#f8f8f8;text-decoration:underline">                    </span><span style="color:#8f5902;font-style:italic"># version of the specification</span><span style="color:#f8f8f8;text-decoration:underline">
+<div class="col col-6" style="text-align: center;"><div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">version</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">3.9</span><span style="color:#f8f8f8;text-decoration:underline">                    </span><span style="color:#8f5902;font-style:italic"># version of the specification</span><span style="color:#f8f8f8;text-decoration:underline">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">services</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">                       </span><span style="color:#8f5902;font-style:italic"># section defining services composing the stack</span><span style="color:#f8f8f8;text-decoration:underline">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">frontend</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">                     </span><span style="color:#8f5902;font-style:italic"># name of the first service (frontend)</span><span style="color:#f8f8f8;text-decoration:underline">
@@ -1496,7 +1500,7 @@ f034da93c476   my-service   "/bin/sh -c 'npm run…"   4 seconds ago   Up 3 seco
 </span></span></span></code></pre></div></div>
 
 
-<div class="col " style="text-align: center;"><div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">volumes</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">                   </span><span style="color:#8f5902;font-style:italic"># section for volumes to be created in the stack</span><span style="color:#f8f8f8;text-decoration:underline">
+<div class="col col-6" style="text-align: center;"><div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">volumes</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">                   </span><span style="color:#8f5902;font-style:italic"># section for volumes to be created in the stack</span><span style="color:#f8f8f8;text-decoration:underline">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">db-data</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">                 </span><span style="color:#8f5902;font-style:italic"># name of the volume, to be referenced by services</span><span style="color:#f8f8f8;text-decoration:underline">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#204a87;font-weight:bold">driver_opts</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span><span style="color:#204a87;font-weight:bold">type</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">"none"</span><span style="color:#f8f8f8;text-decoration:underline">
@@ -1555,18 +1559,15 @@ f034da93c476   my-service   "/bin/sh -c 'npm run…"   4 seconds ago   Up 3 seco
 <h3 id="configs">Configs</h3>
 <p>From <a href="https://docs.docker.com/compose/compose-file/08-configs/">Docker Compose documentation</a>:</p>
 <ul>
-<li>
-<p><strong>configs</strong> are <em>files</em> containing <em>configuration data</em> that can be <em>injected</em> into services upon instantiation</p>
-</li>
-<li>
-<p>they allow users to configure their services’ behaviour <em>without</em> the need to <strong>(re)build a (new) image</strong></p>
-</li>
-<li>
-<p>they are <em>read-only</em> files, mounted into services’ containers, similarly to <em>read-only</em> <strong>volumes</strong></p>
-</li>
-<li>
-<p>they are declared in the <code>configs</code> section of the <code>docker-compose.yml</code> file</p>
-</li>
+<li><strong>configs</strong> are <em>files</em> containing <em>configuration data</em> that can be <em>injected</em> into services upon instantiation</li>
+<li>they allow users to configure their services’ behaviour <em>without</em> the need to <strong>(re)build a (new) image</strong></li>
+<li>they are <em>read-only</em> files, mounted into services’ containers, similarly to <em>read-only</em> <strong>volumes</strong></li>
+<li>they are declared in the <code>configs</code> section of the <code>docker-compose.yml</code> file</li>
+</ul>
+</section><section>
+<h2 id="orchestration-level-notions-pt-3">Orchestration-level notions (pt. 3)</h2>
+<h3 id="configs-1">Configs</h3>
+<ul>
 <li>
 <p>one config may either be created <strong>stack-wise</strong> out of a <strong>local file</strong> from the <em>host</em>…</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">configs</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
@@ -1574,7 +1575,7 @@ f034da93c476   my-service   "/bin/sh -c 'npm run…"   4 seconds ago   Up 3 seco
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">        </span><span style="color:#204a87;font-weight:bold">file</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000">/path/to/config/on/the/host</span><span style="color:#f8f8f8;text-decoration:underline">
 </span></span></span></code></pre></div></li>
 <li>
-<p>… or it can be <strong>manually created</strong> by means of the <code>docker config create [OPTIONS] NAME PATH|-</code> command</p>
+<p>… or it can be <strong>manually created</strong> by means of the <code>docker config create [OPTIONS] NAME PATH</code> command</p>
 <ul>
 <li>in this case they can be referenced in several <code>docker-compose.yml</code> files:
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">configs</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
@@ -1596,7 +1597,7 @@ f034da93c476   my-service   "/bin/sh -c 'npm run…"   4 seconds ago   Up 3 seco
 </span></span></span></code></pre></div></li>
 </ul>
 </section><section>
-<h2 id="orchestration-level-notions-pt-3">Orchestration-level notions (pt. 3)</h2>
+<h2 id="orchestration-level-notions-pt-3-1">Orchestration-level notions (pt. 3)</h2>
 <h3 id="secrets">Secrets</h3>
 <p>From <a href="https://docs.docker.com/compose/compose-file/09-secrets/">Docker Compose documentation</a>:</p>
 <ul>
@@ -1995,7 +1996,7 @@ b304d1ae5404   bridge               bridge    local
 <p>Docker Compose is also useful for software <strong>testing</strong></p>
 </li>
 <li>
-<p>E.g. whenever the system under test relied on some infrastructural component</p>
+<p>E.g. whenever the system under test relies on some <em>infrastructural component</em></p>
 <ul>
 <li>e.g. a database, a message broker, a cache, etc.</li>
 </ul>

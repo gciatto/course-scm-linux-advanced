@@ -403,7 +403,7 @@ __Docker__: the most famous container technology, actually consisting of several
 ## Running containers
 
 1. Pull an image: `docker pull adoptopenjdk`
-2. Run a container! `docker run adoptopenjdk`
+2. Run a container: `docker run adoptopenjdk`
 
 Every image provides a *default command*, running without options runs such default in a *non-interactive* terminal.
 
@@ -1098,7 +1098,7 @@ Let's create a non-trivial scenario with 2 container attached to the same networ
 
 ---
 
-## Exposing ports
+## Exposing ports (pt. 1)
 
 - When a container wraps a __service__ listening on __layer-4 port__...
     + ... the port is __not accessible__ from the _outside_ world
@@ -1115,6 +1115,10 @@ Let's create a non-trivial scenario with 2 container attached to the same networ
     ```
 
     (look at the `PORTS` column)
+
+---
+
+## Exposing ports (pt. 2)
 
 - When _running_ a Docker _container_, the exposed port can be mapped to host's ports via `-P` option
     + this would make any `EXPOSE`d port in the image mapped to some _random_ port of the host
@@ -1182,7 +1186,7 @@ The example application is composed of the following parts:
 
 
 {{< multicol >}}
-{{% col %}}
+{{% col class="col-6" %}}
 ```yaml
 version: 3.9                    # version of the specification
 
@@ -1231,7 +1235,7 @@ services:                       # section defining services composing the stack
       - db-credentials          # reference to the secret (by name)
 ```
 {{% /col %}}
-{{% col %}}
+{{% col class="col-6" %}}
 ```yaml
 volumes:                   # section for volumes to be created in the stack
   db-data:                 # name of the volume, to be referenced by services
@@ -1292,13 +1296,20 @@ From [Docker Compose documentation](https://docs.docker.com/compose/compose-file
 - they allow users to configure their services' behaviour _without_ the need to __(re)build a (new) image__
 - they are _read-only_ files, mounted into services' containers, similarly to _read-only_ __volumes__
 - they are declared in the `configs` section of the `docker-compose.yml` file
+
+---
+
+## Orchestration-level notions (pt. 3)
+
+### Configs
+
 - one config may either be created __stack-wise__ out of a __local file__ from the _host_...
     ```yaml
     configs:
         config_name:
             file: /path/to/config/on/the/host
     ```
-- ... or it can be __manually created__ by means of the `docker config create [OPTIONS] NAME PATH|-` command
+- ... or it can be __manually created__ by means of the `docker config create [OPTIONS] NAME PATH` command
     + in this case they can be referenced in several `docker-compose.yml` files:
         ```yaml
         configs:
@@ -1688,7 +1699,7 @@ secrets:
 
 - Docker Compose is also useful for software __testing__
 
-- E.g. whenever the system under test relied on some infrastructural component
+- E.g. whenever the system under test relies on some _infrastructural component_
     * e.g. a database, a message broker, a cache, etc.
 
 - Usual workflow for testing:

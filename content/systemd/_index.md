@@ -46,7 +46,23 @@ Giovanni Ciatto
 
 ### The role of the _init system_
 
-![](./boot-simple.png)
+{{% multicol %}}
+{{% col %}}
+![](./boot-init.png)
+{{% /col %}}
+{{% col top-margin="20vh" %}}
+> The init system is the _first process_ started by the _kernel_
+
+<br>
+
+- This is why it has __PID=1__
+
+- It is responsible for starting _all_ other _processes_:
+    + including the _display server_ (e.g. X, Wayland)
+    + including the _window manager_ (e.g. Gnome, KDE)
+    + including _daemons_ and _services_ (e.g. `sshd`, `httpd`)
+{{% /col %}}
+{{% /multicol %}}
 
 ---
 
@@ -58,10 +74,18 @@ Giovanni Ciatto
 {{% col %}}
 ![](./boot-architecture.png)
 {{% /col %}}
-{{% col %}}
+{{% col top-margin="30vh" %}}
 - The init system is the _first process_ started by the _kernel_
 - It's responsible for starting _all_ other _processes_
     + including _daemons_ and _services_
     + including 
 {{% /col %}}
 {{% /multicol %}}
+
+---
+
+## Examples
+
+- Timer: duckdns
+- SSHD service
+- DockerD service

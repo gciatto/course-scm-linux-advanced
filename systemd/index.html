@@ -50,15 +50,38 @@
 </section><section>
 <h2 id="what-happens-when-you-boot-a-linux-system-1">What happens when you boot a Linux system?</h2>
 <h3 id="the-role-of-the-_init-system_">The role of the <em>init system</em></h3>
-<p><img src="./boot-simple.png" alt=""></p>
+
+<div class="div w-100">
+    <div class="row "><div class="col align-middle " style="text-align: center;"><p><img src="./boot-init.png" alt=""></p>
+</div>
+<div class="col align-middle " style="text-align: center; margin-top:20vh;"><blockquote>
+<p>The init system is the <em>first process</em> started by the <em>kernel</em></p>
+</blockquote>
+<br>
+<ul>
+<li>
+<p>This is why it has <strong>PID=1</strong></p>
+</li>
+<li>
+<p>It is responsible for starting <em>all</em> other <em>processes</em>:</p>
+<ul>
+<li>including the <em>display server</em> (e.g. X, Wayland)</li>
+<li>including the <em>window manager</em> (e.g. Gnome, KDE)</li>
+<li>including <em>daemons</em> and <em>services</em> (e.g. <code>sshd</code>, <code>httpd</code>)</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
 </section><section>
 <h2 id="what-happens-when-you-boot-a-linux-system-2">What happens when you boot a Linux system?</h2>
 <h3 id="architectural-view">Architectural View</h3>
 
 <div class="div w-100">
-    <div class="row "><div class="col " style="text-align: center;"><p><img src="./boot-architecture.png" alt=""></p>
+    <div class="row "><div class="col align-middle " style="text-align: center;"><p><img src="./boot-architecture.png" alt=""></p>
 </div>
-<div class="col " style="text-align: center;"><ul>
+<div class="col align-middle " style="text-align: center; margin-top:30vh;"><ul>
 <li>The init system is the <em>first process</em> started by the <em>kernel</em></li>
 <li>It’s responsible for starting <em>all</em> other <em>processes</em>
 <ul>
@@ -70,6 +93,13 @@
 </div>
 </div>
 </div>
+</section><section>
+<h2 id="examples">Examples</h2>
+<ul>
+<li>Timer: duckdns</li>
+<li>SSHD service</li>
+<li>DockerD service</li>
+</ul>
 </section>
 
   

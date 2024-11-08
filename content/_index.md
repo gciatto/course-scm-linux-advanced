@@ -12,6 +12,7 @@ A cura di:
 
 - ## [Giovanni Ciatto](mailto:giovanni.ciatto@unibo.it) -> Primo modulo
     - [Containerizzazione ed Orchestrazione con Docker](./containers/)
+    - [Systemd](./systemd/)
 
 - ## [Nicolas Farabegoli](mailto:nicolas.farabegoli@unibo.it) -> [Secondo modulo](https://github.com/nicolasfara/course-scm-linux-advanced/releases/latest)
 

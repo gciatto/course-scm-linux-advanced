@@ -1,8 +1,7 @@
 <!DOCTYPE html><html lang="en"><head>
-	<meta name="generator" content="Hugo 0.137.0">
     <meta charset="utf-8">
-<title>Aspetti avanzati di Linux</title>
-<meta name="description" content="Corso Linux Avanzato @ SCM Group">
+<title>Systemd</title>
+<meta name="description" content="Practical introduction to systemd">
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -25,21 +24,52 @@
       <div class="slides">
   
 
-    <section><h1 id="aspetti-avanzati-di-linux">Aspetti avanzati di Linux</h1>
-<p>A cura di:</p>
+    <section><h1 id="systemd">Systemd</h1>
+<p>Giovanni Ciatto</p>
+</section><section>
+<h2 id="references">References</h2>
 <ul>
-<li>
-<h2 id="giovanni-ciattomailtogiovanniciattouniboit---primo-modulo"><a href="mailto:giovanni.ciatto@unibo.it">Giovanni Ciatto</a> -&gt; Primo modulo</h2>
+<li><a href="https://wiki.archlinux.org/title/Systemd"><code>systemd</code> on ArchLinux Wiki</a></li>
+<li><a href="https://www.digitalocean.com/community/tutorials/systemd-essentials-working-with-services-units-and-the-journal">DigitalOcean’s tutorial on <code>systemd</code></a></li>
+<li><a href="https://www.slideshare.net/slideshow/systemd-46731240/46731240">Lucas Nussbaum’s tutorial on <code>systemd</code></a></li>
+<li><a href="https://zedas.fr/posts/linux-explained-2-init-and-shell/">“Linux explained part 2 : Bootloader, Init and Shell”</a></li>
+<li><a href="https://phndiaye.github.io/the-current-state-of-init-systems.html">“The current state of init systems”</a></li>
+</ul>
+</section><section>
+<h2 id="what-is-systemd-pt-1">What is <code>systemd</code>? (pt. 1)</h2>
+<blockquote>
+<p><code>systemd</code> $\approx$ today’s most common <strong>init system</strong> for Linux systems</p>
+</blockquote>
 <ul>
-<li><a href="./containers/">Containerizzazione ed Orchestrazione con Docker</a></li>
-<li><a href="./systemd/">Systemd</a></li>
+<li>what’s an init system?</li>
+</ul>
+</section><section>
+<h2 id="what-happens-when-you-boot-a-linux-system">What happens when you boot a Linux system?</h2>
+<h3 id="overview">Overview</h3>
+<p><img src="./boot-complex.png" alt=""></p>
+</section><section>
+<h2 id="what-happens-when-you-boot-a-linux-system-1">What happens when you boot a Linux system?</h2>
+<h3 id="the-role-of-the-_init-system_">The role of the <em>init system</em></h3>
+<p><img src="./boot-simple.png" alt=""></p>
+</section><section>
+<h2 id="what-happens-when-you-boot-a-linux-system-2">What happens when you boot a Linux system?</h2>
+<h3 id="architectural-view">Architectural View</h3>
+
+<div class="div w-100">
+    <div class="row "><div class="col " style="text-align: center;"><p><img src="./boot-architecture.png" alt=""></p>
+</div>
+<div class="col " style="text-align: center;"><ul>
+<li>The init system is the <em>first process</em> started by the <em>kernel</em></li>
+<li>It’s responsible for starting <em>all</em> other <em>processes</em>
+<ul>
+<li>including <em>daemons</em> and <em>services</em></li>
+<li>including</li>
 </ul>
 </li>
-<li>
-<h2 id="nicolas-farabegolimailtonicolasfarabegoliuniboit---secondo-modulohttpsgithubcomnicolasfaracourse-scm-linux-advancedreleaseslatest"><a href="mailto:nicolas.farabegoli@unibo.it">Nicolas Farabegoli</a> -&gt; <a href="https://github.com/nicolasfara/course-scm-linux-advanced/releases/latest">Secondo modulo</a></h2>
-</li>
 </ul>
-<h3 id="versione-slides-2024-11-08">Versione slides: 2024-11-08</h3>
+</div>
+</div>
+</div>
 </section>
 
   
@@ -54,7 +84,7 @@
 <a href="/course-scm-linux-advanced/reveal-js/dist/print/" id="print-location" style="display: none;"></a>
 
 <script type="application/json" id="reveal-hugo-site-params">{"custom_theme":"custom-theme.scss","custom_theme_compile":true,"custom_theme_options":{"enablesourcemap":true,"targetpath":"css/custom-theme.css"},"height":"1080","highlight_theme":"solarized-dark","history":true,"mermaid":[{}],"slide_number":true,"theme":"league","transition":"slide","transition_speed":"fast","width":"1920"}</script>
-<script type="application/json" id="reveal-hugo-page-params">null</script>
+<script type="application/json" id="reveal-hugo-page-params">{"custom_theme_options":{"enablesourcemap":true,"targetpath":"css/custom-theme.css"}}</script>
 
 <script src="/course-scm-linux-advanced/reveal-js/dist/reveal.js"></script>
 

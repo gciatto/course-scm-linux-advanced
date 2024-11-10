@@ -41,7 +41,7 @@
 <p><code>systemd</code> $\approx$ today’s most common <strong>init system</strong> for Linux systems</p>
 </blockquote>
 <ul>
-<li>what’s an init system?</li>
+<li>but what’s an <em>init system</em> in the first place?</li>
 </ul>
 </section><section>
 <h2 id="what-happens-when-you-boot-a-linux-system">What happens when you boot a Linux system?</h2>
@@ -54,21 +54,34 @@
 <div class="div w-100">
     <div class="row "><div class="col align-middle " style="text-align: center;"><p><img src="./boot-init.png" alt=""></p>
 </div>
-<div class="col align-middle " style="text-align: center; margin-top:20vh;"><blockquote>
-<p>The init system is the <em>first process</em> started by the <em>kernel</em></p>
-</blockquote>
+<div class="col align-middle " style="text-align: center;"><p>The init system is the <em>first process</em> started by the <em>kernel</em>
 <br>
+(this is why it has <strong>PID=1</strong>)</p>
+<h3 id="heading"></h3>
+<h3 id="responsibilities">Responsibilities</h3>
 <ul>
 <li>
-<p>This is why it has <strong>PID=1</strong></p>
-</li>
-<li>
-<p>It is responsible for starting <em>all</em> other <em>processes</em>:</p>
+<p><em>Starting</em> all other <em>processes</em> (namely, the <strong>services</strong>):</p>
 <ul>
 <li>including the <em>display server</em> (e.g. X, Wayland)</li>
 <li>including the <em>window manager</em> (e.g. Gnome, KDE)</li>
 <li>including <em>daemons</em> and <em>services</em> (e.g. <code>sshd</code>, <code>httpd</code>)</li>
 </ul>
+</li>
+<li>
+<p><em>Mounting</em> the <strong>file systems</strong></p>
+<ul>
+<li>e.g. the <em>home</em> partition, the <em>swap</em> partition, etc.</li>
+</ul>
+</li>
+<li>
+<p><em>Setting up</em> the <strong>network</strong></p>
+<ul>
+<li>e.g. starting the <em>network manager</em>, hence connecting to the <em>default networks</em>, etc.</li>
+</ul>
+</li>
+<li>
+<p>Suspending/hibernating (and resuming), rebooting, and shutting down the system</p>
 </li>
 </ul>
 </div>
@@ -76,23 +89,60 @@
 </div>
 </section><section>
 <h2 id="what-happens-when-you-boot-a-linux-system-2">What happens when you boot a Linux system?</h2>
-<h3 id="architectural-view">Architectural View</h3>
+<h3 id="once-the-system-is-up-and-running">Once the system is up and running…</h3>
 
 <div class="div w-100">
     <div class="row "><div class="col align-middle " style="text-align: center;"><p><img src="./boot-architecture.png" alt=""></p>
 </div>
-<div class="col align-middle " style="text-align: center; margin-top:30vh;"><ul>
-<li>The init system is the <em>first process</em> started by the <em>kernel</em></li>
-<li>It’s responsible for starting <em>all</em> other <em>processes</em>
+<div class="col align-middle " style="text-align: center; margin-top:30vh;"><p>The init system has:</p>
+<ol>
+<li>started all the system services</li>
+<li>mounted all the file systems</li>
+<li>set up the network</li>
+<li>started the display server</li>
+<li>started the window manager</li>
+<li>started the user session</li>
+</ol>
+</div>
+</div>
+</div>
+</section><section>
+<h2 id="init-systems">Init systems</h2>
 <ul>
-<li>including <em>daemons</em> and <em>services</em></li>
-<li>including</li>
-</ul>
+<li>
+<p><a href="https://en.wikipedia.org/wiki/Init">SysVinit</a> (1980s—early 2000s) first family of init systems for Unix-like systems</p>
+</li>
+<li>
+<p><a href="https://en.wikipedia.org/wiki/Upstart_(software)">Upstart</a> (2006—2014) developed by Canonical for Ubuntu</p>
+</li>
+<li>
+<p><a href="https://en.wikipedia.org/wiki/Runit">runit</a> (2004—present) used by niche Linux distributions</p>
+</li>
+<li>
+<p><a href="https://en.wikipedia.org/wiki/OpenRC">OpenRC</a> (2007—present) used by Gentoo and Alpine Linux</p>
+</li>
+<li>
+<p><a href="https://en.wikipedia.org/wiki/Launchd"><code>launchd</code></a> (2005—present) used by macOS, developed by Apple</p>
+</li>
+<li>
+<p><a href="https://en.wikipedia.org/wiki/Systemd"><code>systemd</code></a> (2010—present) inspired by <code>launchd</code>, used by most Linux distributions nowadays</p>
+</li>
+<li>
+<p>Comparison here: <a href="https://wiki.gentoo.org/wiki/Comparison_of_init_systems">https://wiki.gentoo.org/wiki/Comparison_of_init_systems</a></p>
 </li>
 </ul>
-</div>
-</div>
-</div>
+</section><section>
+<h2 id="what-is-systemd-pt-2">What is <code>systemd</code>? (pt. 2)</h2>
+<blockquote>
+<p><code>systemd</code> is a <em>suite</em> of system management <strong>daemons</strong>, <strong>libraries</strong>, and <strong>utilities</strong> designed as a <em>central management and configuration platform</em> for the Linux OS</p>
+</blockquote>
+
+
+
+
+
+<img src="systemd-components.svg" alt="" style="width: 100%; max-width: 95vw; max-height: 80vh; object-fit: contain;">
+
 </section><section>
 <h2 id="examples">Examples</h2>
 <ul>

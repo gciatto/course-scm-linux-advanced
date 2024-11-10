@@ -30,7 +30,7 @@ Giovanni Ciatto
 
 > `systemd` $\approx$ today's most common __init system__ for Linux systems
 
-- what's an init system?
+- but what's an _init system_ in the first place?
 
 ---
 
@@ -50,17 +50,26 @@ Giovanni Ciatto
 {{% col %}}
 ![](./boot-init.png)
 {{% /col %}}
-{{% col top-margin="20vh" %}}
-> The init system is the _first process_ started by the _kernel_
-
+{{% col %}}
+The init system is the _first process_ started by the _kernel_
 <br>
+(this is why it has __PID=1__)
 
-- This is why it has __PID=1__
+###
+### Responsibilities
 
-- It is responsible for starting _all_ other _processes_:
+- _Starting_ all other _processes_ (namely, the __services__):
     + including the _display server_ (e.g. X, Wayland)
     + including the _window manager_ (e.g. Gnome, KDE)
     + including _daemons_ and _services_ (e.g. `sshd`, `httpd`)
+
+- _Mounting_ the __file systems__
+    + e.g. the _home_ partition, the _swap_ partition, etc.
+
+- _Setting up_ the __network__
+    + e.g. starting the _network manager_, hence connecting to the _default networks_, etc.
+
+- Suspending/hibernating (and resuming), rebooting, and shutting down the system
 {{% /col %}}
 {{% /multicol %}}
 
@@ -68,19 +77,48 @@ Giovanni Ciatto
 
 ## What happens when you boot a Linux system?
 
-### Architectural View
+### Once the system is up and running...
 
 {{% multicol %}}
 {{% col %}}
 ![](./boot-architecture.png)
 {{% /col %}}
 {{% col top-margin="30vh" %}}
-- The init system is the _first process_ started by the _kernel_
-- It's responsible for starting _all_ other _processes_
-    + including _daemons_ and _services_
-    + including 
+The init system has:
+1. started all the system services
+1. mounted all the file systems
+1. set up the network
+1. started the display server
+1. started the window manager
+1. started the user session
 {{% /col %}}
 {{% /multicol %}}
+
+---
+
+## Init systems
+
+- [SysVinit](https://en.wikipedia.org/wiki/Init) (1980s—early 2000s) first family of init systems for Unix-like systems
+
+- [Upstart](https://en.wikipedia.org/wiki/Upstart_(software)) (2006—2014) developed by Canonical for Ubuntu
+
+- [runit](https://en.wikipedia.org/wiki/Runit) (2004—present) used by niche Linux distributions
+
+- [OpenRC](https://en.wikipedia.org/wiki/OpenRC) (2007—present) used by Gentoo and Alpine Linux
+
+- [`launchd`](https://en.wikipedia.org/wiki/Launchd) (2005—present) used by macOS, developed by Apple
+
+- [`systemd`](https://en.wikipedia.org/wiki/Systemd) (2010—present) inspired by `launchd`, used by most Linux distributions nowadays
+
+- Comparison here: <https://wiki.gentoo.org/wiki/Comparison_of_init_systems>
+
+---
+
+## What is `systemd`? (pt. 2)
+
+> `systemd` is a _suite_ of system management __daemons__, __libraries__, and __utilities__ designed as a _central management and configuration platform_ for the Linux OS
+
+{{< image src="systemd-components.svg" width="100%" >}}
 
 ---
 

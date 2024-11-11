@@ -23,6 +23,7 @@ Giovanni Ciatto
 - [Lucas Nussbaum's tutorial on `systemd`](https://www.slideshare.net/slideshow/systemd-46731240/46731240)
 - ["Linux explained part 2 : Bootloader, Init and Shell"](https://zedas.fr/posts/linux-explained-2-init-and-shell/)
 - ["The current state of init systems"](https://phndiaye.github.io/the-current-state-of-init-systems.html)
+- ["systemd by example"](https://seb.jambor.dev/posts/systemd-by-example-part-1-minimization/)
 - Also the English [Wikipedia page on systemd](https://en.wikipedia.org/wiki/Systemd) is quite informative
 
 ---
@@ -526,6 +527,55 @@ before delving into the details of `systemctl` and `journalctl`
 {{% /multicol %}}
 
 {{% /section %}}
+
+---
+
+# systemd for service management
+
+How to use `systemctl` and `journalctl`?
+
+---
+
+## Overall functioning of `systemd`
+
+1. The `systemd` daemon is started by the kernel as the first process
+
+2. Upon startup, `systemd` reads the _unit files_ from the _filesystem_
+    - _unit files_ are _declaritive_ text files that describe a __unit__
+    - a __unit__ is a _resource_ that `systemd` knows how to manage (e.g., a _service_, a _timer_, etc.)
+
+3. `systemd` computes in which _order_ the units should be _started_
+    - this is done by _analyzing the dependencies_ between the units
+        + which are _declared_ in the unit files
+
+4. `systemd` then _starts_ the units in the _correct order_
+    - and _monitors_ them to ensure they _stay running_
+
+5. Upon a user request to _shut down_ / _suspend_ / _hibernate_ the system, `systemd` __stops__ the units in the _correct order_
+    - and __restarts__ them upon _resuming_ the system (if needed)
+
+---
+
+## Sorts of units (see [official doc](https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html#Description))
+
+> - Units are classified _by the **suffix**_ (a.k.a. _extension_) of their _unit file_
+> - You can _list_ loaded units via `systemctl list-units [--type=TYPE]`
+> - You can _inspect_ / _locate_ some loaded _unit **file**_ via `systemctl cat NAME.TYPE`
+>     + use `systemctl show NAME.TYPE` to inspect _all_ the properties of a __unit__
+
+- [`service` units](https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html#): a _process_ that needs to be _started_ and _managed_ by `systemd`
+    + e.g., `ssh.service`, `ufw.service`, `cups.service`
+
+- [`socket` units](https://www.freedesktop.org/software/systemd/man/latest/systemd.socket.html#): an _IPC_ or network socket or a file system FIFO controlled and supervised by `systemd`, for _socket-based activation_
+    + e.g., `ssh.socket`, `httpd.socket`
+
+- [`mount` units](https://www.freedesktop.org/software/systemd/man/latest/systemd.mount.html#): a file system mount point controlled and supervised by `systemd`
+    + e.g., `home.mount`, `var.mount` (system partitions are usually mounted by `systemd`)
+
+- [`path` units](https://www.freedesktop.org/software/systemd/man/latest/systemd.path.html#): a path monitored by `systemd`, for _path-based activation_
+
+- [`timer` units](https://www.freedesktop.org/software/system/man/latest/systemd.timer.html#): a timer controlled and supervised by `systemd`, for _timer-based activation_
+    + e.g., `apt-daily.timer`, `apt-daily-upgrade.timer`
 
 ---
 

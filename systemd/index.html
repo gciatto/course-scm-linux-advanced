@@ -1,13 +1,13 @@
 <!DOCTYPE html><html lang="en"><head>
     <meta charset="utf-8">
-<title>Systemd</title>
+<title>System administration with systemd</title>
 <meta name="description" content="Practical introduction to systemd">
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><link rel="stylesheet" href="/course-scm-linux-advanced/reveal-js/dist/reset.css">
 <link rel="stylesheet" href="/course-scm-linux-advanced/reveal-js/dist/reveal.css">
-  <link rel="stylesheet" href="/course-scm-linux-advanced/css/custom-theme.min.e44dbdc0bc9fe3b4078cb624374cbb8d9cab3ee45a2c1e11db0615ced55714ee.css" id="theme"><link rel="stylesheet" href="/course-scm-linux-advanced/highlight-js/solarized-dark.min.css">
+  <link rel="stylesheet" href="/course-scm-linux-advanced/css/custom-theme.min.f8ce39b744487d1a5e0cd5a60f757e03997b8456b7b97d7eeb5bb33ace629bfd.css" id="theme"><link rel="stylesheet" href="/course-scm-linux-advanced/highlight-js/solarized-dark.min.css">
 <link rel="stylesheet" href="https://gitcdn.link/repo/DanySK/css-blur-animation/master/blur.css">
 <link href="https://fonts.googleapis.com/css?family=Roboto Mono" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css?family=Oxygen Mono" rel="stylesheet">
@@ -24,7 +24,7 @@
       <div class="slides">
   
 
-    <section><h1 id="systemd">Systemd</h1>
+    <section><h1 id="system-administration-with-systemd">System administration with systemd</h1>
 <p>Giovanni Ciatto</p>
 </section><section>
 <h2 id="references">References</h2>
@@ -34,6 +34,7 @@
 <li><a href="https://www.slideshare.net/slideshow/systemd-46731240/46731240">Lucas Nussbaum’s tutorial on <code>systemd</code></a></li>
 <li><a href="https://zedas.fr/posts/linux-explained-2-init-and-shell/">“Linux explained part 2 : Bootloader, Init and Shell”</a></li>
 <li><a href="https://phndiaye.github.io/the-current-state-of-init-systems.html">“The current state of init systems”</a></li>
+<li>Also the English <a href="https://en.wikipedia.org/wiki/Systemd">Wikipedia page on systemd</a> is quite informative</li>
 </ul>
 </section><section>
 <h2 id="what-is-systemd-pt-1">What is <code>systemd</code>? (pt. 1)</h2>
@@ -122,19 +123,19 @@
 <p><a href="https://en.wikipedia.org/wiki/OpenRC">OpenRC</a> (2007—present) used by Gentoo and Alpine Linux</p>
 </li>
 <li>
-<p><a href="https://en.wikipedia.org/wiki/Launchd"><code>launchd</code></a> (2005—present) used by macOS, developed by Apple</p>
+<p><a href="https://en.wikipedia.org/wiki/Launchd">launchd</a> (2005—present) used by macOS, developed by Apple</p>
 </li>
 <li>
-<p><a href="https://en.wikipedia.org/wiki/Systemd"><code>systemd</code></a> (2010—present) inspired by <code>launchd</code>, used by most Linux distributions nowadays</p>
+<p><a href="https://en.wikipedia.org/wiki/Systemd">systemd</a> (2010—present) inspired by <code>launchd</code>, used by most Linux distributions nowadays</p>
 </li>
 <li>
 <p>Comparison here: <a href="https://wiki.gentoo.org/wiki/Comparison_of_init_systems">https://wiki.gentoo.org/wiki/Comparison_of_init_systems</a></p>
 </li>
 </ul>
 </section><section>
-<h2 id="what-is-systemd-pt-2">What is <code>systemd</code>? (pt. 2)</h2>
+<h2 id="what-is-systemd-pt-2">What is systemd? (pt. 2)</h2>
 <blockquote>
-<p><code>systemd</code> is a <em>suite</em> of system management <strong>daemons</strong>, <strong>libraries</strong>, and <strong>utilities</strong> designed as a <em>central management and configuration platform</em> for the Linux OS</p>
+<p><strong>systemd</strong> is a <em>suite</em> of system management <strong>daemons</strong>, <strong>libraries</strong>, and <strong>utilities</strong> designed as a <em>central management and configuration platform</em> for the Linux OS</p>
 </blockquote>
 
 
@@ -143,6 +144,423 @@
 
 <img src="systemd-components.svg" alt="" style="width: 100%; max-width: 95vw; max-height: 80vh; object-fit: contain;">
 
+</section><section>
+<h2 id="systemds-utilities-suite">systemd’s utilities suite</h2>
+<p>The systemd <strong>suite</strong> includes the following <em>command-line</em> utilities (corresponding to relevant <em>daemon</em> services):</p>
+<ul>
+<li>
+<p><code>systemctl</code> controls the <code>systemd</code> daemon, from which system- and user-level <em>services</em> can be managed</p>
+</li>
+<li>
+<p><code>journalctl</code> queries messages from the <code>journald</code> daemon, which collects and stores <em>log messages</em> from the kernel and services</p>
+</li>
+<li>
+<p><code>hostnamectl</code> controls the <code>hostnamed</code> daemon, from which the <em>name of the host</em> on the network can be read/set</p>
+</li>
+<li>
+<p><code>loginctl</code> controls the <code>logind</code> daemon, which manages <em>user sessions</em> and <em>seats</em></p>
+</li>
+<li>
+<p><code>timedatectl</code> controls the <code>timedated</code> daemon, which manages the <em>system clock</em> and <em>time zone</em></p>
+</li>
+<li>
+<p><code>localectl</code> controls the <code>localed</code> daemon, which manages the <em>system locale</em> and <em>keyboard layout</em></p>
+</li>
+<li>
+<p><code>busctl</code> controls the <code>bus-proxyd</code> daemon, which provides a <em>D-Bus</em> interface to the system bus</p>
+</li>
+<li>
+<p><code>networkctl</code> controls the <code>networkd</code> daemon, which manages <em>network configurations</em></p>
+</li>
+<li>
+<p><code>resolvectl</code> controls the <code>resolved</code> daemon, which manages <em>DNS</em> configurations</p>
+</li>
+</ul>
+</section><section>
+<h2 id="remarks">Remarks</h2>
+<blockquote>
+<p>This lecture is about the usage of systemd as the <strong>service manager</strong> for Linux
+<br>(i.e., put simply, how to use <code>systemctl</code> and <code>journalctl</code>)</p>
+</blockquote>
+<ul>
+<li>
+<p>… but the systemd suite is much more than that!</p>
+</li>
+<li>
+<p>Overall, systemd is a set of tool for <em>system administration</em></p>
+<ul>
+<li>you can control most aspects of a Linux system using systemd’s utilities</li>
+</ul>
+</li>
+</ul>
+
+
+<span class="fragment ">
+  <h3 id="beware">Beware!</h3>
+<ul>
+<li>
+<p>systemd is a <strong>controversial</strong> piece of software inside the <em>FOSS</em> community</p>
+<ul>
+<li>it has been criticized because it <a href="https://www.zdnet.com/article/linus-torvalds-and-others-on-linuxs-systemd/">arguably violates</a> the <a href="https://en.wikipedia.org/wiki/Unix_philosophy">Unix philosophy</a></li>
+<li>it has been criticized as a <em>mission creep</em> (i.e., it does too much) and as a <em>feature creep</em> (i.e., it has too many features)</li>
+<li>yet, it is the <em>de facto</em> standard for most (and most relevant) <a href="https://en.wikipedia.org/wiki/Systemd#Adoption">Linux distributions</a></li>
+</ul>
+</li>
+<li>
+<p>Yet, <strong>do not expect</strong> all distros to implement/support all the features of the systemd suite</p>
+</li>
+</ul>
+
+</span>
+
+</section><section>
+
+
+<section data-shortcode-section="">
+<h1 id="a-taste-of-the-systemd-suite">A taste of the systemd suite</h1>
+<p>before delving into the details of <code>systemctl</code> and <code>journalctl</code></p>
+</section><section>
+<h2 id="a-taste-of-the-systemd-suite-pt-1">A taste of the systemd suite (pt. 1)</h2>
+<h3 id="hostname-management">Hostname Management</h3>
+<br>
+<div class="div w-100">
+    <div class="row "><div class="col align-middle " style="text-align: center;"><ol>
+<li>Get an overview with <code>hostnamectl --help</code>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span>hostnamectl <span style="color:#ce5c00;font-weight:bold">[</span>OPTIONS...<span style="color:#ce5c00;font-weight:bold">]</span> COMMAND ...
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Query or change system hostname.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Commands:
+</span></span><span style="display:flex;"><span>  status                 Show current hostname settings
+</span></span><span style="display:flex;"><span>  hostname <span style="color:#ce5c00;font-weight:bold">[</span>NAME<span style="color:#ce5c00;font-weight:bold">]</span>        Get/set system hostname
+</span></span><span style="display:flex;"><span>  icon-name <span style="color:#ce5c00;font-weight:bold">[</span>NAME<span style="color:#ce5c00;font-weight:bold">]</span>       Get/set icon name <span style="color:#204a87;font-weight:bold">for</span> host
+</span></span><span style="display:flex;"><span>  chassis <span style="color:#ce5c00;font-weight:bold">[</span>NAME<span style="color:#ce5c00;font-weight:bold">]</span>         Get/set chassis <span style="color:#204a87">type</span> <span style="color:#204a87;font-weight:bold">for</span> host
+</span></span><span style="display:flex;"><span>  deployment <span style="color:#ce5c00;font-weight:bold">[</span>NAME<span style="color:#ce5c00;font-weight:bold">]</span>      Get/set deployment environment <span style="color:#204a87;font-weight:bold">for</span> host
+</span></span><span style="display:flex;"><span>  location <span style="color:#ce5c00;font-weight:bold">[</span>NAME<span style="color:#ce5c00;font-weight:bold">]</span>        Get/set location <span style="color:#204a87;font-weight:bold">for</span> host
+</span></span></code></pre></div></li>
+</ol>
+</div>
+<div class="col align-middle " style="text-align: center;"><ol start="2">
+<li>See information about the <em>current hostname</em> with <code>hostnamectl status</code>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span> Static hostname: lubuntu2410-vm
+</span></span><span style="display:flex;"><span>       Icon name: computer-vm
+</span></span><span style="display:flex;"><span>         Chassis: vm 🖴
+</span></span><span style="display:flex;"><span>      Machine ID: 7fc69dab56a64d73b4f2ae5077df58a0
+</span></span><span style="display:flex;"><span>         Boot ID: 7b52bffe735b47a18135db49790a4cc9
+</span></span><span style="display:flex;"><span>  Virtualization: oracle
+</span></span><span style="display:flex;"><span>Operating System: Ubuntu 24.10                    
+</span></span><span style="display:flex;"><span>          Kernel: Linux 6.11.0-9-generic
+</span></span><span style="display:flex;"><span>    Architecture: x86-64
+</span></span><span style="display:flex;"><span> Hardware Vendor: innotek GmbH
+</span></span><span style="display:flex;"><span>  Hardware Model: VirtualBox
+</span></span><span style="display:flex;"><span>Firmware Version: VirtualBox
+</span></span><span style="display:flex;"><span>   Firmware Date: Fri 2006-12-01
+</span></span><span style="display:flex;"><span>    Firmware Age: 17y 11month 1w 4d 
+</span></span></code></pre></div></li>
+</ol>
+</div>
+</div>
+</div>
+<ol start="3">
+<li>Update the system <em>hostname</em> with <code>hostnamectl hostname my-new-hostname</code></li>
+</ol>
+</section><section>
+<h2 id="a-taste-of-the-systemd-suite-pt-2">A taste of the systemd suite (pt. 2)</h2>
+<h3 id="user-login-and-session-management">User Login and Session Management</h3>
+<ol>
+<li>Get an overview with <code>loginctl --help</code> (sub-commands are organized in <em>Session</em>, <em>User</em>, and <em>Seat</em> commands)
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span>loginctl <span style="color:#ce5c00;font-weight:bold">[</span>OPTIONS...<span style="color:#ce5c00;font-weight:bold">]</span> COMMAND ...
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Send control commands to or query the login manager.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Session Commands:
+</span></span><span style="display:flex;"><span>list-sessions            List sessions
+</span></span><span style="display:flex;"><span>session-status <span style="color:#ce5c00;font-weight:bold">[</span>ID...<span style="color:#ce5c00;font-weight:bold">]</span>   Show session status
+</span></span><span style="display:flex;"><span>show-session <span style="color:#ce5c00;font-weight:bold">[</span>ID...<span style="color:#ce5c00;font-weight:bold">]</span>     Show properties of sessions or the manager
+</span></span><span style="display:flex;"><span>activate <span style="color:#ce5c00;font-weight:bold">[</span>ID<span style="color:#ce5c00;font-weight:bold">]</span>            Activate a session
+</span></span><span style="display:flex;"><span>lock-session <span style="color:#ce5c00;font-weight:bold">[</span>ID...<span style="color:#ce5c00;font-weight:bold">]</span>     Screen lock one or more sessions
+</span></span><span style="display:flex;"><span>unlock-session <span style="color:#ce5c00;font-weight:bold">[</span>ID...<span style="color:#ce5c00;font-weight:bold">]</span>   Screen unlock one or more sessions
+</span></span><span style="display:flex;"><span>lock-sessions            Screen lock all current sessions
+</span></span><span style="display:flex;"><span>unlock-sessions          Screen unlock all current sessions
+</span></span><span style="display:flex;"><span>terminate-session ID...  Terminate one or more sessions
+</span></span><span style="display:flex;"><span>kill-session ID...       Send signal to processes of a session
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>User Commands:
+</span></span><span style="display:flex;"><span>list-users               List users
+</span></span><span style="display:flex;"><span>user-status <span style="color:#ce5c00;font-weight:bold">[</span>USER...<span style="color:#ce5c00;font-weight:bold">]</span>    Show user status
+</span></span><span style="display:flex;"><span>show-user <span style="color:#ce5c00;font-weight:bold">[</span>USER...<span style="color:#ce5c00;font-weight:bold">]</span>      Show properties of users or the manager
+</span></span><span style="display:flex;"><span>enable-linger <span style="color:#ce5c00;font-weight:bold">[</span>USER...<span style="color:#ce5c00;font-weight:bold">]</span>  Enable linger state of one or more users
+</span></span><span style="display:flex;"><span>disable-linger <span style="color:#ce5c00;font-weight:bold">[</span>USER...<span style="color:#ce5c00;font-weight:bold">]</span> Disable linger state of one or more users
+</span></span><span style="display:flex;"><span>terminate-user USER...   Terminate all sessions of one or more users
+</span></span><span style="display:flex;"><span>kill-user USER...        Send signal to processes of a user
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Seat Commands:
+</span></span><span style="display:flex;"><span>list-seats               List seats
+</span></span><span style="display:flex;"><span>seat-status <span style="color:#ce5c00;font-weight:bold">[</span>NAME...<span style="color:#ce5c00;font-weight:bold">]</span>    Show seat status
+</span></span><span style="display:flex;"><span>show-seat <span style="color:#ce5c00;font-weight:bold">[</span>NAME...<span style="color:#ce5c00;font-weight:bold">]</span>      Show properties of seats or the manager
+</span></span><span style="display:flex;"><span>attach NAME DEVICE...    Attach one or more devices to a seat
+</span></span><span style="display:flex;"><span>flush-devices            Flush all device associations
+</span></span><span style="display:flex;"><span>terminate-seat NAME...   Terminate all sessions on one or more seats
+</span></span></code></pre></div></li>
+</ol>
+</section><section>
+<h2 id="a-taste-of-the-systemd-suite-pt-2-1">A taste of the systemd suite (pt. 2)</h2>
+<h3 id="user-login-and-session-management-1">User Login and Session Management</h3>
+<ol start="2">
+<li>
+<p>Get an overview of the current situation with <code>loginctl</code> (no args):</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span>SESSION  UID USER SEAT  LEADER CLASS   TTY   IDLE SINCE
+</span></span><span style="display:flex;"><span>    <span style="color:#0000cf;font-weight:bold">527</span> <span style="color:#0000cf;font-weight:bold">1000</span> user -     <span style="color:#0000cf;font-weight:bold">16410</span>  manager -     no   -    
+</span></span><span style="display:flex;"><span>    <span style="color:#0000cf;font-weight:bold">529</span> <span style="color:#0000cf;font-weight:bold">1000</span> user seat0 <span style="color:#0000cf;font-weight:bold">16591</span>  user    tty2  no   -    
+</span></span><span style="display:flex;"><span>    <span style="color:#0000cf;font-weight:bold">531</span> <span style="color:#0000cf;font-weight:bold">1000</span> user -     <span style="color:#0000cf;font-weight:bold">17051</span>  user    pts/1 no   -    
+</span></span></code></pre></div></li>
+<li>
+<p>A bit of nomenclature:</p>
+<ul>
+<li><strong>Session</strong>: a <em>login session</em> (e.g., a <em>TTY</em> session, an <em>SSH</em> session)</li>
+<li><strong>User</strong>: a <em>user account</em> (e.g., <code>root</code>, <code>user</code>)</li>
+<li><strong>Seat</strong>: a <em>physical or virtual seat</em> (e.g., a <em>display</em>, a <em>keyboard</em>, a <em>mouse</em>)</li>
+<li><strong>Leader</strong>: the <em>PID</em> of the <em>session leader</em> (i.e., the <em>process</em> that started the session)</li>
+</ul>
+</li>
+</ol>
+</section><section>
+<h2 id="a-taste-of-the-systemd-suite-pt-3">A taste of the systemd suite (pt. 3)</h2>
+<h3 id="time-and-date-management">Time and Date Management</h3>
+<br>
+<div class="div w-100">
+    <div class="row "><div class="col align-middle " style="text-align: center;"><ol>
+<li>Get an overview with <code>timedatectl --help</code>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span>timedatectl <span style="color:#ce5c00;font-weight:bold">[</span>OPTIONS...<span style="color:#ce5c00;font-weight:bold">]</span> COMMAND ...
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Query or change system <span style="color:#204a87">time</span> and date settings.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Commands:
+</span></span><span style="display:flex;"><span>  status                 Show current <span style="color:#204a87">time</span> settings
+</span></span><span style="display:flex;"><span>  set-time TIME          Set system <span style="color:#204a87">time</span>
+</span></span><span style="display:flex;"><span>  set-timezone ZONE      Set system <span style="color:#204a87">time</span> zone
+</span></span><span style="display:flex;"><span>  list-timezones         Show known <span style="color:#204a87">time</span> zones
+</span></span><span style="display:flex;"><span>  set-local-rtc BOOL     Control whether RTC is in <span style="color:#204a87">local</span> <span style="color:#204a87">time</span>
+</span></span><span style="display:flex;"><span>  set-ntp BOOL           Control whether NTP is enabled
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  timesync-status       Show status of systemd-timesyncd
+</span></span><span style="display:flex;"><span>  show-timesync         Show properties of systemd-timesyncd
+</span></span><span style="display:flex;"><span>  ntp-servers INTERFACE SERVER…
+</span></span><span style="display:flex;"><span>                        Set the interface specific NTP servers
+</span></span><span style="display:flex;"><span>  revert INTERFACE      Revert the interface specific NTP servers
+</span></span></code></pre></div></li>
+</ol>
+</div>
+<div class="col align-middle " style="text-align: center;"><ol start="2">
+<li>
+<p>See information about the <em>current time (zone)</em> with <code>timedatectl status</code></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span>               Local time: lun 2024-11-11 10:56:28 CET
+</span></span><span style="display:flex;"><span>           Universal time: lun 2024-11-11 09:56:28 UTC
+</span></span><span style="display:flex;"><span>                 RTC time: lun 2024-11-11 09:56:27
+</span></span><span style="display:flex;"><span>                Time zone: Europe/Rome <span style="color:#ce5c00;font-weight:bold">(</span>CET, +0100<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>System clock synchronized: yes
+</span></span><span style="display:flex;"><span>              NTP service: active
+</span></span><span style="display:flex;"><span>          RTC in <span style="color:#204a87">local</span> TZ: no
+</span></span></code></pre></div></li>
+<li>
+<p>Show time-sync status with <code>timedatectl timesync-status</code></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span>       Server: 185.125.190.57 <span style="color:#ce5c00;font-weight:bold">(</span>ntp.ubuntu.com<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>Poll interval: 34min 8s <span style="color:#ce5c00;font-weight:bold">(</span>min: 32s<span style="color:#000;font-weight:bold">;</span> max 34min 8s<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>         Leap: normal
+</span></span><span style="display:flex;"><span>      Version: <span style="color:#0000cf;font-weight:bold">4</span>
+</span></span><span style="display:flex;"><span>      Stratum: <span style="color:#0000cf;font-weight:bold">2</span>
+</span></span><span style="display:flex;"><span>    Reference: 11FD1CFB
+</span></span><span style="display:flex;"><span>    Precision: 1us <span style="color:#ce5c00;font-weight:bold">(</span>-25<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>Root distance: 846us <span style="color:#ce5c00;font-weight:bold">(</span>max: 5s<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>       Offset: +4.710ms
+</span></span><span style="display:flex;"><span>        Delay: 36.168ms
+</span></span><span style="display:flex;"><span>       Jitter: 1.689122s
+</span></span><span style="display:flex;"><span> Packet count: <span style="color:#0000cf;font-weight:bold">130</span>
+</span></span><span style="display:flex;"><span>    Frequency: -53,092ppm
+</span></span></code></pre></div></li>
+</ol>
+</div>
+</div>
+</div>
+</section><section>
+<h2 id="a-taste-of-the-systemd-suite-pt-4">A taste of the systemd suite (pt. 4)</h2>
+<h3 id="locale-management">Locale Management</h3>
+<blockquote>
+<p><strong>Locale</strong> $\approx$ a set of <em>cultural conventions</em> that determine how <em>dates</em>, <em>times</em>, <em>numbers</em>, and <em>currency</em> are <strong>formatted</strong>.
+<em>Keyboard layouts</em> are locale-specific too.</p>
+</blockquote>
+<br>
+<div class="div w-100">
+    <div class="row "><div class="col align-middle " style="text-align: center;"><ol>
+<li>Get an overview with <code>localectl --help</code>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span>localectl <span style="color:#ce5c00;font-weight:bold">[</span>OPTIONS...<span style="color:#ce5c00;font-weight:bold">]</span> COMMAND ...
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Query or change system locale and keyboard settings.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Commands:
+</span></span><span style="display:flex;"><span>  status                   Show current locale settings
+</span></span><span style="display:flex;"><span>  set-locale LOCALE...     Set system locale
+</span></span><span style="display:flex;"><span>  list-locales             Show known locales
+</span></span><span style="display:flex;"><span>  set-keymap MAP <span style="color:#ce5c00;font-weight:bold">[</span>MAP<span style="color:#ce5c00;font-weight:bold">]</span>     Set console and X11 keyboard mappings
+</span></span><span style="display:flex;"><span>  list-keymaps             Show known virtual console keyboard mappings
+</span></span><span style="display:flex;"><span>  set-x11-keymap LAYOUT <span style="color:#ce5c00;font-weight:bold">[</span>MODEL <span style="color:#ce5c00;font-weight:bold">[</span>VARIANT <span style="color:#ce5c00;font-weight:bold">[</span>OPTIONS<span style="color:#ce5c00;font-weight:bold">]]]</span>
+</span></span><span style="display:flex;"><span>                           Set X11 and console keyboard mappings
+</span></span><span style="display:flex;"><span>  list-x11-keymap-models   Show known X11 keyboard mapping models
+</span></span><span style="display:flex;"><span>  list-x11-keymap-layouts  Show known X11 keyboard mapping layouts
+</span></span><span style="display:flex;"><span>  list-x11-keymap-variants <span style="color:#ce5c00;font-weight:bold">[</span>LAYOUT<span style="color:#ce5c00;font-weight:bold">]</span>
+</span></span><span style="display:flex;"><span>                           Show known X11 keyboard mapping variants
+</span></span><span style="display:flex;"><span>  list-x11-keymap-options  Show known X11 keyboard mapping options
+</span></span></code></pre></div></li>
+</ol>
+</div>
+<div class="col align-middle " style="text-align: center;"><ol start="2">
+<li>See information about the <em>current locale</em> with <code>localectl status</code>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span>System Locale: <span style="color:#000">LANG</span><span style="color:#ce5c00;font-weight:bold">=</span>it_IT.UTF-8
+</span></span><span style="display:flex;"><span>    VC Keymap: <span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#204a87">unset</span><span style="color:#ce5c00;font-weight:bold">)</span>         
+</span></span><span style="display:flex;"><span>   X11 Layout: it
+</span></span><span style="display:flex;"><span>    X11 Model: pc105
+</span></span></code></pre></div></li>
+</ol>
+</div>
+</div>
+</div>
+</section><section>
+<h2 id="a-taste-of-the-systemd-suite-pt-5">A taste of the systemd suite (pt. 5)</h2>
+<h3 id="network-management">Network Management</h3>
+<br>
+<div class="div w-100">
+    <div class="row "><div class="col align-middle " style="text-align: center;"><ol>
+<li>Get an overview with <code>networkctl --help</code>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span>networkctl <span style="color:#ce5c00;font-weight:bold">[</span>OPTIONS...<span style="color:#ce5c00;font-weight:bold">]</span> COMMAND
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Query and control the networking subsystem.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Commands:
+</span></span><span style="display:flex;"><span>  list <span style="color:#ce5c00;font-weight:bold">[</span>PATTERN...<span style="color:#ce5c00;font-weight:bold">]</span>      List links
+</span></span><span style="display:flex;"><span>  status <span style="color:#ce5c00;font-weight:bold">[</span>PATTERN...<span style="color:#ce5c00;font-weight:bold">]</span>    Show link status
+</span></span><span style="display:flex;"><span>  lldp <span style="color:#ce5c00;font-weight:bold">[</span>PATTERN...<span style="color:#ce5c00;font-weight:bold">]</span>      Show LLDP neighbors
+</span></span><span style="display:flex;"><span>  label                  Show current address label entries in the kernel
+</span></span><span style="display:flex;"><span>  delete DEVICES...      Delete virtual netdevs
+</span></span><span style="display:flex;"><span>  up DEVICES...          Bring devices up
+</span></span><span style="display:flex;"><span>  down DEVICES...        Bring devices down
+</span></span><span style="display:flex;"><span>  renew DEVICES...       Renew dynamic configurations
+</span></span><span style="display:flex;"><span>  forcerenew DEVICES...  Trigger DHCP reconfiguration of all connected clients
+</span></span><span style="display:flex;"><span>  reconfigure DEVICES... Reconfigure interfaces
+</span></span><span style="display:flex;"><span>  reload                 Reload .network and .netdev files
+</span></span><span style="display:flex;"><span>  edit FILES<span style="color:#000;font-weight:bold">|</span>DEVICES...  Edit network configuration files
+</span></span><span style="display:flex;"><span>  cat <span style="color:#ce5c00;font-weight:bold">[</span>FILES<span style="color:#000;font-weight:bold">|</span>DEVICES...<span style="color:#ce5c00;font-weight:bold">]</span> Show network configuration files
+</span></span><span style="display:flex;"><span>  mask FILES...          Mask network configuration files
+</span></span><span style="display:flex;"><span>  unmask FILES...        Unmask network configuration files
+</span></span><span style="display:flex;"><span>  persistent-storage BOOL
+</span></span><span style="display:flex;"><span>                         Notify systemd-networkd <span style="color:#204a87;font-weight:bold">if</span> persistent storage is ready
+</span></span></code></pre></div></li>
+</ol>
+</div>
+<div class="col align-middle " style="text-align: center;"><ol start="2">
+<li>
+<p>Get the available <em>connections</em> with <code>networkctl list</code></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span>systemd-networkd is not running, output might be incomplete.
+</span></span><span style="display:flex;"><span>IDX LINK   TYPE     OPERATIONAL SETUP    
+</span></span><span style="display:flex;"><span>  <span style="color:#0000cf;font-weight:bold">1</span> lo     loopback -           unmanaged
+</span></span><span style="display:flex;"><span>  <span style="color:#0000cf;font-weight:bold">2</span> enp0s3 ether    -           unmanaged
+</span></span></code></pre></div><ul>
+<li><code>unmanaged</code> $\approx$ the network is not managed by <code>networkd</code></li>
+<li>the warning means that the <code>networkd</code> is not running
+<ul>
+<li><em>Ubuntu-based systems use <code>NetworkManager</code> instead</em>
+<ul>
+<li>to be controlled via the <code>nmcli</code> command</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Get the <em>status</em> of a specific <em>connection</em> with <br> <code>networkctl status LINK</code></p>
+</li>
+<li>
+<p>Use <code>networkctl up/down LINK</code> to affect the <em>connection</em></p>
+<ul>
+<li>which implies <em>connecting</em> (up) or <em>disconnecting</em> (down)</li>
+</ul>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</section><section>
+<h2 id="a-taste-of-the-systemd-suite-pt-6">A taste of the systemd suite (pt. 6)</h2>
+<h3 id="dns-management">DNS Management</h3>
+<div class="div w-100">
+    <div class="row "><div class="col align-middle " style="text-align: center;"><ol>
+<li>Get an overview with <code>resolvectl --help</code>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span>resolvectl <span style="color:#ce5c00;font-weight:bold">[</span>OPTIONS...<span style="color:#ce5c00;font-weight:bold">]</span> COMMAND ...
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Send control commands to the network name resolution manager, or
+</span></span><span style="display:flex;"><span>resolve domain names, IPv4 and IPv6 addresses, DNS records, and services.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Commands:
+</span></span><span style="display:flex;"><span>  query HOSTNAME<span style="color:#000;font-weight:bold">|</span>ADDRESS...    Resolve domain names, IPv4 and IPv6 addresses
+</span></span><span style="display:flex;"><span>  service <span style="color:#ce5c00;font-weight:bold">[[</span>NAME<span style="color:#ce5c00;font-weight:bold">]</span> TYPE<span style="color:#ce5c00;font-weight:bold">]</span> DOMAIN Resolve service <span style="color:#ce5c00;font-weight:bold">(</span>SRV<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>  openpgp EMAIL@DOMAIN...      Query OpenPGP public key
+</span></span><span style="display:flex;"><span>  tlsa DOMAIN<span style="color:#ce5c00;font-weight:bold">[</span>:PORT<span style="color:#ce5c00;font-weight:bold">]</span>...        Query TLS public key
+</span></span><span style="display:flex;"><span>  status <span style="color:#ce5c00;font-weight:bold">[</span>LINK...<span style="color:#ce5c00;font-weight:bold">]</span>             Show link and server status
+</span></span><span style="display:flex;"><span>  statistics                   Show resolver statistics
+</span></span><span style="display:flex;"><span>  reset-statistics             Reset resolver statistics
+</span></span><span style="display:flex;"><span>  flush-caches                 Flush all <span style="color:#204a87">local</span> DNS caches
+</span></span><span style="display:flex;"><span>  reset-server-features        Forget learnt DNS server feature levels
+</span></span><span style="display:flex;"><span>  monitor                      Monitor DNS queries
+</span></span><span style="display:flex;"><span>  show-cache                   Show cache contents
+</span></span><span style="display:flex;"><span>  show-server-state            Show servers state
+</span></span><span style="display:flex;"><span>  dns <span style="color:#ce5c00;font-weight:bold">[</span>LINK <span style="color:#ce5c00;font-weight:bold">[</span>SERVER...<span style="color:#ce5c00;font-weight:bold">]]</span>       Get/set per-interface DNS server address
+</span></span><span style="display:flex;"><span>  domain <span style="color:#ce5c00;font-weight:bold">[</span>LINK <span style="color:#ce5c00;font-weight:bold">[</span>DOMAIN...<span style="color:#ce5c00;font-weight:bold">]]</span>    Get/set per-interface search domain
+</span></span><span style="display:flex;"><span>  default-route <span style="color:#ce5c00;font-weight:bold">[</span>LINK <span style="color:#ce5c00;font-weight:bold">[</span>BOOL<span style="color:#ce5c00;font-weight:bold">]]</span>  Get/set per-interface default route flag
+</span></span><span style="display:flex;"><span>  llmnr <span style="color:#ce5c00;font-weight:bold">[</span>LINK <span style="color:#ce5c00;font-weight:bold">[</span>MODE<span style="color:#ce5c00;font-weight:bold">]]</span>          Get/set per-interface LLMNR mode
+</span></span><span style="display:flex;"><span>  mdns <span style="color:#ce5c00;font-weight:bold">[</span>LINK <span style="color:#ce5c00;font-weight:bold">[</span>MODE<span style="color:#ce5c00;font-weight:bold">]]</span>           Get/set per-interface MulticastDNS mode
+</span></span><span style="display:flex;"><span>  dnsovertls <span style="color:#ce5c00;font-weight:bold">[</span>LINK <span style="color:#ce5c00;font-weight:bold">[</span>MODE<span style="color:#ce5c00;font-weight:bold">]]</span>     Get/set per-interface DNS-over-TLS mode
+</span></span><span style="display:flex;"><span>  dnssec <span style="color:#ce5c00;font-weight:bold">[</span>LINK <span style="color:#ce5c00;font-weight:bold">[</span>MODE<span style="color:#ce5c00;font-weight:bold">]]</span>         Get/set per-interface DNSSEC mode
+</span></span><span style="display:flex;"><span>  nta <span style="color:#ce5c00;font-weight:bold">[</span>LINK <span style="color:#ce5c00;font-weight:bold">[</span>DOMAIN...<span style="color:#ce5c00;font-weight:bold">]]</span>       Get/set per-interface DNSSEC NTA
+</span></span><span style="display:flex;"><span>  revert LINK                  Revert per-interface configuration
+</span></span><span style="display:flex;"><span>  log-level <span style="color:#ce5c00;font-weight:bold">[</span>LEVEL<span style="color:#ce5c00;font-weight:bold">]</span>            Get/set logging threshold <span style="color:#204a87;font-weight:bold">for</span> systemd-resolved
+</span></span></code></pre></div></li>
+</ol>
+</div>
+<div class="col align-middle " style="text-align: center;"><ol start="2">
+<li>
+<p>Get the IP corresponding to some <em>domain</em> with <br> <code>resolvectl query DOMAIN</code></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span>$ resolvectl query www.google.it
+</span></span><span style="display:flex;"><span>www.google.it: 142.251.209.35                  -- link: enp0s3
+</span></span><span style="display:flex;"><span>               2a00:1450:4002:411::2003        -- link: enp0s3
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>-- Information acquired via protocol DNS in 74.5ms.
+</span></span><span style="display:flex;"><span>-- Data is authenticated: no<span style="color:#000;font-weight:bold">;</span> Data was acquired via <span style="color:#204a87">local</span> or encrypted transport: no
+</span></span><span style="display:flex;"><span>-- Data from: network
+</span></span></code></pre></div></li>
+<li>
+<p>Get which protocols are being used with <code>resolvectl status</code></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span>Global
+</span></span><span style="display:flex;"><span>         Protocols: -LLMNR -mDNS -DNSOverTLS <span style="color:#000">DNSSEC</span><span style="color:#ce5c00;font-weight:bold">=</span>no/unsupported
+</span></span><span style="display:flex;"><span>  resolv.conf mode: stub
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Link <span style="color:#0000cf;font-weight:bold">2</span> <span style="color:#ce5c00;font-weight:bold">(</span>enp0s3<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    Current Scopes: DNS
+</span></span><span style="display:flex;"><span>         Protocols: +DefaultRoute -LLMNR -mDNS -DNSOverTLS <span style="color:#000">DNSSEC</span><span style="color:#ce5c00;font-weight:bold">=</span>no/unsupported
+</span></span><span style="display:flex;"><span>Current DNS Server: 10.0.2.3
+</span></span><span style="display:flex;"><span>       DNS Servers: 10.0.2.3
+</span></span></code></pre></div></li>
+<li>
+<p>Show DNS caches with <code>sudo resolvectl show-cache</code></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span>Scope <span style="color:#000">protocol</span><span style="color:#ce5c00;font-weight:bold">=</span>dns <span style="color:#000">ifindex</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#0000cf;font-weight:bold">2</span> <span style="color:#000">ifname</span><span style="color:#ce5c00;font-weight:bold">=</span>enp0s3
+</span></span><span style="display:flex;"><span>www.google.it IN A 142.251.209.35
+</span></span><span style="display:flex;"><span>www.google.it IN AAAA 2a00:1450:4002:411::2003
+</span></span></code></pre></div></li>
+</ol>
+</div>
+</div>
+</div>
+
+</section>
 </section><section>
 <h2 id="examples">Examples</h2>
 <ul>

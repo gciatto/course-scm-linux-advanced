@@ -120,7 +120,7 @@ The init system has:
 
 > __systemd__ is a _suite_ of system management __daemons__, __libraries__, and __utilities__ designed as a _central management and configuration platform_ for the Linux OS
 
-{{< image src="systemd-components.svg" width="100%" >}}
+{{< image src="systemd-components.svg" width="100%" max-h="70vh" >}}
 
 ---
 
@@ -155,7 +155,7 @@ The systemd __suite__ includes the following _command-line_ utilities (correspon
 
 - ... but the systemd suite is much more than that!
 
-- Overall, systemd is a set of tool for _system administration_ 
+- Overall, systemd is a set of tool for _system administration_
     + you can control most aspects of a Linux system using systemd's utilities
 
 {{% fragment %}}
@@ -211,14 +211,14 @@ before delving into the details of `systemctl` and `journalctl`
           Machine ID: 7fc69dab56a64d73b4f2ae5077df58a0
              Boot ID: 7b52bffe735b47a18135db49790a4cc9
       Virtualization: oracle
-    Operating System: Ubuntu 24.10                    
+    Operating System: Ubuntu 24.10
               Kernel: Linux 6.11.0-9-generic
         Architecture: x86-64
      Hardware Vendor: innotek GmbH
       Hardware Model: VirtualBox
     Firmware Version: VirtualBox
        Firmware Date: Fri 2006-12-01
-        Firmware Age: 17y 11month 1w 4d 
+        Firmware Age: 17y 11month 1w 4d
     ```
 {{% /col %}}
 {{% /multicol %}}
@@ -276,9 +276,9 @@ before delving into the details of `systemctl` and `journalctl`
 2. Get an overview of the current situation with `loginctl` (no args):
     ```bash
     SESSION  UID USER SEAT  LEADER CLASS   TTY   IDLE SINCE
-        527 1000 user -     16410  manager -     no   -    
-        529 1000 user seat0 16591  user    tty2  no   -    
-        531 1000 user -     17051  user    pts/1 no   -    
+        527 1000 user -     16410  manager -     no   -
+        529 1000 user seat0 16591  user    tty2  no   -
+        531 1000 user -     17051  user    pts/1 no   -
     ```
 
 3. A bit of nomenclature:
@@ -387,7 +387,7 @@ before delving into the details of `systemctl` and `journalctl`
 2. See information about the _current locale_ with `localectl status`
     ```bash
     System Locale: LANG=it_IT.UTF-8
-        VC Keymap: (unset)         
+        VC Keymap: (unset)
        X11 Layout: it
         X11 Model: pc105
     ```
@@ -408,9 +408,9 @@ before delving into the details of `systemctl` and `journalctl`
 1. Get an overview with `networkctl --help`
     ```bash
     networkctl [OPTIONS...] COMMAND
-    
+
     Query and control the networking subsystem.
-    
+
     Commands:
       list [PATTERN...]      List links
       status [PATTERN...]    Show link status
@@ -435,7 +435,7 @@ before delving into the details of `systemctl` and `journalctl`
 2. Get the available _connections_ with `networkctl list`
     ```bash
     systemd-networkd is not running, output might be incomplete.
-    IDX LINK   TYPE     OPERATIONAL SETUP    
+    IDX LINK   TYPE     OPERATIONAL SETUP
       1 lo     loopback -           unmanaged
       2 enp0s3 ether    -           unmanaged
     ```
@@ -443,7 +443,7 @@ before delving into the details of `systemctl` and `journalctl`
     - `unmanaged` $\approx$ the network is not managed by `networkd`
     - the warning means that the `networkd` is not running
         * _Ubuntu-based systems use `NetworkManager` instead_
-            + to be controlled via the `nmcli` command   
+            + to be controlled via the `nmcli` command
 
 3. Get the _status_ of a specific _connection_ with <br> `networkctl status LINK`
 
@@ -573,9 +573,85 @@ How to use `systemctl` and `journalctl`?
     + e.g., `home.mount`, `var.mount` (system partitions are usually mounted by `systemd`)
 
 - [`path` units](https://www.freedesktop.org/software/systemd/man/latest/systemd.path.html#): a path monitored by `systemd`, for _path-based activation_
+    + e.g., `cups.path`
 
-- [`timer` units](https://www.freedesktop.org/software/system/man/latest/systemd.timer.html#): a timer controlled and supervised by `systemd`, for _timer-based activation_
+- [`timer` units](https://www.freedesktop.org/software/systemd/man/latest/systemd.timer.html#): a timer controlled and supervised by `systemd`, for _timer-based activation_
     + e.g., `apt-daily.timer`, `apt-daily-upgrade.timer`
+
+- [`target` units](https://www.freedesktop.org/software/systemd/man/latest/systemd.target.html#): a _group_ of units, to set _synchronization_ points for ordering dependencies with other units
+    + e.g., `multi-user.target`, `graphical.target`
+
+---
+
+## About Targets (pt. 1)
+
+> __Targets__ $\approx$ checkpoints in the _boot process_ where units have been _started_ and are _running_
+
+{{% multicol %}}
+{{% col %}}
+### Boot logs
+
+{{< image src="./logs.svg" height="70vh" >}}
+{{% /col %}}
+{{% col %}}
+### Dependencies among targets
+
+![](./targets.png)
+{{% /col %}}
+{{% /multicol %}}
+
+---
+
+## About Targets (pt. 2)
+
+(Use `systemd-analyze plot > plot.svg` to generate a plot like this)
+
+{{< image src="./time-plot.svg" width="100%" max-h="80vh" >}}
+
+---
+
+## Unit files (pt. 1)
+
+(Use `systemctl cat ssh.service` to inspect the _SSH daemon_'s unit file)
+
+```systemd
+# /usr/lib/systemd/system/ssh.service
+
+[Unit]
+Description=OpenBSD Secure Shell server
+Documentation=man:sshd(8) man:sshd_config(5)
+After=network.target nss-user-lookup.target auditd.service
+ConditionPathExists=!/etc/ssh/sshd_not_to_be_run
+
+[Service]
+EnvironmentFile=-/etc/default/ssh
+ExecStartPre=/usr/sbin/sshd -t
+ExecStart=/usr/sbin/sshd -D $SSHD_OPTS
+ExecReload=/usr/sbin/sshd -t
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
+Restart=on-failure
+RestartPreventExitStatus=255
+Type=notify
+RuntimeDirectory=sshd
+RuntimeDirectoryMode=0755
+
+[Install]
+WantedBy=multi-user.target
+Alias=sshd.service
+```
+
+---
+
+## Unit files (pt. 2)
+
+TBD: location
+
+TBD: syntax
+
+TBD: dependencies
+
+TBD: how to operate
 
 ---
 

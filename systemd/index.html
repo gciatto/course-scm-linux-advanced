@@ -34,6 +34,7 @@
 <li><a href="https://www.slideshare.net/slideshow/systemd-46731240/46731240">Lucas Nussbaum’s tutorial on <code>systemd</code></a></li>
 <li><a href="https://zedas.fr/posts/linux-explained-2-init-and-shell/">“Linux explained part 2 : Bootloader, Init and Shell”</a></li>
 <li><a href="https://phndiaye.github.io/the-current-state-of-init-systems.html">“The current state of init systems”</a></li>
+<li><a href="https://seb.jambor.dev/posts/systemd-by-example-part-1-minimization/">“systemd by example”</a></li>
 <li>Also the English <a href="https://en.wikipedia.org/wiki/Systemd">Wikipedia page on systemd</a> is quite informative</li>
 </ul>
 </section><section>
@@ -561,6 +562,87 @@
 </div>
 
 </section>
+</section><section>
+<h1 id="systemd-for-service-management">systemd for service management</h1>
+<p>How to use <code>systemctl</code> and <code>journalctl</code>?</p>
+</section><section>
+<h2 id="overall-functioning-of-systemd">Overall functioning of <code>systemd</code></h2>
+<ol>
+<li>
+<p>The <code>systemd</code> daemon is started by the kernel as the first process</p>
+</li>
+<li>
+<p>Upon startup, <code>systemd</code> reads the <em>unit files</em> from the <em>filesystem</em></p>
+<ul>
+<li><em>unit files</em> are <em>declaritive</em> text files that describe a <strong>unit</strong></li>
+<li>a <strong>unit</strong> is a <em>resource</em> that <code>systemd</code> knows how to manage (e.g., a <em>service</em>, a <em>timer</em>, etc.)</li>
+</ul>
+</li>
+<li>
+<p><code>systemd</code> computes in which <em>order</em> the units should be <em>started</em></p>
+<ul>
+<li>this is done by <em>analyzing the dependencies</em> between the units
+<ul>
+<li>which are <em>declared</em> in the unit files</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>systemd</code> then <em>starts</em> the units in the <em>correct order</em></p>
+<ul>
+<li>and <em>monitors</em> them to ensure they <em>stay running</em></li>
+</ul>
+</li>
+<li>
+<p>Upon a user request to <em>shut down</em> / <em>suspend</em> / <em>hibernate</em> the system, <code>systemd</code> <strong>stops</strong> the units in the <em>correct order</em></p>
+<ul>
+<li>and <strong>restarts</strong> them upon <em>resuming</em> the system (if needed)</li>
+</ul>
+</li>
+</ol>
+</section><section>
+<h2 id="sorts-of-units-see-official-dochttpswwwfreedesktoporgsoftwaresystemdmanlatestsystemdunithtmldescription">Sorts of units (see <a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html#Description">official doc</a>)</h2>
+<blockquote>
+<ul>
+<li>Units are classified <em>by the <strong>suffix</strong></em> (a.k.a. <em>extension</em>) of their <em>unit file</em></li>
+<li>You can <em>list</em> loaded units via <code>systemctl list-units [--type=TYPE]</code></li>
+<li>You can <em>inspect</em> / <em>locate</em> some loaded <em>unit <strong>file</strong></em> via <code>systemctl cat NAME.TYPE</code>
+<ul>
+<li>use <code>systemctl show NAME.TYPE</code> to inspect <em>all</em> the properties of a <strong>unit</strong></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<ul>
+<li>
+<p><a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html#"><code>service</code> units</a>: a <em>process</em> that needs to be <em>started</em> and <em>managed</em> by <code>systemd</code></p>
+<ul>
+<li>e.g., <code>ssh.service</code>, <code>ufw.service</code>, <code>cups.service</code></li>
+</ul>
+</li>
+<li>
+<p><a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.socket.html#"><code>socket</code> units</a>: an <em>IPC</em> or network socket or a file system FIFO controlled and supervised by <code>systemd</code>, for <em>socket-based activation</em></p>
+<ul>
+<li>e.g., <code>ssh.socket</code>, <code>httpd.socket</code></li>
+</ul>
+</li>
+<li>
+<p><a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.mount.html#"><code>mount</code> units</a>: a file system mount point controlled and supervised by <code>systemd</code></p>
+<ul>
+<li>e.g., <code>home.mount</code>, <code>var.mount</code> (system partitions are usually mounted by <code>systemd</code>)</li>
+</ul>
+</li>
+<li>
+<p><a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.path.html#"><code>path</code> units</a>: a path monitored by <code>systemd</code>, for <em>path-based activation</em></p>
+</li>
+<li>
+<p><a href="https://www.freedesktop.org/software/system/man/latest/systemd.timer.html#"><code>timer</code> units</a>: a timer controlled and supervised by <code>systemd</code>, for <em>timer-based activation</em></p>
+<ul>
+<li>e.g., <code>apt-daily.timer</code>, <code>apt-daily-upgrade.timer</code></li>
+</ul>
+</li>
+</ul>
 </section><section>
 <h2 id="examples">Examples</h2>
 <ul>

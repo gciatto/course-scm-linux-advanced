@@ -1085,7 +1085,7 @@ one should write information about the <strong>socket</strong> or FIFO the unit 
 </li>
 </ul>
 </section><section>
-<h2 id="operating-with-units-pt-4">Operating with units (pt. 4)</h2>
+<h2 id="running-exercise-ssh-daemon-pt-1">Running Exercise: SSH daemon (pt. 1)</h2>
 <ol>
 <li>
 <p>Try to <code>stop</code> the <code>ssh.service</code> and to <em>connect</em> to the machine via SSH</p>
@@ -1112,11 +1112,12 @@ one should write information about the <strong>socket</strong> or FIFO the unit 
 <p>Try to <strong>reboot</strong> the system. Upon <em>startup</em>, are the <code>ssh.service</code> and <code>ssh.socket</code> units <em>active</em>?</p>
 <ul>
 <li>they should, because the units are <em>enabled</em> (i.e., they are <em>configured</em> for <em>automatic</em> start-up)</li>
+<li>you should now be <em>able</em> to connect to the machine via SSH</li>
 </ul>
 </li>
 </ol>
 </section><section>
-<h2 id="operating-with-units-pt-5">Operating with units (pt. 5)</h2>
+<h2 id="operating-with-units-pt-4">Operating with units (pt. 4)</h2>
 <ul>
 <li>
 <p><strong>Enabling</strong> / <strong>disabling</strong> a unit: <code>sudo systemctl enable|disable NAME.TYPE</code></p>
@@ -1143,10 +1144,108 @@ one should write information about the <strong>socket</strong> or FIFO the unit 
 </li>
 </ul>
 </section><section>
-<h2 id="tbd">TBD</h2>
-<p>continue SSH example</p>
-<p>dependencies</p>
-<p>how to operate</p>
+<h2 id="running-example-ssh-daemon-pt-2">Running Example: SSH daemon (pt. 2)</h2>
+<ol start="4">
+<li>
+<p>Try now to <code>disable</code> the <code>ssh.service</code> and <code>ssh.socket</code>, then try to <em>connect</em> to the machine via SSH</p>
+<ul>
+<li>you should <em>still</em> be <em>able</em> to connect to the machine via SSH
+<ul>
+<li>because the units are <em>not enabled</em>, but they are <em>still active</em></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Try to reboot the system. Upon <em>startup</em>, are the <code>ssh.service</code> and <code>ssh.socket</code> units <em>active</em>?</p>
+<ul>
+<li>they should <em>not</em>, because the units are <em>not enabled</em></li>
+<li>you should now be <em>unable</em> to connect to the machine via SSH</li>
+</ul>
+</li>
+<li>
+<p>Try to <code>enable</code> the <code>ssh.service</code> and <code>ssh.socket</code>, then try to <em>connect</em> to the machine via SSH</p>
+<ul>
+<li>you should still be <em>unable</em> to connect to the machine via SSH
+<ul>
+<li>because the units are <em>enabled</em> but not <em>active</em></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Try to <code>start</code> the <code>ssh.service</code> and <code>ssh.socket</code>, then try to <em>connect</em> to the machine via SSH</p>
+<ul>
+<li>you should now be <em>able</em> to connect to the machine via SSH</li>
+<li>the same is true after a <em>reboot</em></li>
+</ul>
+</li>
+</ol>
+</section><section>
+<h2 id="about-dependencies-pt-1">About dependencies (pt. 1)</h2>
+<p>Units may define <em>dependencies</em> on other units, which impact the <em>order</em> in which they are <em>started</em> and <em>stopped</em>:</p>
+<ol>
+<li>
+<p><strong>Wanting</strong>: $A$ <code>Wants</code> $B$ (or $B$ <code>WantedBy</code> $A$) indicates a <em>weak</em> dependency</p>
+<ul>
+<li>if service $A$ <em>wants</em> service $B$, <code>systemd</code> will <em>attempt</em> to start $B$ when starting $A$</li>
+<li>if $B$ fails or isn’t available, $A$ will still start</li>
+<li>used when a unit <em>can benefit</em> from another service but doesn’t strictly require it
+<ul>
+<li>e.g., <strong>targets</strong> <em>want</em> services to be started, but don’t <em>require</em> them</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Requiring</strong>: $A$ <code>Requires</code> $B$ (or $B$ <code>RequiredBy</code> $A$) indicates a <em>strong</em> dependency</p>
+<ul>
+<li>if service $A$ <em>requires</em> service $B$, $A$ will <em>not</em> start unless $B$ starts successfully</li>
+<li>if $B$ fails to start, <code>systemd</code> will stop $A$ as well</li>
+<li>used when a unit is <em>essential</em> for another to function
+<ul>
+<li>e.g., <strong>services</strong> <em>require</em> <strong>sockets</strong> to be started before they can start</li>
+</ul>
+</li>
+<li>yet, $A$ <code>Requires</code> $B$ does <strong>not</strong> imply $B$ <code>Before</code> $A$</li>
+</ul>
+</li>
+<li>
+<p><strong>Before</strong>/<strong>After</strong>: $A$ <code>Before</code> $B$ (or $B$ <code>After</code> $A$) indicates an <em>ordering</em> dependency</p>
+<ul>
+<li>if service $A$ <em>starts before</em> service $B$, <code>systemd</code> will <em>start</em> $A$ before $B$</li>
+<li>these are just <em>ordering</em> dependencies:
+<ul>
+<li>so specifying $B$ <code>After</code> $A$ $\not\implies$ $A$ <code>Requires</code> $B$</li>
+<li>so $B$ is started <em>even if</em> $A$ fails to start</li>
+</ul>
+</li>
+<li>used to <em>control</em> the <em>order</em> in which units are started</li>
+</ul>
+</li>
+</ol>
+</section><section>
+<h2 id="about-dependencies-pt-2">About dependencies (pt. 2)</h2>
+<ol start="4">
+<li>
+<p><strong>Conflict</strong>: $A$ <code>Conflicts</code> $B$ indicates that $A$ and $B$ <em>cannot</em> be <em>active</em> at the <em>same time</em></p>
+<ul>
+<li>if $A$ has a conflict with $B$ and you start $A$ while $B$ is running, <code>systemd</code> will <em>stop</em> $B$ before starting $A$</li>
+<li>useful for <em>mutually exclusive</em> services</li>
+<li>$A$ <code>Conflicts</code> $B$ $\implies$ $B$ <code>Conflicts</code> $A$</li>
+</ul>
+</li>
+<li>
+<p><strong>Binding</strong>: $A$ <code>BindsTo</code> $B$ (or $B$ <code>BoundBy</code> $A$) indicates that $A$ is <em>tightly bound</em> to $B$</p>
+<ul>
+<li>if $B$ stops or fails, $A$ will also stop</li>
+<li>used for <em>stronger</em> dependencies than <code>Requires</code></li>
+</ul>
+</li>
+<li>
+<p>other sorts of dependencies are available, see the <a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html">official doc</a></p>
+</li>
+</ol>
 </section><section>
 <h2 id="examples">Examples</h2>
 <ul>
@@ -1154,6 +1253,7 @@ one should write information about the <strong>socket</strong> or FIFO the unit 
 <li>SSHD service</li>
 <li>SSH agent service</li>
 <li>DockerD service</li>
+<li>Logging</li>
 </ul>
 </section>
 

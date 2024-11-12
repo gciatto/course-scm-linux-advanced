@@ -976,7 +976,7 @@ one should write information about the __socket__ or FIFO the unit supervises
 
 ---
 
-## Operating with units (pt. 4)
+## Running Exercise: SSH daemon (pt. 1)
 
 1. Try to `stop` the `ssh.service` and to _connect_ to the machine via SSH
     + you can _still connect_ to the machine via SSH, because `ssh.socket` is _still active_
@@ -989,14 +989,14 @@ one should write information about the __socket__ or FIFO the unit supervises
 
 3. Try to __reboot__ the system. Upon _startup_, are the `ssh.service` and `ssh.socket` units _active_?
     + they should, because the units are _enabled_ (i.e., they are _configured_ for _automatic_ start-up)
+    + you should now be _able_ to connect to the machine via SSH
 
 ---
 
-## Operating with units (pt. 5)
+## Operating with units (pt. 4)
 
 - __Enabling__ / __disabling__ a unit: `sudo systemctl enable|disable NAME.TYPE`
     + use `systemctl --user enable|disable NAME.TYPE` for _user units_ (no need for `sudo`)
-
 
 - The _effect_ is that the `[Install]` section of the unit file is _interpreted_    
     + ... and the __dependencies__ therein specified are _installed_ / _uninstalled_ accordingly
@@ -1008,13 +1008,64 @@ one should write information about the __socket__ or FIFO the unit supervises
 
 ---
 
-## TBD
+## Running Example: SSH daemon (pt. 2)
 
-continue SSH example
+4. Try now to `disable` the `ssh.service` and `ssh.socket`, then try to _connect_ to the machine via SSH
+    + you should _still_ be _able_ to connect to the machine via SSH
+        * because the units are _not enabled_, but they are _still active_
 
-dependencies
+5. Try to reboot the system. Upon _startup_, are the `ssh.service` and `ssh.socket` units _active_?
+    + they should _not_, because the units are _not enabled_ 
+    + you should now be _unable_ to connect to the machine via SSH
 
-how to operate
+6. Try to `enable` the `ssh.service` and `ssh.socket`, then try to _connect_ to the machine via SSH
+    + you should still be _unable_ to connect to the machine via SSH
+        * because the units are _enabled_ but not _active_
+
+7. Try to `start` the `ssh.service` and `ssh.socket`, then try to _connect_ to the machine via SSH
+    + you should now be _able_ to connect to the machine via SSH
+    + the same is true after a _reboot_
+
+---
+
+## About dependencies (pt. 1)
+
+Units may define _dependencies_ on other units, which impact the _order_ in which they are _started_ and _stopped_:
+
+1. __Wanting__: $A$ `Wants` $B$ (or $B$ `WantedBy` $A$) indicates a _weak_ dependency
+    - if service $A$ *wants* service $B$, `systemd` will _attempt_ to start $B$ when starting $A$
+    - if $B$ fails or isn't available, $A$ will still start
+    - used when a unit _can benefit_ from another service but doesn't strictly require it
+        + e.g., __targets__ _want_ services to be started, but don't _require_ them
+
+2. __Requiring__: $A$ `Requires` $B$ (or $B$ `RequiredBy` $A$) indicates a _strong_ dependency
+    - if service $A$ *requires* service $B$, $A$ will _not_ start unless $B$ starts successfully
+    - if $B$ fails to start, `systemd` will stop $A$ as well
+    - used when a unit is _essential_ for another to function
+        + e.g., __services__ _require_ __sockets__ to be started before they can start
+    - yet, $A$ `Requires` $B$ does __not__ imply $B$ `Before` $A$
+
+3. __Before__/__After__: $A$ `Before` $B$ (or $B$ `After` $A$) indicates an _ordering_ dependency
+    - if service $A$ *starts before* service $B$, `systemd` will _start_ $A$ before $B$
+    - these are just _ordering_ dependencies:
+        + so specifying $B$ `After` $A$ $\not\implies$ $A$ `Requires` $B$
+        + so $B$ is started _even if_ $A$ fails to start
+    - used to _control_ the _order_ in which units are started
+    
+---
+
+## About dependencies (pt. 2)
+
+4. __Conflict__: $A$ `Conflicts` $B$ indicates that $A$ and $B$ _cannot_ be _active_ at the _same time_
+    - if $A$ has a conflict with $B$ and you start $A$ while $B$ is running, `systemd` will _stop_ $B$ before starting $A$
+    - useful for _mutually exclusive_ services
+    - $A$ `Conflicts` $B$ $\implies$ $B$ `Conflicts` $A$
+
+5. __Binding__: $A$ `BindsTo` $B$ (or $B$ `BoundBy` $A$) indicates that $A$ is _tightly bound_ to $B$
+    - if $B$ stops or fails, $A$ will also stop
+    - used for _stronger_ dependencies than `Requires`
+
+6. other sorts of dependencies are available, see the [official doc](https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html)
 
 ---
 
@@ -1024,3 +1075,5 @@ how to operate
 - SSHD service
 - SSH agent service
 - DockerD service
+- Logging
+

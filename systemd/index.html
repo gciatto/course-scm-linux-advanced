@@ -109,6 +109,39 @@
 </div>
 </div>
 </section><section>
+<h2 id="os-services-and-daemons">OS Services and Daemons</h2>
+<p>In the context of <em>operative systems</em> (OS):</p>
+<ul>
+<li>
+<p>a <strong>service</strong> is a <em>process</em> that runs <em>continuously</em> in the background</p>
+<ul>
+<li>it is <em>started</em> and <em>stopped</em> by the OS (actually, by the <em>init system</em>), often with <em>administrative privileges</em></li>
+<li>it offers some <em>functionality</em> to the <em>user</em> or to other <em>services</em></li>
+</ul>
+</li>
+<li>
+<p>in the *nix world, <strong>“daemon”</strong> is a <em>synonym</em> for “service”</p>
+<ul>
+<li>the term <a href="https://en.wikipedia.org/wiki/Daemon_(computing)">comes from Greek mythology</a>:
+a <em>daimon</em> is a <em>spirit</em> that acts as an <em>intermediary</em> between <em>humans</em> and the <em>gods</em></li>
+</ul>
+</li>
+</ul>
+
+
+<span class="fragment ">
+  <h3 id="examples-of-servicesdaemons-in-a-linux-system">Examples of services/daemons in a Linux system</h3>
+<ul>
+<li><code>sshd</code> (the <em>SSH daemon</em>) is a service that allows clients to <em>remotely connect</em> to the system, via the <a href="https://en.wikipedia.org/wiki/Secure_Shell">SSH protocol</a></li>
+<li><code>ssh-agent</code> is a service that <em>manages</em> SSH keys for the user</li>
+<li><code>httpd</code> (the <em>HTTP daemon</em>) is a service that <em>serves</em> web pages to clients, via the <a href="https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol">HTTP protocol</a></li>
+<li><code>cupsd</code> (the <em>CUPS daemon</em>) is a service that <em>manages</em> printers, via the <a href="https://en.wikipedia.org/wiki/CUPS">CUPS protocol</a></li>
+<li><code>dockerd</code> (the <em>Docker daemon</em>) is a service that <em>manages</em> containers on a given host</li>
+</ul>
+
+</span>
+
+</section><section>
 <h2 id="init-systems">Init systems</h2>
 <ul>
 <li>
@@ -602,7 +635,10 @@
 </li>
 </ol>
 </section><section>
-<h2 id="sorts-of-units-see-official-dochttpswwwfreedesktoporgsoftwaresystemdmanlatestsystemdunithtmldescription">Sorts of units (see <a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html#Description">official doc</a>)</h2>
+
+
+<section data-shortcode-section="">
+<h2 id="main-sorts-of-units-see-official-dochttpswwwfreedesktoporgsoftwaresystemdmanlatestsystemdunithtmldescription">Main sorts of units (see <a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html#Description">official doc</a>)</h2>
 <blockquote>
 <ul>
 <li>Units are classified <em>by the <strong>suffix</strong></em> (a.k.a. <em>extension</em>) of their <em>unit file</em></li>
@@ -622,6 +658,22 @@
 </ul>
 </li>
 <li>
+<p><a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.timer.html#"><code>timer</code> units</a>: a timer controlled and supervised by <code>systemd</code>, for <em>timer-based activation</em></p>
+<ul>
+<li>e.g., <code>apt-daily.timer</code>, <code>apt-daily-upgrade.timer</code></li>
+</ul>
+</li>
+<li>
+<p><a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.target.html#"><code>target</code> units</a>: a <em>group</em> of units, to set <em>synchronization</em> points for ordering dependencies with other units</p>
+<ul>
+<li>e.g., <code>multi-user.target</code>, <code>graphical.target</code></li>
+</ul>
+</li>
+</ul>
+</section><section>
+<h2 id="other-sorts-of-units-see-official-dochttpswwwfreedesktoporgsoftwaresystemdmanlatestsystemdunithtmldescription">Other sorts of units (see <a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html#Description">official doc</a>)</h2>
+<ul>
+<li>
 <p><a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.socket.html#"><code>socket</code> units</a>: an <em>IPC</em> or network socket or a file system FIFO controlled and supervised by <code>systemd</code>, for <em>socket-based activation</em></p>
 <ul>
 <li>e.g., <code>ssh.socket</code>, <code>httpd.socket</code></li>
@@ -640,46 +692,49 @@
 </ul>
 </li>
 <li>
-<p><a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.timer.html#"><code>timer</code> units</a>: a timer controlled and supervised by <code>systemd</code>, for <em>timer-based activation</em></p>
+<p><a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.slice.html#"><code>slice</code> units</a>: a <em>group</em> of related processes, for which <em>common resource limitations</em> can apply</p>
 <ul>
-<li>e.g., <code>apt-daily.timer</code>, <code>apt-daily-upgrade.timer</code></li>
+<li>e.g., <code>user-1000.slice</code> (i.e. the <em>slice</em> for the user with UID=1000), <code>-.slice</code> (i.e. the <em>root slice</em>)</li>
 </ul>
 </li>
 <li>
-<p><a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.target.html#"><code>target</code> units</a>: a <em>group</em> of units, to set <em>synchronization</em> points for ordering dependencies with other units</p>
+<p><a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.device.html#"><code>device</code> units</a>: a unit describing the configuration of a <em>device</em> in <code>/dev</code></p>
 <ul>
-<li>e.g., <code>multi-user.target</code>, <code>graphical.target</code></li>
+<li>e.g., <code>dev-ttyS0.device</code> corresponds to the <em>serial port</em> <code>/dev/ttyS0</code></li>
+</ul>
+</li>
+<li>
+<p><a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.swap.html#"><code>swap</code> units</a>: a <em>swap partition</em> controlled and supervised by <code>systemd</code></p>
+<ul>
+<li>e.g., <code>swapfile.swap</code></li>
 </ul>
 </li>
 </ul>
+
+</section>
 </section><section>
-<h2 id="about-targets-pt-1">About Targets (pt. 1)</h2>
+<h2 id="about-targets">About Targets</h2>
 <blockquote>
 <p><strong>Targets</strong> $\approx$ checkpoints in the <em>boot process</em> where units have been <em>started</em> and are <em>running</em></p>
 </blockquote>
 
 <div class="div w-100">
     <div class="row "><div class="col align-middle " style="text-align: center;"><h3 id="boot-logs">Boot logs</h3>
-<img src="./logs.svg" alt="" style="height: 70vh; max-width: 95vw; max-height: 80vh; object-fit: contain;">
+<img src="./logs.svg" alt="" style="width: 100%; max-width: 95vw; max-height: 80vh; object-fit: contain;">
 </div>
-<div class="col align-middle " style="text-align: center;"><h3 id="dependencies-among-targets">Dependencies among targets</h3>
+<div class="col align-middle " style="text-align: center;"><h3 id="terget-dependencies">Terget dependencies</h3>
 <p><img src="./targets.png" alt=""></p>
 </div>
-</div>
-</div>
-</section><section>
-<h2 id="about-targets-pt-2">About Targets (pt. 2)</h2>
-<p>(Use <code>systemd-analyze plot &gt; plot.svg</code> to generate a plot like this)</p>
-
-
-
-
-
+<div class="col align-middle " style="text-align: center;"><h3 id="startup-time">Startup time</h3>
+<p>(<code>systemd-analyze plot &gt; plot.svg</code>)</p>
 <img src="./time-plot.svg" alt="" style="width: 100%; max-width: 95vw; max-height: 80vh; object-fit: contain;">
-
+</div>
+</div>
+</div>
 </section><section>
 <h2 id="unit-files-pt-1">Unit files (pt. 1)</h2>
-<p>(Use <code>systemctl cat ssh.service</code> to inspect the <em>SSH daemon</em>’s unit file)</p>
+<h3 id="example-the-_ssh-daemon_-unit-file">Example: the <em>SSH daemon</em> unit file</h3>
+<p>(Use <code>systemctl cat ssh.service</code> to inspect your <em>SSH daemon</em>’s unit file)</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># /usr/lib/systemd/system/ssh.service</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">[Unit]</span>
@@ -689,11 +744,11 @@
 </span></span><span style="display:flex;"><span><span style="color:#c4a000">ConditionPathExists</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">!/etc/ssh/sshd_not_to_be_run</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">[Service]</span>
-</span></span><span style="display:flex;"><span><span style="color:#c4a000">EnvironmentFile</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">-/etc/default/ssh</span>
-</span></span><span style="display:flex;"><span><span style="color:#c4a000">ExecStartPre</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">/usr/sbin/sshd -t</span>
-</span></span><span style="display:flex;"><span><span style="color:#c4a000">ExecStart</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">/usr/sbin/sshd -D $SSHD_OPTS</span>
+</span></span><span style="display:flex;"><span><span style="color:#c4a000">EnvironmentFile</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">-/etc/default/ssh           # cat /etc/default/ssh</span>
+</span></span><span style="display:flex;"><span><span style="color:#c4a000">ExecStartPre</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">/usr/sbin/sshd -t              # man sshd | grep -e '-t'</span>
+</span></span><span style="display:flex;"><span><span style="color:#c4a000">ExecStart</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">/usr/sbin/sshd -D $SSHD_OPTS      # man sshd | grep -e '-D'</span>
 </span></span><span style="display:flex;"><span><span style="color:#c4a000">ExecReload</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">/usr/sbin/sshd -t</span>
-</span></span><span style="display:flex;"><span><span style="color:#c4a000">ExecReload</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">/bin/kill -HUP $MAINPID</span>
+</span></span><span style="display:flex;"><span><span style="color:#c4a000">ExecReload</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">/bin/kill -HUP $MAINPID          # sends a HUP ("Hang UP") signal to the main process</span>
 </span></span><span style="display:flex;"><span><span style="color:#c4a000">KillMode</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">process</span>
 </span></span><span style="display:flex;"><span><span style="color:#c4a000">Restart</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">on-failure</span>
 </span></span><span style="display:flex;"><span><span style="color:#c4a000">RestartPreventExitStatus</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">255</span>
@@ -705,16 +760,399 @@
 </span></span><span style="display:flex;"><span><span style="color:#c4a000">WantedBy</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">multi-user.target</span>
 </span></span><span style="display:flex;"><span><span style="color:#c4a000">Alias</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">sshd.service</span>
 </span></span></code></pre></div></section><section>
+
+
+<section data-shortcode-section="">
 <h2 id="unit-files-pt-2">Unit files (pt. 2)</h2>
-<p>TBD: location</p>
-<p>TBD: syntax</p>
-<p>TBD: dependencies</p>
-<p>TBD: how to operate</p>
+<h3 id="location-of-unit-files">Location of unit files</h3>
+<ol>
+<li>
+<p><strong>System unit files</strong> for <em>the distribution</em> are usually stored in <code>/lib/systemd/system/</code></p>
+<ul>
+<li>on most distributions, <code>/lib</code> is a <em>sym-link</em> to <code>/usr/lib</code>, so the actual path is <code>/usr/lib/systemd/system/</code></li>
+<li>try <code>tree -C /lib/systemd/system/ | less</code> to see the <em>system unit files</em></li>
+</ul>
+</li>
+<li>
+<p>Administrators can <em>override</em> these system unit files by placing <strong>custom unit files</strong> in <code>/etc/systemd/system/</code></p>
+<ul>
+<li><em>custom</em> unit files take <strong>precedence</strong> over <em>system</em> unit files</li>
+<li>try <code>tree -C /etc/systemd/system/ | less</code> to see the <em>custom unit files</em></li>
+</ul>
+</li>
+<li>
+<p><em>User unit files</em> are stored in <code>~/.config/systemd/user/</code></p>
+<ul>
+<li>try <code>tree -C ~/.config/systemd/user/ | less</code> to see the <em>user unit files</em></li>
+</ul>
+</li>
+</ol>
+</section><section>
+<h2 id="unit-files-pt-2-1">Unit files (pt. 2)</h2>
+<h3 id="full-look-up-locations-priority-list-according-to-the-official-dochttpswwwfreedesktoporgsoftwaresystemdmanlatestsystemdunithtml">Full look-up locations priority list (according to the <a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html">official doc</a>)</h3>
+<p>(descending order of precedence)</p>
+<div class="div w-100">
+    <div class="row "><div class="col align-middle " style="text-align: center;"><h4 id="system-unit-search-path">System Unit Search Path</h4>
+<ol>
+<li><code>/etc/systemd/system.control/*</code></li>
+<li><code>/run/systemd/system.control/*</code></li>
+<li><code>/run/systemd/transient/*</code></li>
+<li><code>/run/systemd/generator.early/*</code></li>
+<li><code>/etc/systemd/system/*</code></li>
+<li><code>/etc/systemd/system.attached/*</code></li>
+<li><code>/run/systemd/system/*</code></li>
+<li><code>/run/systemd/system.attached/*</code></li>
+<li><code>/run/systemd/generator/*</code></li>
+<li><code>/usr/local/lib/systemd/system/*</code></li>
+<li><code>/usr/lib/systemd/system/*</code></li>
+<li><code>/run/systemd/generator.late/*</code></li>
+</ol>
+</div>
+<div class="col align-middle " style="text-align: center;"><h4 id="user-unit-search-path">User Unit Search Path</h4>
+<ol>
+<li><code>~/.config/systemd/user.control/*</code></li>
+<li><code>$XDG_RUNTIME_DIR/systemd/user.control/*</code></li>
+<li><code>$XDG_RUNTIME_DIR/systemd/transient/*</code></li>
+<li><code>$XDG_RUNTIME_DIR/systemd/generator.early/*</code></li>
+<li><code>~/.config/systemd/user/*</code></li>
+<li><code>$XDG_CONFIG_DIRS/systemd/user/*</code></li>
+<li><code>/etc/systemd/user/*</code></li>
+<li><code>$XDG_RUNTIME_DIR/systemd/user/*</code></li>
+<li><code>/run/systemd/user/*</code></li>
+<li><code>$XDG_RUNTIME_DIR/systemd/generator/*</code></li>
+<li><code>$XDG_DATA_HOME/systemd/user/*</code></li>
+<li><code>$XDG_DATA_DIRS/systemd/user/*</code></li>
+<li><code>/usr/local/lib/systemd/user/*</code></li>
+<li><code>/usr/lib/systemd/user/*</code></li>
+<li><code>$XDG_RUNTIME_DIR/systemd/generator.late/*</code></li>
+</ol>
+</div>
+</div>
+</div>
+
+</section>
+</section><section>
+
+
+<section data-shortcode-section="">
+<h2 id="unit-files-pt-3">Unit files (pt. 3)</h2>
+<h3 id="syntax-of-unit-files">Syntax of unit files</h3>
+<p>Syntax is inspired to <a href="https://en.wikipedia.org/wiki/INI_file">Window’s <code>.ini</code> files</a>:</p>
+<blockquote>
+<p>a bunch of <code>[Sections]</code> with <code>Key=Value</code> pairs, one per line, using <code>#</code> for comments</p>
+</blockquote>
+<h3 id="example">Example</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">[Section]</span>
+</span></span><span style="display:flex;"><span><span style="color:#c4a000">Key1</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">Value1</span>
+</span></span><span style="display:flex;"><span><span style="color:#c4a000">Key2</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">Value2</span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># this is a comment</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">[AnotherSection]</span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># this is another comment</span>
+</span></span><span style="display:flex;"><span><span style="color:#c4a000">Key3</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">Value3</span>
+</span></span><span style="display:flex;"><span><span style="color:#c4a000">Key3</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">Some keys can be repeated</span>
+</span></span><span style="display:flex;"><span><span style="color:#c4a000">Key4</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">Value4</span>
+</span></span></code></pre></div></section><section>
+<h2 id="unit-files-pt-3-1">Unit files (pt. 3)</h2>
+<h3 id="syntax-of-unit-files-1">Syntax of unit files</h3>
+<ul>
+<li>
+<p>In <a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html#%5BUnit%5D%20Section%20Options">section <code>[Unit]</code></a>
+one should write <em>generic information</em> about the <strong>unit</strong> that is NOT dependent on the type of unit:</p>
+<ul>
+<li><code>Description=</code> a short <em>human-readable</em> <strong>title</strong> of the unit, to be shown in the logs</li>
+<li><code>Documentation=</code> a space-separated list of <em>URLs</em> to the <strong>documentation</strong> of the unit</li>
+<li><code>Before=</code>, <code>After=</code> a space-separated list of <em>unit</em> that <strong>must be started</strong> <em>after/before</em> this unit</li>
+<li><code>ConditionPathExists=</code> a <em>path</em> that must (NOT, if prefixed by <code>!</code>) <strong>exist</strong> for the unit to be started</li>
+</ul>
+</li>
+<li>
+<p>In <a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html#%5BInstall%5D%20Section%20Options">section <code>[Install]</code></a>
+one should write <em>information</em> about how the unit is <strong>installed</strong>:</p>
+<ul>
+<li><em>installation</em> of a unit (a.k.a. <strong>enabling</strong> it) $\approx$ <em>manually</em> configuring the unit for <em>automatic</em> start-up
+<ul>
+<li><em><strong>de</strong>installation</em> of a unit (a.k.a. <strong>disabling</strong> it) $\approx$ <em>manually</em> configuring the unit for <em>manual</em> start-up</li>
+</ul>
+</li>
+<li><code>Alias=</code> a space-separated list of <em>alternative names</em> for the unit</li>
+<li><code>Also=</code></li>
+<li><code>WantedBy=, RequiredBy=, UpheldBy=</code> these properties are related to <em>dependency management</em>, explained later</li>
+</ul>
+</li>
+</ul>
+</section><section>
+<h2 id="unit-files-pt-3-2">Unit files (pt. 3)</h2>
+<h3 id="syntax-of-service-unit-files-12">Syntax of <code>.service</code> unit files (1/2)</h3>
+<ul>
+<li>In <a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html#Options">section <code>[Service]</code></a>
+one should write information about the <strong>service</strong> and the process it supervises
+<ul>
+<li><code>ExecStartPre=</code>, <code>ExecStartPost=</code> command to be <strong>executed</strong> <em>before/after</em> the <em>main command</em> (for testing purposes)</li>
+<li><code>ExecStart=</code> the <em>main command</em> to be executed to <strong>start</strong> the service
+<ul>
+<li>the <strong>PID</strong> of the service’s process is stored in <code>$MAINPID</code></li>
+</ul>
+</li>
+<li><code>ExecReload=</code> command(s) to be executed upon <strong>reloading</strong> of the service, before re-executing the <em>main command</em></li>
+<li><code>Restart=</code> configures whether the service shall be <strong>restarted</strong> when the service process <em>exits</em>, is <em>killed</em>, or a <em>timeout</em> is reached
+<ul>
+<li>one of <code>no</code> (default), <code>on-success</code>, <code>on-failure</code>, <code>on-abnormal</code>, <code>on-watchdog</code>, <code>on-abort</code>, or <code>always</code> (cf. <a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html#Restart=">official doc</a>)</li>
+</ul>
+</li>
+<li><code>RestartPreventExitStatus=</code> a space-separated list of <em>exit status codes</em> that will <em>not</em> trigger a restart</li>
+<li><code>Type=</code> configures the mechanism via which the service is considered <strong>activated</strong> ($\approx$ <em>started</em> and <em>ready</em> to be used)
+<ul>
+<li><a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html#Type=">many options available</a>, e.g. <code>exec</code> (after main process is executed), <code>notify</code> (after it sends a <em>notification</em>), etc.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section><section>
+<h2 id="unit-files-pt-3-3">Unit files (pt. 3)</h2>
+<h3 id="syntax-of-service-unit-files-22">Syntax of <code>.service</code> unit files (2/2)</h3>
+<ul>
+<li>
+<p>Many options related to <a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html">process execution</a> or <a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.kill.html#">process killing apply</a> here</p>
+<ul>
+<li><a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html#EnvironmentFile="><code>EnvironmentFile=</code></a> the <strong>path</strong> to <em>file</em> that contains <em>environment variables</em> for the service</li>
+<li><code>KillMode=</code> specifies how processes of this unit shall be <strong>killed</strong>:
+<ul>
+<li><code>process</code> $\rightarrow$ only the service process is killed</li>
+<li><code>mixed</code> $\rightarrow$ signal <code>SIGKILL</code> is sent to <em>all processes</em> in the control group of this unit, <em>including the main one</em></li>
+<li><code>control-group</code> $\rightarrow$ like <code>mixed</code>, <em>except the main one</em>, requires setting <code>ExecStop</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Beware of <a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html#Command%20lines">special executable prefixes</a>: such as <code>-</code> (ignore errors), <code>+</code> (run in full privilege), <code>:</code> (do not expand variables), etc.</p>
+</li>
+</ul>
+
+</section>
+</section><section>
+<h2 id="operating-with-units-pt-1">Operating with units (pt. 1)</h2>
+<ul>
+<li>Getting the <strong>runtime status</strong> of a unit: <code>systemctl status NAME.TYPE</code>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span>$ systemctl status ssh
+</span></span><span style="display:flex;"><span>● ssh.service - OpenBSD Secure Shell server
+</span></span><span style="display:flex;"><span>    Loaded: loaded <span style="color:#ce5c00;font-weight:bold">(</span>/usr/lib/systemd/system/ssh.service<span style="color:#000;font-weight:bold">;</span> disabled<span style="color:#000;font-weight:bold">;</span> preset: enabled<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    Active: active <span style="color:#ce5c00;font-weight:bold">(</span>running<span style="color:#ce5c00;font-weight:bold">)</span> since Mon 2024-11-11 11:09:51 CET<span style="color:#000;font-weight:bold">;</span> <span style="color:#0000cf;font-weight:bold">1</span> day 1h ago
+</span></span><span style="display:flex;"><span>Invocation: 95b989f6f1a94ccabefa0e9925ea4ede
+</span></span><span style="display:flex;"><span>TriggeredBy: ● ssh.socket
+</span></span><span style="display:flex;"><span>    Docs: man:sshd<span style="color:#ce5c00;font-weight:bold">(</span>8<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>            man:sshd_config<span style="color:#ce5c00;font-weight:bold">(</span>5<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>Main PID: <span style="color:#0000cf;font-weight:bold">1861</span> <span style="color:#ce5c00;font-weight:bold">(</span>sshd<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    Tasks: <span style="color:#0000cf;font-weight:bold">1</span> <span style="color:#ce5c00;font-weight:bold">(</span>limit: 4598<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    Memory: 6.2M <span style="color:#ce5c00;font-weight:bold">(</span>peak: 22.9M<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>        CPU: 908ms
+</span></span><span style="display:flex;"><span>    CGroup: /system.slice/ssh.service
+</span></span><span style="display:flex;"><span>            └─1861 <span style="color:#4e9a06">"sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups"</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>nov <span style="color:#0000cf;font-weight:bold">12</span> 09:39:50 lubuntu2410-vm sshd<span style="color:#ce5c00;font-weight:bold">[</span>6813<span style="color:#ce5c00;font-weight:bold">]</span>: pam_systemd<span style="color:#ce5c00;font-weight:bold">(</span>sshd:session<span style="color:#ce5c00;font-weight:bold">)</span>: New sd-bus connection <span style="color:#ce5c00;font-weight:bold">(</span>system-bus-pam-systemd-6813<span style="color:#ce5c00;font-weight:bold">)</span> opened.
+</span></span><span style="display:flex;"><span>nov <span style="color:#0000cf;font-weight:bold">12</span> 11:07:07 lubuntu2410-vm sshd<span style="color:#ce5c00;font-weight:bold">[</span>7083<span style="color:#ce5c00;font-weight:bold">]</span>: Accepted password <span style="color:#204a87;font-weight:bold">for</span> user from 10.0.2.2 port <span style="color:#0000cf;font-weight:bold">47930</span> ssh2
+</span></span><span style="display:flex;"><span>nov <span style="color:#0000cf;font-weight:bold">12</span> 11:07:07 lubuntu2410-vm sshd<span style="color:#ce5c00;font-weight:bold">[</span>7083<span style="color:#ce5c00;font-weight:bold">]</span>: pam_unix<span style="color:#ce5c00;font-weight:bold">(</span>sshd:session<span style="color:#ce5c00;font-weight:bold">)</span>: session opened <span style="color:#204a87;font-weight:bold">for</span> user user<span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">uid</span><span style="color:#ce5c00;font-weight:bold">=</span>1000<span style="color:#ce5c00;font-weight:bold">)</span> by user<span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">uid</span><span style="color:#ce5c00;font-weight:bold">=</span>0<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>nov <span style="color:#0000cf;font-weight:bold">12</span> 11:07:07 lubuntu2410-vm sshd<span style="color:#ce5c00;font-weight:bold">[</span>7083<span style="color:#ce5c00;font-weight:bold">]</span>: pam_systemd<span style="color:#ce5c00;font-weight:bold">(</span>sshd:session<span style="color:#ce5c00;font-weight:bold">)</span>: New sd-bus connection <span style="color:#ce5c00;font-weight:bold">(</span>system-bus-pam-systemd-7083<span style="color:#ce5c00;font-weight:bold">)</span> opened.
+</span></span></code></pre></div></li>
+</ul>
+</section><section>
+<h2 id="operating-with-units-pt-2">Operating with units (pt. 2)</h2>
+<ul>
+<li>
+<p><strong>Starting</strong> / <strong>stopping</strong> / <strong>restarting</strong> a unit: <code>sudo systemctl start|stop|restart NAME.TYPE</code></p>
+<ul>
+<li>use <code>systemctl --user start|stop|restart NAME.TYPE</code> for <em>user units</em> (no need for <code>sudo</code>)</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span>$ sudo systemctl stop ssh.service
+</span></span><span style="display:flex;"><span>Stopping <span style="color:#4e9a06">'ssh.service'</span>, but its triggering units are still active:
+</span></span><span style="display:flex;"><span>ssh.socket
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ sudo systemctl start ssh.service
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ sudo systemctl restart ssh.service
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Attempts to do admin operations without sudo, will prompt for password:</span>
+</span></span><span style="display:flex;"><span>$ systemctl stop ssh.service
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">====</span> AUTHENTICATING FOR org.freedesktop.systemd1.manage-units <span style="color:#ce5c00;font-weight:bold">====</span>
+</span></span><span style="display:flex;"><span>Autenticazione richiesta per fermare <span style="color:#4e9a06">'ssh.service'</span>.
+</span></span><span style="display:flex;"><span>Authenticating as: user
+</span></span><span style="display:flex;"><span>Password:
+</span></span></code></pre></div></li>
+</ul>
+
+
+<span class="fragment ">
+  <blockquote>
+<p><strong>Note</strong>: try stopping the <code>ssh.service</code> and see if you can <em>still connect</em> to the machine via SSH. <em>Why?</em></p>
+</blockquote>
+
+</span>
+
+</section><section>
+<h2 id="operating-with-units-pt-3">Operating with units (pt. 3)</h2>
+<ul>
+<li>Inspecting the <strong>dependencies</strong> of a unit: <code>systemctl list-dependencies NAME.TYPE</code>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span>$ systemctl list-dependencies ssh.service
+</span></span><span style="display:flex;"><span>ssh.service
+</span></span><span style="display:flex;"><span>● ├─-.mount
+</span></span><span style="display:flex;"><span>● ├─ssh.socket <span style="color:#8f5902;font-style:italic">############ &lt;--- notice this _socket unit_</span>
+</span></span><span style="display:flex;"><span>● ├─system.slice
+</span></span><span style="display:flex;"><span>● └─sysinit.target
+</span></span><span style="display:flex;"><span>●   ├─apparmor.service
+</span></span><span style="display:flex;"><span>○   ├─...
+</span></span><span style="display:flex;"><span>●   ├─systemd-update-utmp.service
+</span></span><span style="display:flex;"><span>●   ├─local-fs.target
+</span></span><span style="display:flex;"><span>●   │ ├─-.mount
+</span></span><span style="display:flex;"><span>●   │ ├─run-lock.mount
+</span></span><span style="display:flex;"><span>○   │ ├─systemd-fsck-root.service
+</span></span><span style="display:flex;"><span>●   │ ├─systemd-remount-fs.service
+</span></span><span style="display:flex;"><span>●   │ └─tmp.mount
+</span></span><span style="display:flex;"><span>●   └─swap.target
+</span></span><span style="display:flex;"><span>●     └─swapfile.swap
+</span></span></code></pre></div></li>
+</ul>
+</section><section>
+<h2 id="socket-activation">Socket activation</h2>
+<ul>
+<li>
+<p>Some daemons work by <strong>listening</strong> for <em>incoming connections</em></p>
+<ul>
+<li>e.g., <code>sshd</code> listens on <em>TCP port</em> <code>22</code> for incoming <em>SSH</em> connections</li>
+<li>e.g., <code>httpd</code> listens on <em>TCP port</em> <code>80</code> for incoming <em>HTTP</em> connections</li>
+<li>e.g. <code>dockerd</code> listens on <em>Unix socket</em> <code>/var/run/docker.sock</code> for incoming <em>Docker</em> commands</li>
+</ul>
+</li>
+<li>
+<p><a href="https://en.wikipedia.org/wiki/Network_socket">“Socket”</a> is a <em>software endpoint</em> of a process willing to communicate <em>over the network</em> (or locally)</p>
+<ul>
+<li>e.g. <code>INET</code> sockets (e.g., <code>TCP</code>, <code>UDP</code>) for <em>network</em> communication, <code>UNIX</code> sockets for <em>local</em> IPC</li>
+</ul>
+</li>
+<li>
+<p>Most commonly, the process willing to <strong>listen</strong> on a <em>socket</em>, would create the socket <em>upon startup</em>…</p>
+<ul>
+<li>here, time/computation is <em>wasted</em> to start up a process that may <em>just listen</em> for a while</li>
+</ul>
+</li>
+<li>
+<p>… but <code>systemd</code> can <strong>listen</strong> on the <em>socket</em> <strong>instead of</strong> the <em>process</em>, and <strong>trigger</strong> the <em>process</em> upon <em>incoming connections</em></p>
+<ul>
+<li>this is called <strong>socket activation</strong></li>
+</ul>
+</li>
+<li>
+<p>To support <em>socket activation</em>, the <code>.service</code> unit file should have a <strong>corresponding</strong> <code>.socket</code> unit file</p>
+</li>
+</ul>
+</section><section>
+<h2 id="unit-files-pt-4">Unit files (pt. 4)</h2>
+<h3 id="example-the-ssh-daemon-_socket_-unit-file">Example: the SSH daemon <em>socket</em> unit file</h3>
+<p>(Use <code>systemctl cat ssh.socket</code> to inspect your SSH daemon’s <em>socket</em> unit file)</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># /usr/lib/systemd/system/ssh.socket</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">[Unit]</span>
+</span></span><span style="display:flex;"><span><span style="color:#c4a000">Description</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">OpenBSD Secure Shell server socket</span>
+</span></span><span style="display:flex;"><span><span style="color:#c4a000">Before</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">sockets.target ssh.service                   # notice the dependency on the ssh.service   </span>
+</span></span><span style="display:flex;"><span><span style="color:#c4a000">ConditionPathExists</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">!/etc/ssh/sshd_not_to_be_run</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">[Socket]</span>
+</span></span><span style="display:flex;"><span><span style="color:#c4a000">ListenStream</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">0.0.0.0:22                             # listen on all IPv4 interfaces on port 22   </span>
+</span></span><span style="display:flex;"><span><span style="color:#c4a000">ListenStream</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">[::]:22                                # listen on all IPv6 interfaces on port 22</span>
+</span></span><span style="display:flex;"><span><span style="color:#c4a000">Accept</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">no</span>
+</span></span><span style="display:flex;"><span><span style="color:#c4a000">FreeBind</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">yes</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">[Install]</span>
+</span></span><span style="display:flex;"><span><span style="color:#c4a000">WantedBy</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">sockets.target</span>
+</span></span><span style="display:flex;"><span><span style="color:#c4a000">RequiredBy</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">ssh.service</span>
+</span></span></code></pre></div></section><section>
+<h2 id="unit-files-pt-4-1">Unit files (pt. 4)</h2>
+<h3 id="syntax-of-socket-unit-files">Syntax of <code>.socket</code> unit files</h3>
+<ul>
+<li>In <a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.socket.html#Options">section <code>[Socket]</code></a>
+one should write information about the <strong>socket</strong> or FIFO the unit supervises
+<ul>
+<li><code>ListenStream=, ListenDatagram=, ListenSequentialPacket=</code> <strong>address</strong> to listen on for a <em>stream</em>, <em>datagram</em>, or <em>sequential packet</em> socket, respectively</li>
+<li><code>Accept=</code> takes a <em>boolean</em> argument:
+<ul>
+<li><code>yes</code>: a service instance is spawned <em>for each</em> incoming connection and <em>only</em> the connection socket is passed to it</li>
+<li><code>no</code>: <em>all</em> listening sockets themselves are passed to the started service unit, and <em>only one service</em> is spawned for all connections</li>
+</ul>
+</li>
+<li><code>FreeBind=</code> controls whether the socket can be bound to <em>non-local IP</em> addresses</li>
+</ul>
+</li>
+</ul>
+</section><section>
+<h2 id="operating-with-units-pt-4">Operating with units (pt. 4)</h2>
+<ol>
+<li>
+<p>Try to <code>stop</code> the <code>ssh.service</code> and to <em>connect</em> to the machine via SSH</p>
+<ul>
+<li>you can <em>still connect</em> to the machine via SSH, because <code>ssh.socket</code> is <em>still active</em>
+<ul>
+<li>it will <em>start</em> the <code>ssh.service</code> <em>upon</em> an <em>incoming connection</em></li>
+</ul>
+</li>
+<li>notice that the <code>ssh.service</code> is <em>active</em>, <strong>after</strong> the SSH connection is established</li>
+</ul>
+</li>
+<li>
+<p>Try to <code>stop</code> the <code>ssh.socket</code> AND <code>ssh.socket</code>, then try to <em>connect</em> to the machine via SSH</p>
+<ul>
+<li>now you should be <em>unable</em> to connect to the machine via SSH
+<ul>
+<li>because the <code>ssh.socket</code> is <em>not active</em> to <em>start</em> the <code>ssh.service</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Try to <strong>reboot</strong> the system. Upon <em>startup</em>, are the <code>ssh.service</code> and <code>ssh.socket</code> units <em>active</em>?</p>
+<ul>
+<li>they should, because the units are <em>enabled</em> (i.e., they are <em>configured</em> for <em>automatic</em> start-up)</li>
+</ul>
+</li>
+</ol>
+</section><section>
+<h2 id="operating-with-units-pt-5">Operating with units (pt. 5)</h2>
+<ul>
+<li>
+<p><strong>Enabling</strong> / <strong>disabling</strong> a unit: <code>sudo systemctl enable|disable NAME.TYPE</code></p>
+<ul>
+<li>use <code>systemctl --user enable|disable NAME.TYPE</code> for <em>user units</em> (no need for <code>sudo</code>)</li>
+</ul>
+</li>
+<li>
+<p>The <em>effect</em> is that the <code>[Install]</code> section of the unit file is <em>interpreted</em></p>
+<ul>
+<li>… and the <strong>dependencies</strong> therein specified are <em>installed</em> / <em>uninstalled</em> accordingly</li>
+</ul>
+</li>
+<li>
+<p>The <code>[Install]</code> section of a unit <em>$A$</em> would most commonly specify:</p>
+<ul>
+<li>some <code>WantedBy</code> dependency w.r.t. some <strong>target</strong> unit <em>$T$</em> $\implies$ <em>$A$</em> is <strong>started</strong> automatically when <em>$T$</em> is <strong>started</strong></li>
+<li>some <code>RequiredBy</code> dependency w.r.t. some other unit <em>$B$</em> $\implies$ <em>$B$</em> <strong>requires</strong> <em>$A$</em> to be able to <strong>start</strong>
+<ul>
+<li>this is commonly the case for <em>socket</em> units, which are <em>required</em> by the <em>service</em> units they trigger</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section><section>
+<h2 id="tbd">TBD</h2>
+<p>continue SSH example</p>
+<p>dependencies</p>
+<p>how to operate</p>
 </section><section>
 <h2 id="examples">Examples</h2>
 <ul>
 <li>Timer: duckdns</li>
 <li>SSHD service</li>
+<li>SSH agent service</li>
 <li>DockerD service</li>
 </ul>
 </section>

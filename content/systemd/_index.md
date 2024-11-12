@@ -98,6 +98,30 @@ The init system has:
 
 ---
 
+## OS Services and Daemons
+
+In the context of _operative systems_ (OS):
+
+- a __service__ is a _process_ that runs _continuously_ in the background
+    + it is _started_ and _stopped_ by the OS (actually, by the _init system_), often with _administrative privileges_
+    + it offers some _functionality_ to the _user_ or to other _services_
+
+- in the *nix world, __"daemon"__ is a _synonym_ for "service"
+    + the term [comes from Greek mythology](https://en.wikipedia.org/wiki/Daemon_(computing)):
+    a _daimon_ is a _spirit_ that acts as an _intermediary_ between _humans_ and the _gods_
+
+{{% fragment %}}
+### Examples of services/daemons in a Linux system
+
+- `sshd` (the _SSH daemon_) is a service that allows clients to _remotely connect_ to the system, via the [SSH protocol](https://en.wikipedia.org/wiki/Secure_Shell)
+- `ssh-agent` is a service that _manages_ SSH keys for the user
+- `httpd` (the _HTTP daemon_) is a service that _serves_ web pages to clients, via the [HTTP protocol](https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol)
+- `cupsd` (the _CUPS daemon_) is a service that _manages_ printers, via the [CUPS protocol](https://en.wikipedia.org/wiki/CUPS)
+- `dockerd` (the _Docker daemon_) is a service that _manages_ containers on a given host
+{{% /fragment %}}
+
+---
+
 ## Init systems
 
 - [SysVinit](https://en.wikipedia.org/wiki/Init) (1980s—early 2000s) first family of init systems for Unix-like systems
@@ -556,7 +580,9 @@ How to use `systemctl` and `journalctl`?
 
 ---
 
-## Sorts of units (see [official doc](https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html#Description))
+{{% section %}}
+
+## Main sorts of units (see [official doc](https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html#Description))
 
 > - Units are classified _by the **suffix**_ (a.k.a. _extension_) of their _unit file_
 > - You can _list_ loaded units via `systemctl list-units [--type=TYPE]`
@@ -565,6 +591,16 @@ How to use `systemctl` and `journalctl`?
 
 - [`service` units](https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html#): a _process_ that needs to be _started_ and _managed_ by `systemd`
     + e.g., `ssh.service`, `ufw.service`, `cups.service`
+
+- [`timer` units](https://www.freedesktop.org/software/systemd/man/latest/systemd.timer.html#): a timer controlled and supervised by `systemd`, for _timer-based activation_
+    + e.g., `apt-daily.timer`, `apt-daily-upgrade.timer`
+
+- [`target` units](https://www.freedesktop.org/software/systemd/man/latest/systemd.target.html#): a _group_ of units, to set _synchronization_ points for ordering dependencies with other units
+    + e.g., `multi-user.target`, `graphical.target`
+
+---
+
+## Other sorts of units (see [official doc](https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html#Description))
 
 - [`socket` units](https://www.freedesktop.org/software/systemd/man/latest/systemd.socket.html#): an _IPC_ or network socket or a file system FIFO controlled and supervised by `systemd`, for _socket-based activation_
     + e.g., `ssh.socket`, `httpd.socket`
@@ -575,15 +611,20 @@ How to use `systemctl` and `journalctl`?
 - [`path` units](https://www.freedesktop.org/software/systemd/man/latest/systemd.path.html#): a path monitored by `systemd`, for _path-based activation_
     + e.g., `cups.path`
 
-- [`timer` units](https://www.freedesktop.org/software/systemd/man/latest/systemd.timer.html#): a timer controlled and supervised by `systemd`, for _timer-based activation_
-    + e.g., `apt-daily.timer`, `apt-daily-upgrade.timer`
+- [`slice` units](https://www.freedesktop.org/software/systemd/man/latest/systemd.slice.html#): a _group_ of related processes, for which _common resource limitations_ can apply
+    + e.g., `user-1000.slice` (i.e. the _slice_ for the user with UID=1000), `-.slice` (i.e. the _root slice_)
 
-- [`target` units](https://www.freedesktop.org/software/systemd/man/latest/systemd.target.html#): a _group_ of units, to set _synchronization_ points for ordering dependencies with other units
-    + e.g., `multi-user.target`, `graphical.target`
+- [`device` units](https://www.freedesktop.org/software/systemd/man/latest/systemd.device.html#): a unit describing the configuration of a _device_ in `/dev`
+    + e.g., `dev-ttyS0.device` corresponds to the _serial port_ `/dev/ttyS0`
+
+- [`swap` units](https://www.freedesktop.org/software/systemd/man/latest/systemd.swap.html#): a _swap partition_ controlled and supervised by `systemd`
+    + e.g., `swapfile.swap`
+
+{{% /section %}}
 
 ---
 
-## About Targets (pt. 1)
+## About Targets
 
 > __Targets__ $\approx$ checkpoints in the _boot process_ where units have been _started_ and are _running_
 
@@ -591,28 +632,29 @@ How to use `systemctl` and `journalctl`?
 {{% col %}}
 ### Boot logs
 
-{{< image src="./logs.svg" height="70vh" >}}
+{{< image src="./logs.svg" width="100%" max-h="80vh" >}}
 {{% /col %}}
 {{% col %}}
-### Dependencies among targets
+### Terget dependencies
 
 ![](./targets.png)
+{{% /col %}}
+{{% col %}}
+### Startup time
+
+(`systemd-analyze plot > plot.svg`)
+
+{{< image src="./time-plot.svg" width="100%" max-h="80vh" >}}
 {{% /col %}}
 {{% /multicol %}}
 
 ---
 
-## About Targets (pt. 2)
-
-(Use `systemd-analyze plot > plot.svg` to generate a plot like this)
-
-{{< image src="./time-plot.svg" width="100%" max-h="80vh" >}}
-
----
-
 ## Unit files (pt. 1)
 
-(Use `systemctl cat ssh.service` to inspect the _SSH daemon_'s unit file)
+### Example: the _SSH daemon_ unit file
+
+(Use `systemctl cat ssh.service` to inspect your _SSH daemon_'s unit file)
 
 ```systemd
 # /usr/lib/systemd/system/ssh.service
@@ -624,11 +666,11 @@ After=network.target nss-user-lookup.target auditd.service
 ConditionPathExists=!/etc/ssh/sshd_not_to_be_run
 
 [Service]
-EnvironmentFile=-/etc/default/ssh
-ExecStartPre=/usr/sbin/sshd -t
-ExecStart=/usr/sbin/sshd -D $SSHD_OPTS
+EnvironmentFile=-/etc/default/ssh           # cat /etc/default/ssh
+ExecStartPre=/usr/sbin/sshd -t              # man sshd | grep -e '-t'
+ExecStart=/usr/sbin/sshd -D $SSHD_OPTS      # man sshd | grep -e '-D'
 ExecReload=/usr/sbin/sshd -t
-ExecReload=/bin/kill -HUP $MAINPID
+ExecReload=/bin/kill -HUP $MAINPID          # sends a HUP ("Hang UP") signal to the main process
 KillMode=process
 Restart=on-failure
 RestartPreventExitStatus=255
@@ -643,15 +685,336 @@ Alias=sshd.service
 
 ---
 
+{{% section %}}
+
 ## Unit files (pt. 2)
 
-TBD: location
+### Location of unit files
 
-TBD: syntax
+1. __System unit files__ for _the distribution_ are usually stored in `/lib/systemd/system/`
+    + on most distributions, `/lib` is a _sym-link_ to `/usr/lib`, so the actual path is `/usr/lib/systemd/system/`
+    + try `tree -C /lib/systemd/system/ | less` to see the _system unit files_
 
-TBD: dependencies
+2. Administrators can _override_ these system unit files by placing __custom unit files__ in `/etc/systemd/system/`
+    + _custom_ unit files take __precedence__ over _system_ unit files
+    + try `tree -C /etc/systemd/system/ | less` to see the _custom unit files_
 
-TBD: how to operate
+3. _User unit files_ are stored in `~/.config/systemd/user/`
+    + try `tree -C ~/.config/systemd/user/ | less` to see the _user unit files_
+
+--- 
+
+## Unit files (pt. 2)
+
+### Full look-up locations priority list (according to the [official doc](https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html))
+
+(descending order of precedence)
+
+{{% multicol %}}
+{{% col %}}
+#### System Unit Search Path
+
+1. `/etc/systemd/system.control/*`
+1. `/run/systemd/system.control/*`  
+1. `/run/systemd/transient/*`
+1. `/run/systemd/generator.early/*`
+1. `/etc/systemd/system/*`
+1. `/etc/systemd/system.attached/*`
+1. `/run/systemd/system/*`
+1. `/run/systemd/system.attached/*`
+1. `/run/systemd/generator/*`
+1. `/usr/local/lib/systemd/system/*`
+1. `/usr/lib/systemd/system/*`
+1. `/run/systemd/generator.late/*`
+{{% /col %}}
+{{% col %}}
+#### User Unit Search Path
+
+1. `~/.config/systemd/user.control/*`
+1. `$XDG_RUNTIME_DIR/systemd/user.control/*`
+1. `$XDG_RUNTIME_DIR/systemd/transient/*`
+1. `$XDG_RUNTIME_DIR/systemd/generator.early/*`
+1. `~/.config/systemd/user/*`
+1. `$XDG_CONFIG_DIRS/systemd/user/*`
+1. `/etc/systemd/user/*`
+1. `$XDG_RUNTIME_DIR/systemd/user/*`
+1. `/run/systemd/user/*`
+1. `$XDG_RUNTIME_DIR/systemd/generator/*`
+1. `$XDG_DATA_HOME/systemd/user/*`
+1. `$XDG_DATA_DIRS/systemd/user/*`
+1. `/usr/local/lib/systemd/user/*`
+1. `/usr/lib/systemd/user/*`
+1. `$XDG_RUNTIME_DIR/systemd/generator.late/*`
+{{% /col %}}
+{{% /multicol %}}
+
+{{% /section %}}
+
+---
+
+{{% section %}}
+
+## Unit files (pt. 3)
+
+### Syntax of unit files
+
+Syntax is inspired to [Window's `.ini` files](https://en.wikipedia.org/wiki/INI_file):
+> a bunch of `[Sections]` with `Key=Value` pairs, one per line, using `#` for comments
+
+### Example
+
+```systemd
+[Section]
+Key1=Value1
+Key2=Value2
+# this is a comment
+
+[AnotherSection]
+# this is another comment
+Key3=Value3
+Key3=Some keys can be repeated
+Key4=Value4
+```
+
+---
+
+## Unit files (pt. 3)
+
+### Syntax of unit files
+
+- In [section `[Unit]`](https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html#%5BUnit%5D%20Section%20Options) 
+one should write _generic information_ about the __unit__ that is NOT dependent on the type of unit:
+    * `Description=` a short _human-readable_ __title__ of the unit, to be shown in the logs
+    * `Documentation=` a space-separated list of _URLs_ to the __documentation__ of the unit
+    * `Before=`, `After=` a space-separated list of _unit_ that __must be started__ _after/before_ this unit
+    * `ConditionPathExists=` a _path_ that must (NOT, if prefixed by `!`) __exist__ for the unit to be started
+
+- In [section `[Install]`](https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html#%5BInstall%5D%20Section%20Options)
+one should write _information_ about how the unit is __installed__:
+    * _installation_ of a unit (a.k.a. __enabling__ it) $\approx$ _manually_ configuring the unit for _automatic_ start-up
+        * _**de**installation_ of a unit (a.k.a. __disabling__ it) $\approx$ _manually_ configuring the unit for _manual_ start-up
+    * `Alias=` a space-separated list of _alternative names_ for the unit
+    * `Also=`
+    * `WantedBy=, RequiredBy=, UpheldBy=` these properties are related to _dependency management_, explained later
+
+---
+
+## Unit files (pt. 3)
+
+### Syntax of `.service` unit files (1/2)
+
+- In [section `[Service]`](https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html#Options)
+one should write information about the __service__ and the process it supervises
+    * `ExecStartPre=`, `ExecStartPost=` command to be __executed__ _before/after_ the _main command_ (for testing purposes)
+    * `ExecStart=` the _main command_ to be executed to __start__ the service
+        + the __PID__ of the service's process is stored in `$MAINPID`
+    * `ExecReload=` command(s) to be executed upon __reloading__ of the service, before re-executing the _main command_
+    * `Restart=` configures whether the service shall be __restarted__ when the service process _exits_, is _killed_, or a _timeout_ is reached
+        + one of `no` (default), `on-success`, `on-failure`, `on-abnormal`, `on-watchdog`, `on-abort`, or `always` (cf. [official doc](https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html#Restart=))
+    * `RestartPreventExitStatus=` a space-separated list of _exit status codes_ that will _not_ trigger a restart
+    * `Type=` configures the mechanism via which the service is considered __activated__ ($\approx$ _started_ and _ready_ to be used)
+        + [many options available](https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html#Type=), e.g. `exec` (after main process is executed), `notify` (after it sends a _notification_), etc.
+
+---
+
+## Unit files (pt. 3)
+
+### Syntax of `.service` unit files (2/2)
+
+- Many options related to [process execution](https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html) or [process killing apply](https://www.freedesktop.org/software/systemd/man/latest/systemd.kill.html#) here
+    * [`EnvironmentFile=`](https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html#EnvironmentFile=) the __path__ to _file_ that contains _environment variables_ for the service
+    * `KillMode=` specifies how processes of this unit shall be __killed__:
+        + `process` $\rightarrow$ only the service process is killed
+        + `mixed` $\rightarrow$ signal `SIGKILL` is sent to _all processes_ in the control group of this unit, _including the main one_ 
+        + `control-group` $\rightarrow$ like `mixed`, _except the main one_, requires setting `ExecStop`
+
+- Beware of [special executable prefixes](https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html#Command%20lines): such as `-` (ignore errors), `+` (run in full privilege), `:` (do not expand variables), etc.
+
+{{% /section %}}
+
+---
+
+## Operating with units (pt. 1)
+
+- Getting the __runtime status__ of a unit: `systemctl status NAME.TYPE`
+    ```bash
+    $ systemctl status ssh
+    ● ssh.service - OpenBSD Secure Shell server
+        Loaded: loaded (/usr/lib/systemd/system/ssh.service; disabled; preset: enabled)
+        Active: active (running) since Mon 2024-11-11 11:09:51 CET; 1 day 1h ago
+    Invocation: 95b989f6f1a94ccabefa0e9925ea4ede
+    TriggeredBy: ● ssh.socket
+        Docs: man:sshd(8)
+                man:sshd_config(5)
+    Main PID: 1861 (sshd)
+        Tasks: 1 (limit: 4598)
+        Memory: 6.2M (peak: 22.9M)
+            CPU: 908ms
+        CGroup: /system.slice/ssh.service
+                └─1861 "sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups"
+
+    nov 12 09:39:50 lubuntu2410-vm sshd[6813]: pam_systemd(sshd:session): New sd-bus connection (system-bus-pam-systemd-6813) opened.
+    nov 12 11:07:07 lubuntu2410-vm sshd[7083]: Accepted password for user from 10.0.2.2 port 47930 ssh2
+    nov 12 11:07:07 lubuntu2410-vm sshd[7083]: pam_unix(sshd:session): session opened for user user(uid=1000) by user(uid=0)
+    nov 12 11:07:07 lubuntu2410-vm sshd[7083]: pam_systemd(sshd:session): New sd-bus connection (system-bus-pam-systemd-7083) opened.
+    ```
+
+---
+
+## Operating with units (pt. 2)
+
+- __Starting__ / __stopping__ / __restarting__ a unit: `sudo systemctl start|stop|restart NAME.TYPE`
+    + use `systemctl --user start|stop|restart NAME.TYPE` for _user units_ (no need for `sudo`)
+
+    ```bash
+    $ sudo systemctl stop ssh.service
+    Stopping 'ssh.service', but its triggering units are still active:
+    ssh.socket
+
+    $ sudo systemctl start ssh.service
+
+    $ sudo systemctl restart ssh.service
+
+    # Attempts to do admin operations without sudo, will prompt for password:
+    $ systemctl stop ssh.service
+    ==== AUTHENTICATING FOR org.freedesktop.systemd1.manage-units ====
+    Autenticazione richiesta per fermare 'ssh.service'.
+    Authenticating as: user
+    Password:
+    ```
+
+{{% fragment %}}
+> __Note__: try stopping the `ssh.service` and see if you can _still connect_ to the machine via SSH. _Why?_
+{{% /fragment %}}
+
+---
+
+## Operating with units (pt. 3)
+
+- Inspecting the __dependencies__ of a unit: `systemctl list-dependencies NAME.TYPE`
+    ```bash
+    $ systemctl list-dependencies ssh.service
+    ssh.service
+    ● ├─-.mount
+    ● ├─ssh.socket ############ <--- notice this _socket unit_
+    ● ├─system.slice
+    ● └─sysinit.target
+    ●   ├─apparmor.service
+    ○   ├─...
+    ●   ├─systemd-update-utmp.service
+    ●   ├─local-fs.target
+    ●   │ ├─-.mount
+    ●   │ ├─run-lock.mount
+    ○   │ ├─systemd-fsck-root.service
+    ●   │ ├─systemd-remount-fs.service
+    ●   │ └─tmp.mount
+    ●   └─swap.target
+    ●     └─swapfile.swap
+
+    ```
+
+---
+
+## Socket activation
+
+- Some daemons work by __listening__ for _incoming connections_
+    + e.g., `sshd` listens on _TCP port_ `22` for incoming _SSH_ connections
+    + e.g., `httpd` listens on _TCP port_ `80` for incoming _HTTP_ connections
+    + e.g. `dockerd` listens on _Unix socket_ `/var/run/docker.sock` for incoming _Docker_ commands
+
+- ["Socket"](https://en.wikipedia.org/wiki/Network_socket) is a _software endpoint_ of a process willing to communicate _over the network_ (or locally)
+    + e.g. `INET` sockets (e.g., `TCP`, `UDP`) for _network_ communication, `UNIX` sockets for _local_ IPC
+
+- Most commonly, the process willing to __listen__ on a _socket_, would create the socket _upon startup_...
+    + here, time/computation is _wasted_ to start up a process that may _just listen_ for a while
+
+- ... but `systemd` can __listen__ on the _socket_ __instead of__ the _process_, and __trigger__ the _process_ upon _incoming connections_
+    + this is called __socket activation__
+
+- To support _socket activation_, the `.service` unit file should have a __corresponding__ `.socket` unit file
+
+---
+
+## Unit files (pt. 4)
+
+### Example: the SSH daemon _socket_ unit file
+
+(Use `systemctl cat ssh.socket` to inspect your SSH daemon's _socket_ unit file)
+
+```systemd
+# /usr/lib/systemd/system/ssh.socket
+
+[Unit]
+Description=OpenBSD Secure Shell server socket
+Before=sockets.target ssh.service                   # notice the dependency on the ssh.service   
+ConditionPathExists=!/etc/ssh/sshd_not_to_be_run
+
+[Socket]
+ListenStream=0.0.0.0:22                             # listen on all IPv4 interfaces on port 22   
+ListenStream=[::]:22                                # listen on all IPv6 interfaces on port 22
+Accept=no
+FreeBind=yes
+
+[Install]
+WantedBy=sockets.target
+RequiredBy=ssh.service
+```
+
+---
+
+## Unit files (pt. 4)
+
+### Syntax of `.socket` unit files
+
+- In [section `[Socket]`](https://www.freedesktop.org/software/systemd/man/latest/systemd.socket.html#Options) 
+one should write information about the __socket__ or FIFO the unit supervises
+    * `ListenStream=, ListenDatagram=, ListenSequentialPacket=` __address__ to listen on for a _stream_, _datagram_, or _sequential packet_ socket, respectively
+    * `Accept=` takes a _boolean_ argument:
+        - `yes`: a service instance is spawned _for each_ incoming connection and _only_ the connection socket is passed to it
+        - `no`: _all_ listening sockets themselves are passed to the started service unit, and _only one service_ is spawned for all connections
+    * `FreeBind=` controls whether the socket can be bound to _non-local IP_ addresses
+
+---
+
+## Operating with units (pt. 4)
+
+1. Try to `stop` the `ssh.service` and to _connect_ to the machine via SSH
+    + you can _still connect_ to the machine via SSH, because `ssh.socket` is _still active_
+        * it will _start_ the `ssh.service` _upon_ an _incoming connection_
+    + notice that the `ssh.service` is _active_, __after__ the SSH connection is established
+
+2. Try to `stop` the `ssh.socket` AND `ssh.socket`, then try to _connect_ to the machine via SSH
+    + now you should be _unable_ to connect to the machine via SSH
+        * because the `ssh.socket` is _not active_ to _start_ the `ssh.service`
+
+3. Try to __reboot__ the system. Upon _startup_, are the `ssh.service` and `ssh.socket` units _active_?
+    + they should, because the units are _enabled_ (i.e., they are _configured_ for _automatic_ start-up)
+
+---
+
+## Operating with units (pt. 5)
+
+- __Enabling__ / __disabling__ a unit: `sudo systemctl enable|disable NAME.TYPE`
+    + use `systemctl --user enable|disable NAME.TYPE` for _user units_ (no need for `sudo`)
+
+
+- The _effect_ is that the `[Install]` section of the unit file is _interpreted_    
+    + ... and the __dependencies__ therein specified are _installed_ / _uninstalled_ accordingly
+
+- The `[Install]` section of a unit _$A$_ would most commonly specify:
+    + some `WantedBy` dependency w.r.t. some __target__ unit _$T$_ $\implies$ _$A$_ is __started__ automatically when _$T$_ is __started__
+    + some `RequiredBy` dependency w.r.t. some other unit _$B$_ $\implies$ _$B$_ __requires__ _$A$_ to be able to __start__
+        * this is commonly the case for _socket_ units, which are _required_ by the _service_ units they trigger
+
+---
+
+## TBD
+
+continue SSH example
+
+dependencies
+
+how to operate
 
 ---
 
@@ -659,4 +1022,5 @@ TBD: how to operate
 
 - Timer: duckdns
 - SSHD service
+- SSH agent service
 - DockerD service

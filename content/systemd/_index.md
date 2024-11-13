@@ -632,7 +632,7 @@ How to use `systemctl` and `journalctl`?
 {{% col %}}
 ### Boot logs
 
-{{< image src="./logs.svg" width="100%" max-h="80vh" >}}
+{{< image src="./logs.svg" width="100%" max-h="70vh" >}}
 {{% /col %}}
 {{% col %}}
 ### Terget dependencies
@@ -644,7 +644,7 @@ How to use `systemctl` and `journalctl`?
 
 (`systemd-analyze plot > plot.svg`)
 
-{{< image src="./time-plot.svg" width="100%" max-h="80vh" >}}
+{{< image src="./time-plot.svg" width="100%" max-h="60vh" >}}
 {{% /col %}}
 {{% /multicol %}}
 
@@ -702,7 +702,7 @@ Alias=sshd.service
 3. _User unit files_ are stored in `~/.config/systemd/user/`
     + try `tree -C ~/.config/systemd/user/ | less` to see the _user unit files_
 
---- 
+---
 
 ## Unit files (pt. 2)
 
@@ -715,7 +715,7 @@ Alias=sshd.service
 #### System Unit Search Path
 
 1. `/etc/systemd/system.control/*`
-1. `/run/systemd/system.control/*`  
+1. `/run/systemd/system.control/*`
 1. `/run/systemd/transient/*`
 1. `/run/systemd/generator.early/*`
 1. `/etc/systemd/system/*`
@@ -782,7 +782,7 @@ Key4=Value4
 
 ### Syntax of unit files
 
-- In [section `[Unit]`](https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html#%5BUnit%5D%20Section%20Options) 
+- In [section `[Unit]`](https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html#%5BUnit%5D%20Section%20Options)
 one should write _generic information_ about the __unit__ that is NOT dependent on the type of unit:
     * `Description=` a short _human-readable_ __title__ of the unit, to be shown in the logs
     * `Documentation=` a space-separated list of _URLs_ to the __documentation__ of the unit
@@ -813,7 +813,10 @@ one should write information about the __service__ and the process it supervises
         + one of `no` (default), `on-success`, `on-failure`, `on-abnormal`, `on-watchdog`, `on-abort`, or `always` (cf. [official doc](https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html#Restart=))
     * `RestartPreventExitStatus=` a space-separated list of _exit status codes_ that will _not_ trigger a restart
     * `Type=` configures the mechanism via which the service is considered __activated__ ($\approx$ _started_ and _ready_ to be used)
-        + [many options available](https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html#Type=), e.g. `exec` (after main process is executed), `notify` (after it sends a _notification_), etc.
+        + [many options available](https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html#Type=), e.g.:
+            + `exec` (after main process is _started_)
+            + `notify` (after it sends a _notification_ via `sd_notify()`)
+            + `oneshot` (after the main process _exits_)
 
 ---
 
@@ -825,7 +828,7 @@ one should write information about the __service__ and the process it supervises
     * [`EnvironmentFile=`](https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html#EnvironmentFile=) the __path__ to _file_ that contains _environment variables_ for the service
     * `KillMode=` specifies how processes of this unit shall be __killed__:
         + `process` $\rightarrow$ only the service process is killed
-        + `mixed` $\rightarrow$ signal `SIGKILL` is sent to _all processes_ in the control group of this unit, _including the main one_ 
+        + `mixed` $\rightarrow$ signal `SIGKILL` is sent to _all processes_ in the control group of this unit, _including the main one_
         + `control-group` $\rightarrow$ like `mixed`, _except the main one_, requires setting `ExecStop`
 
 - Beware of [special executable prefixes](https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html#Command%20lines): such as `-` (ignore errors), `+` (run in full privilege), `:` (do not expand variables), etc.
@@ -946,11 +949,11 @@ one should write information about the __service__ and the process it supervises
 
 [Unit]
 Description=OpenBSD Secure Shell server socket
-Before=sockets.target ssh.service                   # notice the dependency on the ssh.service   
+Before=sockets.target ssh.service                   # notice the dependency on the ssh.service
 ConditionPathExists=!/etc/ssh/sshd_not_to_be_run
 
 [Socket]
-ListenStream=0.0.0.0:22                             # listen on all IPv4 interfaces on port 22   
+ListenStream=0.0.0.0:22                             # listen on all IPv4 interfaces on port 22
 ListenStream=[::]:22                                # listen on all IPv6 interfaces on port 22
 Accept=no
 FreeBind=yes
@@ -966,7 +969,7 @@ RequiredBy=ssh.service
 
 ### Syntax of `.socket` unit files
 
-- In [section `[Socket]`](https://www.freedesktop.org/software/systemd/man/latest/systemd.socket.html#Options) 
+- In [section `[Socket]`](https://www.freedesktop.org/software/systemd/man/latest/systemd.socket.html#Options)
 one should write information about the __socket__ or FIFO the unit supervises
     * `ListenStream=, ListenDatagram=, ListenSequentialPacket=` __address__ to listen on for a _stream_, _datagram_, or _sequential packet_ socket, respectively
     * `Accept=` takes a _boolean_ argument:
@@ -998,7 +1001,7 @@ one should write information about the __socket__ or FIFO the unit supervises
 - __Enabling__ / __disabling__ a unit: `sudo systemctl enable|disable NAME.TYPE`
     + use `systemctl --user enable|disable NAME.TYPE` for _user units_ (no need for `sudo`)
 
-- The _effect_ is that the `[Install]` section of the unit file is _interpreted_    
+- The _effect_ is that the `[Install]` section of the unit file is _interpreted_
     + ... and the __dependencies__ therein specified are _installed_ / _uninstalled_ accordingly
 
 - The `[Install]` section of a unit _$A$_ would most commonly specify:
@@ -1008,14 +1011,14 @@ one should write information about the __socket__ or FIFO the unit supervises
 
 ---
 
-## Running Example: SSH daemon (pt. 2)
+## Running Exercise: SSH daemon (pt. 2)
 
 4. Try now to `disable` the `ssh.service` and `ssh.socket`, then try to _connect_ to the machine via SSH
     + you should _still_ be _able_ to connect to the machine via SSH
         * because the units are _not enabled_, but they are _still active_
 
 5. Try to reboot the system. Upon _startup_, are the `ssh.service` and `ssh.socket` units _active_?
-    + they should _not_, because the units are _not enabled_ 
+    + they should _not_, because the units are _not enabled_
     + you should now be _unable_ to connect to the machine via SSH
 
 6. Try to `enable` the `ssh.service` and `ssh.socket`, then try to _connect_ to the machine via SSH
@@ -1051,7 +1054,7 @@ Units may define _dependencies_ on other units, which impact the _order_ in whic
         + so specifying $B$ `After` $A$ $\not\implies$ $A$ `Requires` $B$
         + so $B$ is started _even if_ $A$ fails to start
     - used to _control_ the _order_ in which units are started
-    
+
 ---
 
 ## About dependencies (pt. 2)
@@ -1066,6 +1069,177 @@ Units may define _dependencies_ on other units, which impact the _order_ in whic
     - used for _stronger_ dependencies than `Requires`
 
 6. other sorts of dependencies are available, see the [official doc](https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html)
+
+---
+
+## Timer activation
+
+- Some units' activation may be bound to __time__
+    * e.g. __at__ a given _date/time_ in the future
+    * e.g. on a __recurring__ basis (e.g., _hourly_, _daily_, _weekly_, _monthly_, _yearly_, etc.)
+    * e.g. after a __relative amount__ of _time_ has _elapsed_ since:
+        + the system was _booted_
+        + `systemd` was _started_
+        + some unit was _(de)activated_
+
+- To support __timer activation__, a _$U$_ unit file should have a _corresponding_ `.timer` unit file
+    + describing when _$U$_ should be _activated_
+    + and _if/when_ the activation of _$U$_ should be _repeated_
+    + most commonly, the timer unit is named _$U$_`.timer`
+
+- The timer is said to __"elapse"__ (one or more times): the effect of an elapsing timer is to _activate_ its _associated unit_
+
+---
+
+## Unit Files (pt. 5)
+
+### Syntax of `.timer` unit files (1/2)
+
+<br>
+
+- In [section `[Timer]`](https://www.freedesktop.org/software/systemd/man/latest/systemd.timer.html),
+one should write information about the __timer__ unit
+    * `Unit=` specifies the _unit_ that should be _activated_ when the timer _elapses_
+    * `OnCalendar=` specifies the _date/time_ when the timer should _activate_
+        + the argument is a [calendar event](https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events)
+    * `OnActiveSec=`, `OnBootSec=`, `OnStartupSec=`, `OnUnitActiveSec=`, `OnUnitInactiveSec=` specifies the _relative time_ when the timer should _activate_,
+    respectively w.r.t. the _timer's activation_, the system _boot_, `systemd` activation, the unit's _(de)activation_
+        + the argument is a [time span](https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Parsing%20Time%20Spans)
+    * `Persistent=` controls whether the timer should be _persistent_ (i.e., _saved_ across reboots)
+        1. if _true_, the time when the service unit was last triggered is _stored on disk_
+        2. when the timer is activated, the service unit is triggered _immediately_ if it would have been triggered _at least once_ __while__ being __inactive__
+
+---
+
+## Unit Files (pt. 5)
+
+### Syntax of `.timer` unit files (2/2)
+
+<br>
+
+- Examples of __calendar events_ (also good for _periodic_ activation):
+    ```plaintext
+        minutely → *-*-* *:*:00
+          hourly → *-*-* *:00:00
+           daily → *-*-* 00:00:00
+         monthly → *-*-01 00:00:00
+          weekly → Mon *-*-* 00:00:00
+          yearly → *-01-01 00:00:00
+       quarterly → *-01,04,07,10-01 00:00:00
+    semiannually → *-01,07-01 00:00:00
+    every 15mins → *-*-* *:00,15,30,45:00    or    *-*-* *:00/15:*
+    ```
+
+- Examples of __time spans__:
+    ```plaintext
+    2 h
+    2hours
+    48hr
+    1y 12month
+    55s500ms
+    300ms20s 5day
+    ```
+
+---
+
+{{% section %}}
+
+## Running Exercise: DuckDNS timer (pt. 1)
+
+- [DuckDNS](https://www.duckdns.org) is a free online service aimed at registering _custom DNS entries_
+    + e.g., `CUSTOM.duckdns.org` can be _mapped_ to your computer's _IP address_
+    + this is useful for _remote access_ to your _home network_ (e.g., via _SSH_)
+
+![](./duckdns.png)
+
+---
+
+## Running Exercise: DuckDNS timer (pt. 2)
+
+> __Problem__: most commonly, your _home network_ has a _dynamic IP address_
+
+{{% fragment %}}
+> __Solution__: you can _periodically_ update your _DNS entry_ with your _current IP address_
+{{% /fragment %}}
+
+{{% fragment %}}
+### Updating the DuckDNS entry programmatically
+
+1. Simply perform an HTTP `GET` request to https://www.duckdns.org/update?domains=CUSTOM&token=TOKEN&ip=IP (e.g. via `curl`)
+    + where `CUSTOM` is your _custom domain_,
+    + `TOKEN` is the authentication _token_,
+    + and `IP` is your _current IP address_ (could be _empty_, to use the _source IP_)
+
+2. response shall be `OK` if the update was successful, `KO` otherwise
+{{% /fragment %}}
+
+---
+
+## Running Exercise: DuckDNS timer (pt. 3)
+
+1. Let's create a file containing the _default configuration_ for the DuckDNS service,
+<br> via `sudo mkdir -p /etc/duckdns.d ; sudo nano /etc/duckdns.d/default.cfg`:
+    ```plaintext
+    DUCKDNS_HOSTNAME=your-custom-domain
+    DUCKDNS_TOKEN=your-authentication-token
+    ```
+
+2. Let's _create_ a script for updating the DuckDNS entry, via `sudo nano /usr/bin/duckdns`:
+    ```bash
+    #!/bin/sh
+
+    logger -t DuckDNS "Updating DuckDNS entries"
+    EXITCODE=0
+    for file in /etc/duckdns.d/*.cfg; do
+        . "${file}"
+        logger -t DuckDNS "Executing config file '${file}'"
+        OUTPUT=$(curl --silent "https://www.duckdns.org/update?domains=${DUCKDNS_HOSTNAME}&token=${DUCKDNS_TOKEN}&ip=")
+        logger -t DuckDNS ${OUTPUT}
+        if [ "${OUTPUT}" = "KO" ]; then
+            logger -t DuckDNS "You should check if your domain/token is correct because the server responded negatively!"
+            EXITCODE=1
+        fi
+    done
+
+    exit $EXITCODE
+    ```
+    - this requires the `curl` package to be installed
+
+3. Let's make the script _executable_ by anyone, via `sudo chmod a+x /usr/bin/duckdns`
+
+4. Let's _test_ the script by running `duckdns` command (__no logs?__ try `cat /var/log/syslog | grep DuckDNS`)
+
+---
+
+## Running Exercise: DuckDNS timer (pt. 4)
+
+5. Let's create a `.service` unit file for the DuckDNS _service_, via `sudo nano /etc/systemd/system/duckdns.service`:
+    ```systemd
+    [Unit]
+    Description=DuckDNS update job
+
+    [Install]
+    WantedBy=multi-user.target
+
+    [Service]
+    Type=oneshot
+    ExecStart=/usr/bin/duckdns
+    ```
+
+6. Let's create a `.timer` unit file for the DuckDNS _timer_, via `sudo nano /etc/systemd/system/duckdns.timer`:
+    ```systemd
+    [Unit]
+    Description=Run DuckDNS periodically
+
+    [Timer]
+    OnCalendar=*-*-* *:00/15:*
+
+    [Install]
+    WantedBy=timers.target
+    ```
+
+7. Let's _enable_ and _start_ the DuckDNS _service_ and _timer_, via `sudo systemctl enable --now duckdns.service duckdns.timer`
+{{% /section %}}
 
 ---
 

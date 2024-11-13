@@ -720,14 +720,14 @@ a <em>daimon</em> is a <em>spirit</em> that acts as an <em>intermediary</em> bet
 
 <div class="div w-100">
     <div class="row "><div class="col align-middle " style="text-align: center;"><h3 id="boot-logs">Boot logs</h3>
-<img src="./logs.svg" alt="" style="width: 100%; max-width: 95vw; max-height: 80vh; object-fit: contain;">
+<img src="./logs.svg" alt="" style="width: 100%; max-width: 95vw; max-height: 70vh; object-fit: contain;">
 </div>
 <div class="col align-middle " style="text-align: center;"><h3 id="terget-dependencies">Terget dependencies</h3>
 <p><img src="./targets.png" alt=""></p>
 </div>
 <div class="col align-middle " style="text-align: center;"><h3 id="startup-time">Startup time</h3>
 <p>(<code>systemd-analyze plot &gt; plot.svg</code>)</p>
-<img src="./time-plot.svg" alt="" style="width: 100%; max-width: 95vw; max-height: 80vh; object-fit: contain;">
+<img src="./time-plot.svg" alt="" style="width: 100%; max-width: 95vw; max-height: 60vh; object-fit: contain;">
 </div>
 </div>
 </div>
@@ -903,7 +903,13 @@ one should write information about the <strong>service</strong> and the process 
 <li><code>RestartPreventExitStatus=</code> a space-separated list of <em>exit status codes</em> that will <em>not</em> trigger a restart</li>
 <li><code>Type=</code> configures the mechanism via which the service is considered <strong>activated</strong> ($\approx$ <em>started</em> and <em>ready</em> to be used)
 <ul>
-<li><a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html#Type=">many options available</a>, e.g. <code>exec</code> (after main process is executed), <code>notify</code> (after it sends a <em>notification</em>), etc.</li>
+<li><a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html#Type=">many options available</a>, e.g.:
+<ul>
+<li><code>exec</code> (after main process is <em>started</em>)</li>
+<li><code>notify</code> (after it sends a <em>notification</em> via <code>sd_notify()</code>)</li>
+<li><code>oneshot</code> (after the main process <em>exits</em>)</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1054,11 +1060,11 @@ one should write information about the <strong>service</strong> and the process 
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">[Unit]</span>
 </span></span><span style="display:flex;"><span><span style="color:#c4a000">Description</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">OpenBSD Secure Shell server socket</span>
-</span></span><span style="display:flex;"><span><span style="color:#c4a000">Before</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">sockets.target ssh.service                   # notice the dependency on the ssh.service   </span>
+</span></span><span style="display:flex;"><span><span style="color:#c4a000">Before</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">sockets.target ssh.service                   # notice the dependency on the ssh.service</span>
 </span></span><span style="display:flex;"><span><span style="color:#c4a000">ConditionPathExists</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">!/etc/ssh/sshd_not_to_be_run</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">[Socket]</span>
-</span></span><span style="display:flex;"><span><span style="color:#c4a000">ListenStream</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">0.0.0.0:22                             # listen on all IPv4 interfaces on port 22   </span>
+</span></span><span style="display:flex;"><span><span style="color:#c4a000">ListenStream</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">0.0.0.0:22                             # listen on all IPv4 interfaces on port 22</span>
 </span></span><span style="display:flex;"><span><span style="color:#c4a000">ListenStream</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">[::]:22                                # listen on all IPv6 interfaces on port 22</span>
 </span></span><span style="display:flex;"><span><span style="color:#c4a000">Accept</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">no</span>
 </span></span><span style="display:flex;"><span><span style="color:#c4a000">FreeBind</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">yes</span>
@@ -1144,7 +1150,7 @@ one should write information about the <strong>socket</strong> or FIFO the unit 
 </li>
 </ul>
 </section><section>
-<h2 id="running-example-ssh-daemon-pt-2">Running Example: SSH daemon (pt. 2)</h2>
+<h2 id="running-exercise-ssh-daemon-pt-2">Running Exercise: SSH daemon (pt. 2)</h2>
 <ol start="4">
 <li>
 <p>Try now to <code>disable</code> the <code>ssh.service</code> and <code>ssh.socket</code>, then try to <em>connect</em> to the machine via SSH</p>
@@ -1246,6 +1252,201 @@ one should write information about the <strong>socket</strong> or FIFO the unit 
 <p>other sorts of dependencies are available, see the <a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html">official doc</a></p>
 </li>
 </ol>
+</section><section>
+<h2 id="timer-activation">Timer activation</h2>
+<ul>
+<li>
+<p>Some units’ activation may be bound to <strong>time</strong></p>
+<ul>
+<li>e.g. <strong>at</strong> a given <em>date/time</em> in the future</li>
+<li>e.g. on a <strong>recurring</strong> basis (e.g., <em>hourly</em>, <em>daily</em>, <em>weekly</em>, <em>monthly</em>, <em>yearly</em>, etc.)</li>
+<li>e.g. after a <strong>relative amount</strong> of <em>time</em> has <em>elapsed</em> since:
+<ul>
+<li>the system was <em>booted</em></li>
+<li><code>systemd</code> was <em>started</em></li>
+<li>some unit was <em>(de)activated</em></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>To support <strong>timer activation</strong>, a <em>$U$</em> unit file should have a <em>corresponding</em> <code>.timer</code> unit file</p>
+<ul>
+<li>describing when <em>$U$</em> should be <em>activated</em></li>
+<li>and <em>if/when</em> the activation of <em>$U$</em> should be <em>repeated</em></li>
+<li>most commonly, the timer unit is named <em>$U$</em><code>.timer</code></li>
+</ul>
+</li>
+<li>
+<p>The timer is said to <strong>“elapse”</strong> (one or more times): the effect of an elapsing timer is to <em>activate</em> its <em>associated unit</em></p>
+</li>
+</ul>
+</section><section>
+<h2 id="unit-files-pt-5">Unit Files (pt. 5)</h2>
+<h3 id="syntax-of-timer-unit-files-12">Syntax of <code>.timer</code> unit files (1/2)</h3>
+<br>
+<ul>
+<li>In <a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.timer.html">section <code>[Timer]</code></a>,
+one should write information about the <strong>timer</strong> unit
+<ul>
+<li><code>Unit=</code> specifies the <em>unit</em> that should be <em>activated</em> when the timer <em>elapses</em></li>
+<li><code>OnCalendar=</code> specifies the <em>date/time</em> when the timer should <em>activate</em>
+<ul>
+<li>the argument is a <a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events">calendar event</a></li>
+</ul>
+</li>
+<li><code>OnActiveSec=</code>, <code>OnBootSec=</code>, <code>OnStartupSec=</code>, <code>OnUnitActiveSec=</code>, <code>OnUnitInactiveSec=</code> specifies the <em>relative time</em> when the timer should <em>activate</em>,
+respectively w.r.t. the <em>timer’s activation</em>, the system <em>boot</em>, <code>systemd</code> activation, the unit’s <em>(de)activation</em>
+<ul>
+<li>the argument is a <a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Parsing%20Time%20Spans">time span</a></li>
+</ul>
+</li>
+<li><code>Persistent=</code> controls whether the timer should be <em>persistent</em> (i.e., <em>saved</em> across reboots)
+<ol>
+<li>if <em>true</em>, the time when the service unit was last triggered is <em>stored on disk</em></li>
+<li>when the timer is activated, the service unit is triggered <em>immediately</em> if it would have been triggered <em>at least once</em> <strong>while</strong> being <strong>inactive</strong></li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+</section><section>
+<h2 id="unit-files-pt-5-1">Unit Files (pt. 5)</h2>
+<h3 id="syntax-of-timer-unit-files-22">Syntax of <code>.timer</code> unit files (2/2)</h3>
+<br>
+<ul>
+<li>
+<p>Examples of _<em>calendar events</em> (also good for <em>periodic</em> activation):</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span>    minutely → *-*-* *:*:00
+</span></span><span style="display:flex;"><span>      hourly → *-*-* *:00:00
+</span></span><span style="display:flex;"><span>       daily → *-*-* 00:00:00
+</span></span><span style="display:flex;"><span>     monthly → *-*-01 00:00:00
+</span></span><span style="display:flex;"><span>      weekly → Mon *-*-* 00:00:00
+</span></span><span style="display:flex;"><span>      yearly → *-01-01 00:00:00
+</span></span><span style="display:flex;"><span>   quarterly → *-01,04,07,10-01 00:00:00
+</span></span><span style="display:flex;"><span>semiannually → *-01,07-01 00:00:00
+</span></span><span style="display:flex;"><span>every 15mins → *-*-* *:00,15,30,45:00    or    *-*-* *:00/15:*
+</span></span></code></pre></div></li>
+<li>
+<p>Examples of <strong>time spans</strong>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span>2 h
+</span></span><span style="display:flex;"><span>2hours
+</span></span><span style="display:flex;"><span>48hr
+</span></span><span style="display:flex;"><span>1y 12month
+</span></span><span style="display:flex;"><span>55s500ms
+</span></span><span style="display:flex;"><span>300ms20s 5day
+</span></span></code></pre></div></li>
+</ul>
+</section><section>
+
+
+<section data-shortcode-section="">
+<h2 id="running-exercise-duckdns-timer-pt-1">Running Exercise: DuckDNS timer (pt. 1)</h2>
+<ul>
+<li><a href="https://www.duckdns.org">DuckDNS</a> is a free online service aimed at registering <em>custom DNS entries</em>
+<ul>
+<li>e.g., <code>CUSTOM.duckdns.org</code> can be <em>mapped</em> to your computer’s <em>IP address</em></li>
+<li>this is useful for <em>remote access</em> to your <em>home network</em> (e.g., via <em>SSH</em>)</li>
+</ul>
+</li>
+</ul>
+<p><img src="./duckdns.png" alt=""></p>
+</section><section>
+<h2 id="running-exercise-duckdns-timer-pt-2">Running Exercise: DuckDNS timer (pt. 2)</h2>
+<blockquote>
+<p><strong>Problem</strong>: most commonly, your <em>home network</em> has a <em>dynamic IP address</em></p>
+</blockquote>
+<span class="fragment ">
+  <blockquote>
+<p><strong>Solution</strong>: you can <em>periodically</em> update your <em>DNS entry</em> with your <em>current IP address</em></p>
+</blockquote>
+</span>
+<span class="fragment ">
+  <h3 id="updating-the-duckdns-entry-programmatically">Updating the DuckDNS entry programmatically</h3>
+<ol>
+<li>
+<p>Simply perform an HTTP <code>GET</code> request to <a href="https://www.duckdns.org/update?domains=CUSTOM&amp;token=TOKEN&amp;ip=IP">https://www.duckdns.org/update?domains=CUSTOM&amp;token=TOKEN&amp;ip=IP</a> (e.g. via <code>curl</code>)</p>
+<ul>
+<li>where <code>CUSTOM</code> is your <em>custom domain</em>,</li>
+<li><code>TOKEN</code> is the authentication <em>token</em>,</li>
+<li>and <code>IP</code> is your <em>current IP address</em> (could be <em>empty</em>, to use the <em>source IP</em>)</li>
+</ul>
+</li>
+<li>
+<p>response shall be <code>OK</code> if the update was successful, <code>KO</code> otherwise</p>
+</li>
+</ol>
+</span>
+</section><section>
+<h2 id="running-exercise-duckdns-timer-pt-3">Running Exercise: DuckDNS timer (pt. 3)</h2>
+<ol>
+<li>
+<p>Let’s create a file containing the <em>default configuration</em> for the DuckDNS service,
+<br> via <code>sudo mkdir -p /etc/duckdns.d ; sudo nano /etc/duckdns.d/default.cfg</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span>DUCKDNS_HOSTNAME=your-custom-domain
+</span></span><span style="display:flex;"><span>DUCKDNS_TOKEN=your-authentication-token
+</span></span></code></pre></div></li>
+<li>
+<p>Let’s <em>create</em> a script for updating the DuckDNS entry, via <code>sudo nano /usr/bin/duckdns</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">#!/bin/sh
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>
+</span></span><span style="display:flex;"><span>logger -t DuckDNS <span style="color:#4e9a06">"Updating DuckDNS entries"</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">EXITCODE</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#0000cf;font-weight:bold">0</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">for</span> file in /etc/duckdns.d/*.cfg<span style="color:#000;font-weight:bold">;</span> <span style="color:#204a87;font-weight:bold">do</span>
+</span></span><span style="display:flex;"><span>    . <span style="color:#4e9a06">"</span><span style="color:#4e9a06">${</span><span style="color:#000">file</span><span style="color:#4e9a06">}</span><span style="color:#4e9a06">"</span>
+</span></span><span style="display:flex;"><span>    logger -t DuckDNS <span style="color:#4e9a06">"Executing config file '</span><span style="color:#4e9a06">${</span><span style="color:#000">file</span><span style="color:#4e9a06">}</span><span style="color:#4e9a06">'"</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">OUTPUT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87;font-weight:bold">$(</span>curl --silent <span style="color:#4e9a06">"https://www.duckdns.org/update?domains=</span><span style="color:#4e9a06">${</span><span style="color:#000">DUCKDNS_HOSTNAME</span><span style="color:#4e9a06">}</span><span style="color:#4e9a06">&amp;token=</span><span style="color:#4e9a06">${</span><span style="color:#000">DUCKDNS_TOKEN</span><span style="color:#4e9a06">}</span><span style="color:#4e9a06">&amp;ip="</span><span style="color:#204a87;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    logger -t DuckDNS <span style="color:#4e9a06">${</span><span style="color:#000">OUTPUT</span><span style="color:#4e9a06">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#ce5c00;font-weight:bold">[</span> <span style="color:#4e9a06">"</span><span style="color:#4e9a06">${</span><span style="color:#000">OUTPUT</span><span style="color:#4e9a06">}</span><span style="color:#4e9a06">"</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#4e9a06">"KO"</span> <span style="color:#ce5c00;font-weight:bold">]</span><span style="color:#000;font-weight:bold">;</span> <span style="color:#204a87;font-weight:bold">then</span>
+</span></span><span style="display:flex;"><span>        logger -t DuckDNS <span style="color:#4e9a06">"You should check if your domain/token is correct because the server responded negatively!"</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">EXITCODE</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#0000cf;font-weight:bold">1</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">fi</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">done</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">exit</span> <span style="color:#000">$EXITCODE</span>
+</span></span></code></pre></div><ul>
+<li>this requires the <code>curl</code> package to be installed</li>
+</ul>
+</li>
+<li>
+<p>Let’s make the script <em>executable</em> by anyone, via <code>sudo chmod a+x /usr/bin/duckdns</code></p>
+</li>
+<li>
+<p>Let’s <em>test</em> the script by running <code>duckdns</code> command (<strong>no logs?</strong> try <code>cat /var/log/syslog | grep DuckDNS</code>)</p>
+</li>
+</ol>
+</section><section>
+<h2 id="running-exercise-duckdns-timer-pt-4">Running Exercise: DuckDNS timer (pt. 4)</h2>
+<ol start="5">
+<li>
+<p>Let’s create a <code>.service</code> unit file for the DuckDNS <em>service</em>, via <code>sudo nano /etc/systemd/system/duckdns.service</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">[Unit]</span>
+</span></span><span style="display:flex;"><span><span style="color:#c4a000">Description</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">DuckDNS update job</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">[Install]</span>
+</span></span><span style="display:flex;"><span><span style="color:#c4a000">WantedBy</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">multi-user.target</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">[Service]</span>
+</span></span><span style="display:flex;"><span><span style="color:#c4a000">Type</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">oneshot</span>
+</span></span><span style="display:flex;"><span><span style="color:#c4a000">ExecStart</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">/usr/bin/duckdns</span>
+</span></span></code></pre></div></li>
+<li>
+<p>Let’s create a <code>.timer</code> unit file for the DuckDNS <em>timer</em>, via <code>sudo nano /etc/systemd/system/duckdns.timer</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">[Unit]</span>
+</span></span><span style="display:flex;"><span><span style="color:#c4a000">Description</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">Run DuckDNS periodically</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">[Timer]</span>
+</span></span><span style="display:flex;"><span><span style="color:#c4a000">OnCalendar</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">*-*-* *:00/15:*</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">[Install]</span>
+</span></span><span style="display:flex;"><span><span style="color:#c4a000">WantedBy</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">timers.target</span>
+</span></span></code></pre></div></li>
+<li>
+<p>Let’s <em>enable</em> and <em>start</em> the DuckDNS <em>service</em> and <em>timer</em>, via <code>sudo systemctl enable --now duckdns.service duckdns.timer</code></p>
+</li>
+</ol>
+
+</section>
 </section><section>
 <h2 id="examples">Examples</h2>
 <ul>

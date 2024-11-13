@@ -1383,8 +1383,8 @@ respectively w.r.t. the <em>timer’s activation</em>, the system <em>boot</em>,
 <li>
 <p>Let’s create a file containing the <em>default configuration</em> for the DuckDNS service,
 <br> via <code>sudo mkdir -p /etc/duckdns.d ; sudo nano /etc/duckdns.d/default.cfg</code>:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span>DUCKDNS_HOSTNAME=your-custom-domain
-</span></span><span style="display:flex;"><span>DUCKDNS_TOKEN=your-authentication-token
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span>DUCKDNS_HOSTNAME=
+</span></span><span style="display:flex;"><span>DUCKDNS_TOKEN=
 </span></span></code></pre></div></li>
 <li>
 <p>Let’s <em>create</em> a script for updating the DuckDNS entry, via <code>sudo nano /usr/bin/duckdns</code>:</p>
@@ -1444,18 +1444,145 @@ respectively w.r.t. the <em>timer’s activation</em>, the system <em>boot</em>,
 <li>
 <p>Let’s <em>enable</em> and <em>start</em> the DuckDNS <em>service</em> and <em>timer</em>, via <code>sudo systemctl enable --now duckdns.service duckdns.timer</code></p>
 </li>
+<li>
+<p><strong>How do we check if the DuckDNS service is working?</strong></p>
+</li>
 </ol>
 
 </section>
 </section><section>
-<h2 id="examples">Examples</h2>
+<h2 id="systemd-journal-and-logging-pt-1">Systemd, Journal, and Logging (pt. 1)</h2>
 <ul>
-<li>Timer: duckdns</li>
-<li>SSHD service</li>
-<li>SSH agent service</li>
-<li>DockerD service</li>
-<li>Logging</li>
+<li>
+<p><code>systemd</code> is <em>integrated</em> with the <em>system log</em> (a.k.a. <em>journal</em>)</p>
+<ul>
+<li>the <em>journal</em> is a <em>structured</em> and <em>indexed</em> <em>log</em> of <em>system events</em></li>
+<li>it is <em>stored</em> in <code>/var/log/journal/</code> and <em>managed</em> by <code>journald</code> (a daemon which is part of the <code>systemd</code> suite)</li>
+<li>the <em>journal</em> is <strong>persistent</strong> across <em>reboots</em></li>
 </ul>
+</li>
+<li>
+<p><strong>Logs</strong> produced by <code>systemd</code>’s <em>units</em> are <em>forwarded</em> to the <em>journal</em></p>
+<ul>
+<li>you can <em>inspect</em> the <em>journal</em> via <code>journalctl</code> command
+<ul>
+<li>the <em>journal</em> is <strong>page</strong>: use <em>arrow keys</em> to <em>navigate</em>, <em>Q</em> to <em>quit</em></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section><section>
+<h2 id="systemd-journal-and-logging-pt-2">Systemd, Journal, and Logging (pt. 2)</h2>
+<ul>
+<li>
+<p>Useful options of <code>journalctl</code> for <strong>inspecting</strong> the logs:</p>
+<ul>
+<li><code>journalctl</code> get <em>all</em> logs, from the <em>oldest</em> to the <em>newest</em></li>
+<li><code>journalctl -u NAME.TYPE</code> to <em>filter</em> logs for a <em>specific unit</em></li>
+<li><code>journalctl -b</code> to <em>filter</em> logs for the <em>current boot</em>
+<ul>
+<li><code>journalctl -b -1</code> for the <em>previous boot</em>, <code>journalctl -b -2</code> for the <em>boot before that</em>, etc.</li>
+</ul>
+</li>
+<li><code>journalctl -f</code> to <em>follow</em> the <em>live</em> logs</li>
+<li><code>journalctl -n N</code> to <em>show</em> the <em>last N</em> log entries</li>
+<li><code>journalctl -e</code> to jump to the <em>end</em> of the logs</li>
+<li><code>journalctl --since "2024-11-11 11:09:51" --until "2024-11-11 11:10:51"</code> to <em>filter</em> logs for a <em>specific time range</em></li>
+<li><code>journalctl -g PATTERN</code> to <em>filter</em> logs matching a <em>specific pattern</em> (cf. the <code>grep</code> command)</li>
+<li><code>journalctl -x</code> to <em>show</em> message <em>explanations</em> (e.g., <em>systemd</em> messages) where available</li>
+<li>see other options with <code>man journalctl</code> or <code>journalctl --help</code></li>
+</ul>
+</li>
+<li>
+<p>Notice that the options can be <strong>combined</strong>:</p>
+<ul>
+<li>e.g., <code>journalctl -u ssh.service -b -n 10</code> $\rightarrow$ <em>show</em> the <em>last 10</em> logs for the <em>SSH daemon</em> unit in the <em>current boot</em></li>
+<li>e.g., <code>journalctl -exu ssh.service</code> $\rightarrow$ <em>show</em> the <em>last</em> logs for the <em>SSH daemon</em> unit, with <em>explanations</em></li>
+</ul>
+</li>
+</ul>
+</section><section>
+<h2 id="systemd-journal-and-logging-pt-3">Systemd, Journal, and Logging (pt. 3)</h2>
+<ul>
+<li>
+<p>Being persistent, logs take up <em>disk space</em></p>
+<ul>
+<li><code>journalctl --disk-usage</code> to <em>show</em> the <em>disk usage</em> of the <em>journal</em></li>
+</ul>
+</li>
+<li>
+<p>Useful options of <code>journalctl</code> for <strong>managing</strong> the logs:</p>
+<ul>
+<li><code>journalctl --vacuum-size=SIZE</code> to <em>limit</em> the <em>disk space</em> used by the <em>journal</em></li>
+<li><code>journalctl --vacuum-time=TIME</code> to <em>limit</em> the <em>time</em> for which logs are <em>retained</em> (by <strong>erasing</strong> <em>older</em> logs)</li>
+<li><code>journalctl --rotate</code> to <em>rotate</em> the <em>journal</em> (i.e., <em>archive</em> the <em>current</em> journal and <em>start</em> a <em>new</em> one)</li>
+</ul>
+</li>
+</ul>
+</section><section>
+
+
+<section data-shortcode-section="">
+<h2 id="running-exercise-duckdns-timer-pt-5">Running Exercise: DuckDNS timer (pt. 5)</h2>
+<ol start="9">
+<li>Let’s <em>inspect</em> the logs of the DuckDNS service, via <code>journalctl -fexu duckdns.service</code>
+<ul>
+<li>you should see the <em>logs</em> of the <em>DuckDNS service</em> being <em>executed</em> every <em>15 minutes</em></li>
+</ul>
+</li>
+</ol>
+<pre tabindex="0"><code class="nohighlight" data-noescape="">nov 13 18:35:45 lubuntu2410-vm systemd[1]: Starting duckdns.service - DuckDNS update job...
+░░ Subject: L'unità duckdns.service inizia la fase di avvio
+░░ Defined-By: systemd
+░░ Support: http://www.ubuntu.com/support
+░░
+░░ L'unità duckdns.service ha iniziato la fase di avvio.
+nov 13 18:35:45 lubuntu2410-vm DuckDNS[3548]: Updating DuckDNS entries
+nov 13 18:35:45 lubuntu2410-vm DuckDNS[3549]: Executing config file '/etc/duckdns.d/default.cfg'
+nov 13 18:35:46 lubuntu2410-vm DuckDNS[3552]: KO
+nov 13 18:35:46 lubuntu2410-vm systemd[1]: duckdns.service: Main process exited, code=exited, statu&gt;
+░░ Subject: Uscito processo unità
+░░ Defined-By: systemd
+░░ Support: http://www.ubuntu.com/support
+░░
+░░ Un processo ExecStart appartenente all'unità duckdns.service è uscito.
+░░
+░░ Il codice di uscita del processo è 'exited' ed è uscito con 1.
+nov 13 18:35:46 lubuntu2410-vm systemd[1]: duckdns.service: Failed with result 'exit-code'.
+░░ Subject: Unit fallita
+░░ Defined-By: systemd
+░░ Support: http://www.ubuntu.com/support
+░░
+░░ Unità duckdns.service entrata nello stato 'failed' (fallito) con risultato 'exit-code'.
+nov 13 18:35:46 lubuntu2410-vm systemd[1]: Failed to start duckdns.service - DuckDNS update job.
+░░ Subject: L'unità duckdns.service è fallita
+░░ Defined-By: systemd
+░░ Support: http://www.ubuntu.com/support
+░░
+░░ L'unità duckdns.service è fallita.
+░░
+░░ Il risultato è failed.
+</code></pre></section><section>
+<h2 id="running-exercise-duckdns-timer-pt-6">Running Exercise: DuckDNS timer (pt. 6)</h2>
+<ol start="10">
+<li>
+<p>The issue here is that we did not the necessary information <code>/etc/duckdns.d/default.cfg</code></p>
+</li>
+<li>
+<p>Try to fill that file with the correct information, via <code>sudo nano /etc/duckdns.d/default.cfg</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span>DUCKDNS_HOSTNAME=your-custom-domain
+</span></span><span style="display:flex;"><span>DUCKDNS_TOKEN=your-authentication-token
+</span></span></code></pre></div></li>
+<li>
+<p>Let’s <em>restart</em> the DuckDNS service, via <code>sudo systemctl restart duckdns.service</code></p>
+</li>
+<li>
+<p>Let’s look at the logs again to see if the DuckDNS service is working</p>
+</li>
+</ol>
+
+</section>
 </section>
 
   

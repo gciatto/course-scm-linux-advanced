@@ -1180,8 +1180,8 @@ one should write information about the __timer__ unit
 1. Let's create a file containing the _default configuration_ for the DuckDNS service,
 <br> via `sudo mkdir -p /etc/duckdns.d ; sudo nano /etc/duckdns.d/default.cfg`:
     ```plaintext
-    DUCKDNS_HOSTNAME=your-custom-domain
-    DUCKDNS_TOKEN=your-authentication-token
+    DUCKDNS_HOSTNAME=
+    DUCKDNS_TOKEN=
     ```
 
 2. Let's _create_ a script for updating the DuckDNS entry, via `sudo nano /usr/bin/duckdns`:
@@ -1239,15 +1239,115 @@ one should write information about the __timer__ unit
     ```
 
 7. Let's _enable_ and _start_ the DuckDNS _service_ and _timer_, via `sudo systemctl enable --now duckdns.service duckdns.timer`
+
+8. __How do we check if the DuckDNS service is working?__
+
 {{% /section %}}
 
 ---
 
-## Examples
+## Systemd, Journal, and Logging (pt. 1)
 
-- Timer: duckdns
-- SSHD service
-- SSH agent service
-- DockerD service
-- Logging
+- `systemd` is _integrated_ with the _system log_ (a.k.a. _journal_)
+    + the _journal_ is a _structured_ and _indexed_ _log_ of _system events_
+    + it is _stored_ in `/var/log/journal/` and _managed_ by `journald` (a daemon which is part of the `systemd` suite)
+    + the _journal_ is __persistent__ across _reboots_
+
+- __Logs__ produced by `systemd`'s _units_ are _forwarded_ to the _journal_
+    + you can _inspect_ the _journal_ via `journalctl` command
+        + the _journal_ is __page__: use _arrow keys_ to _navigate_, _Q_ to _quit_
+
+---
+
+## Systemd, Journal, and Logging (pt. 2)
+
+- Useful options of `journalctl` for __inspecting__ the logs:
+    + `journalctl` get _all_ logs, from the _oldest_ to the _newest_
+    + `journalctl -u NAME.TYPE` to _filter_ logs for a _specific unit_
+    + `journalctl -b` to _filter_ logs for the _current boot_
+        * `journalctl -b -1` for the _previous boot_, `journalctl -b -2` for the _boot before that_, etc.
+    + `journalctl -f` to _follow_ the _live_ logs
+    + `journalctl -n N` to _show_ the _last N_ log entries
+    + `journalctl -e` to jump to the _end_ of the logs
+    + `journalctl --since "2024-11-11 11:09:51" --until "2024-11-11 11:10:51"` to _filter_ logs for a _specific time range_
+    + `journalctl -g PATTERN` to _filter_ logs matching a _specific pattern_ (cf. the `grep` command)
+    + `journalctl -x` to _show_ message _explanations_ (e.g., _systemd_ messages) where available
+    + see other options with `man journalctl` or `journalctl --help`
+
+- Notice that the options can be __combined__:
+    + e.g., `journalctl -u ssh.service -b -n 10` $\rightarrow$ _show_ the _last 10_ logs for the _SSH daemon_ unit in the _current boot_
+    + e.g., `journalctl -exu ssh.service` $\rightarrow$ _show_ the _last_ logs for the _SSH daemon_ unit, with _explanations_
+---
+
+## Systemd, Journal, and Logging (pt. 3)
+
+- Being persistent, logs take up _disk space_
+    + `journalctl --disk-usage` to _show_ the _disk usage_ of the _journal_
+
+- Useful options of `journalctl` for __managing__ the logs:
+    + `journalctl --vacuum-size=SIZE` to _limit_ the _disk space_ used by the _journal_
+    + `journalctl --vacuum-time=TIME` to _limit_ the _time_ for which logs are _retained_ (by __erasing__ _older_ logs)
+    + `journalctl --rotate` to _rotate_ the _journal_ (i.e., _archive_ the _current_ journal and _start_ a _new_ one)
+
+---
+
+{{% section %}}
+
+## Running Exercise: DuckDNS timer (pt. 5)
+
+9. Let's _inspect_ the logs of the DuckDNS service, via `journalctl -fexu duckdns.service`
+    + you should see the _logs_ of the _DuckDNS service_ being _executed_ every _15 minutes_
+
+
+```journalctl
+nov 13 18:35:45 lubuntu2410-vm systemd[1]: Starting duckdns.service - DuckDNS update job...
+░░ Subject: L'unità duckdns.service inizia la fase di avvio
+░░ Defined-By: systemd
+░░ Support: http://www.ubuntu.com/support
+░░
+░░ L'unità duckdns.service ha iniziato la fase di avvio.
+nov 13 18:35:45 lubuntu2410-vm DuckDNS[3548]: Updating DuckDNS entries
+nov 13 18:35:45 lubuntu2410-vm DuckDNS[3549]: Executing config file '/etc/duckdns.d/default.cfg'
+nov 13 18:35:46 lubuntu2410-vm DuckDNS[3552]: KO
+nov 13 18:35:46 lubuntu2410-vm systemd[1]: duckdns.service: Main process exited, code=exited, statu>
+░░ Subject: Uscito processo unità
+░░ Defined-By: systemd
+░░ Support: http://www.ubuntu.com/support
+░░
+░░ Un processo ExecStart appartenente all'unità duckdns.service è uscito.
+░░
+░░ Il codice di uscita del processo è 'exited' ed è uscito con 1.
+nov 13 18:35:46 lubuntu2410-vm systemd[1]: duckdns.service: Failed with result 'exit-code'.
+░░ Subject: Unit fallita
+░░ Defined-By: systemd
+░░ Support: http://www.ubuntu.com/support
+░░
+░░ Unità duckdns.service entrata nello stato 'failed' (fallito) con risultato 'exit-code'.
+nov 13 18:35:46 lubuntu2410-vm systemd[1]: Failed to start duckdns.service - DuckDNS update job.
+░░ Subject: L'unità duckdns.service è fallita
+░░ Defined-By: systemd
+░░ Support: http://www.ubuntu.com/support
+░░
+░░ L'unità duckdns.service è fallita.
+░░
+░░ Il risultato è failed.
+```
+
+---
+
+## Running Exercise: DuckDNS timer (pt. 6)
+
+10. The issue here is that we did not the necessary information `/etc/duckdns.d/default.cfg`
+
+11. Try to fill that file with the correct information, via `sudo nano /etc/duckdns.d/default.cfg`:
+    ```plaintext
+    DUCKDNS_HOSTNAME=your-custom-domain
+    DUCKDNS_TOKEN=your-authentication-token
+    ```
+
+12. Let's _restart_ the DuckDNS service, via `sudo systemctl restart duckdns.service`
+
+13. Let's look at the logs again to see if the DuckDNS service is working
+
+{{% /section %}}
 

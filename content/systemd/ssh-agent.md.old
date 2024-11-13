@@ -1,0 +1,29 @@
+---
+
+## Running Exercise: SSH Agent (pt. 1)
+
+1. Let's suppose you have a _private SSH key_ on your Linux computer, protected via a __passphrase__
+    + this would be a file such as `~/.ssh/id_ed25519` (the _private key_) and `~/.ssh/id_ed25519.pub` (the _public key_)
+    + you can create one via `ssh-keygen` (please provide a _non-empty_ __passphrase__)
+
+2. Let's suppose you use the private key _frequently_ (e.g., operate [with GitHub](https://github.com/settings/keys)) and you don't want to _type_ the _passphrase_ __every time__
+    + to exemplify the situation, try to _clone_ a _recursive_ repository via SSH (after you configured your SSH key on GitHub):
+        ```bash
+        git clone --recursive git@github.com:gciatto/course-scm-linux-advanced.git
+        ```
+    (you should be prompted for the _same passphrase_ of your _private key_, multiple times)
+
+{{% fragment %}}
+> __Solution__: you can use an [SSH agent](https://wiki.archlinux.org/title/SSH_keys#SSH_agents) to _cache_ the _passphrase_ of your _private key_
+- to be configured _user-wide_, the SSH agent should be configured as a _user `.service` unit_
+{{% /fragment %}}
+
+---
+
+## Running Exercise: SSH Agent (pt. 2)
+
+3. The _SSH agent_ is a _daemon_ that _stores_ the _private keys_ and _passphrases_ in _memory_
+    + it _caches_ the _passphrases_ for _private keys_ so that you don't have to _type_ them _every time_
+    + it _provides_ the _private keys_ to the _SSH client_ when _needed_
+
+4.

@@ -722,7 +722,7 @@ a <em>daimon</em> is a <em>spirit</em> that acts as an <em>intermediary</em> bet
     <div class="row "><div class="col align-middle " style="text-align: center;"><h3 id="boot-logs">Boot logs</h3>
 <img src="./logs.svg" alt="" style="width: 100%; max-width: 95vw; max-height: 70vh; object-fit: contain;">
 </div>
-<div class="col align-middle " style="text-align: center;"><h3 id="terget-dependencies">Terget dependencies</h3>
+<div class="col align-middle " style="text-align: center;"><h3 id="target-dependencies">Target dependencies</h3>
 <p><img src="./targets.png" alt=""></p>
 </div>
 <div class="col align-middle " style="text-align: center;"><h3 id="startup-time">Startup time</h3>
@@ -876,7 +876,7 @@ one should write <em>information</em> about how the unit is <strong>installed</s
 </ul>
 </li>
 <li><code>Alias=</code> a space-separated list of <em>alternative names</em> for the unit</li>
-<li><code>Also=</code></li>
+<li><code>Also=</code> additional units to install/deinstall when this unit is installed/deinstalled</li>
 <li><code>WantedBy=, RequiredBy=, UpheldBy=</code> these properties are related to <em>dependency management</em>, explained later</li>
 </ul>
 </li>
@@ -1105,7 +1105,7 @@ one should write information about the <strong>socket</strong> or FIFO the unit 
 </ul>
 </li>
 <li>
-<p>Try to <code>stop</code> the <code>ssh.socket</code> AND <code>ssh.socket</code>, then try to <em>connect</em> to the machine via SSH</p>
+<p>Try to <code>stop</code> the <code>ssh.service</code> AND <code>ssh.socket</code>, then try to <em>connect</em> to the machine via SSH</p>
 <ul>
 <li>now you should be <em>unable</em> to connect to the machine via SSH
 <ul>

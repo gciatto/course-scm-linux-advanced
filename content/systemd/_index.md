@@ -635,7 +635,7 @@ How to use `systemctl` and `journalctl`?
 {{< image src="./logs.svg" width="100%" max-h="70vh" >}}
 {{% /col %}}
 {{% col %}}
-### Terget dependencies
+### Target dependencies
 
 ![](./targets.png)
 {{% /col %}}
@@ -794,7 +794,7 @@ one should write _information_ about how the unit is __installed__:
     * _installation_ of a unit (a.k.a. __enabling__ it) $\approx$ _manually_ configuring the unit for _automatic_ start-up
         * _**de**installation_ of a unit (a.k.a. __disabling__ it) $\approx$ _manually_ configuring the unit for _manual_ start-up
     * `Alias=` a space-separated list of _alternative names_ for the unit
-    * `Also=`
+    * `Also=` additional units to install/deinstall when this unit is installed/deinstalled
     * `WantedBy=, RequiredBy=, UpheldBy=` these properties are related to _dependency management_, explained later
 
 ---
@@ -986,7 +986,7 @@ one should write information about the __socket__ or FIFO the unit supervises
         * it will _start_ the `ssh.service` _upon_ an _incoming connection_
     + notice that the `ssh.service` is _active_, __after__ the SSH connection is established
 
-2. Try to `stop` the `ssh.socket` AND `ssh.socket`, then try to _connect_ to the machine via SSH
+2. Try to `stop` the `ssh.service` AND `ssh.socket`, then try to _connect_ to the machine via SSH
     + now you should be _unable_ to connect to the machine via SSH
         * because the `ssh.socket` is _not active_ to _start_ the `ssh.service`
 

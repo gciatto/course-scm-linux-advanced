@@ -31,6 +31,7 @@
 <ul>
 <li><a href="https://iximiuz.com/en/posts/laymans-iptables-101/">Illustrated introduction to Linux <code>iptables</code></a></li>
 <li><a href="https://stuffphilwrites.com/2014/09/iptables-processing-flowchart/"><code>iptables</code> Processing Flowchart (Updated Often)</a></li>
+<li>Also the English <a href="https://en.wikipedia.org/wiki/Netfilter">Wikipedia page on Netfilter</a> is quite informative</li>
 </ul>
 </section><section>
 <h2 id="network-packets-stepping-through-the-linux-os">Network packets stepping through the Linux OS</h2>
@@ -106,6 +107,39 @@
 <li><strong>load balancing</strong>: may be achieved by <em>modifying</em> packets in the <code>FORWARD</code> phase</li>
 <li><strong>traffic shaping</strong>: may be achieved by <em>marking</em> packets in the <code>PREROUTING</code> or <code>INPUT</code> phase</li>
 </ul>
+</section><section>
+<h2 id="netfilter-and-iptables">Netfilter and <code>iptables</code></h2>
+<p><a href="https://en.wikipedia.org/wiki/Netfilter">Netfilter</a> is the <em>framework</em> in the Linux kernel responsible for <em>handling packets</em></p>
+
+
+
+
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/d/dd/Netfilter-components.svg" alt="" style="width: 100%; max-width: 95vw; max-height: 60vh; object-fit: contain;">
+
+<ul>
+<li>it allows for attaching <em>custom</em> logic to specific <em>points</em> in the <em>packet processing</em> flow</li>
+<li>you can do so, via <em>high-level</em> user-space tools, such as <code>iptables</code></li>
+</ul>
+</section><section>
+<h2 id="four-important-aspects-of-netfilteriptables">Four important aspects of Netfilter/<code>iptables</code></h2>
+<ol>
+<li>
+<p><strong>Chain</strong>: a <em>list</em> of <em>rules</em> to be <em>applied</em> to a packet to <em>determine</em> its <em>fate</em></p>
+<ul>
+<li>they are usually named after the <em>phase</em> in the <em>packet processing</em> flow they are attached to (e.g. <code>INPUT</code>, <code>FORWARD</code>, <code>OUTPUT</code>, <code>PREROUTING</code>, <code>POSTROUTING</code>)</li>
+</ul>
+</li>
+<li>
+<p><strong>Rule</strong>: TBD</p>
+</li>
+<li>
+<p><strong>Target</strong>: TBD</p>
+</li>
+<li>
+<p><strong>Table</strong>: TBD</p>
+</li>
+</ol>
 </section>
 
   

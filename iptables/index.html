@@ -33,6 +33,79 @@
 <li><a href="https://stuffphilwrites.com/2014/09/iptables-processing-flowchart/"><code>iptables</code> Processing Flowchart (Updated Often)</a></li>
 </ul>
 </section><section>
+<h2 id="network-packets-stepping-through-the-linux-os">Network packets stepping through the Linux OS</h2>
+
+
+
+
+
+<img src="./simplified-flow-1.png" alt="" style="width: 100%; max-width: 95vw; max-height: 60vh; object-fit: contain;">
+
+<ol>
+<li>
+<p><strong>Ingoing</strong> packets, coming <em>from</em> the Internet, are received by <em>some</em> local <em>network interface</em> (e.g., <code>eth0</code>)</p>
+<ol>
+<li>these may be <strong>directed</strong> towards some <em>local process</em> willing to <strong>receive</strong> them</li>
+<li>… or towards <strong>another machine</strong> in the <em>local</em> network, via another local network interface (e.g., <code>eth1</code>)</li>
+</ol>
+</li>
+<li>
+<p><strong>Outgoing</strong> packets are sent by <em>some</em> local <em>network interface</em> (e.g., <code>eth1</code>) <em>towards</em> the Internet</p>
+<ol>
+<li>due to either some <em>local process</em> <strong>sending</strong> them…</li>
+<li>… or some <strong>forwarding</strong></li>
+</ol>
+</li>
+</ol>
+</section><section>
+<h2 id="whats-forwarding">What’s forwarding?</h2>
+
+
+
+
+
+<img src="./routing.svg" alt="" style="width: 100%; max-width: 95vw; max-height: 60vh; object-fit: contain;">
+
+<ul>
+<li>While <strong>sending</strong> and <strong>receiving</strong> packets is more common for <em>end-hosts</em> (e.g. clients or servers)…</li>
+<li>… <strong>forwarding</strong> is more common <em>infrastructural</em> hosts (e.g. routers, load balancers, etc.)</li>
+</ul>
+</section><section>
+<h2 id="the-need-for-customization-pt-1">The need for customization (pt. 1)</h2>
+
+
+
+
+
+<img src="./simplified-flow-2.png" alt="" style="width: 100%; max-width: 95vw; max-height: 60vh; object-fit: contain;">
+
+<h4 id="one-may-want-to-__alter__-the-_default_-behaviour-of-the-linux-os-in-handling-packets-eg-to-perform">One may want to <strong>alter</strong> the <em>default</em> behaviour of the Linux OS in handling packets, e.g. to perform:</h4>
+<ul>
+<li><strong>firewalling</strong>, e.g. <em>blocking</em> packets from/to some IP addresses, or ports for <em>security</em> reasons</li>
+<li><strong>translating network addresses</strong>, e.g. <em>translating</em> packets’ source/destination IP addresses or ports, e.g. for the sake of <em>access control</em>
+<ul>
+<li>a.k.a. <em>NAT</em>ting, <em>masquerading</em></li>
+</ul>
+</li>
+<li><strong>load balancing</strong>, e.g. <em>distributing</em> packets among multiple servers</li>
+<li><strong>traffic shaping</strong>, e.g. <em>prioritizing</em> packets based on their content, or <em>limiting</em> their bandwidth</li>
+</ul>
+</section><section>
+<h2 id="the-need-for-customization-pt-2">The need for customization (pt. 2)</h2>
+
+
+
+
+
+<img src="./simplified-flow-2.png" alt="" style="width: 100%; max-width: 95vw; max-height: 60vh; object-fit: contain;">
+
+<h4 id="this-implies-__attaching__-some-_custom_-logic-to-specific-_points_-in-the-_packet-processing_-flow-eg">This implies <strong>attaching</strong> some <em>custom</em> logic to specific <em>points</em> in the <em>packet processing</em> flow, e.g.:</h4>
+<ul>
+<li><strong>firewalling</strong>: may be achieved by <em>dropping</em> packets in the <code>INPUT</code> phase</li>
+<li><strong>NATting</strong>: may be achieved by <em>modifying</em> packets in the <code>POSTROUTING</code> phase</li>
+<li><strong>load balancing</strong>: may be achieved by <em>modifying</em> packets in the <code>FORWARD</code> phase</li>
+<li><strong>traffic shaping</strong>: may be achieved by <em>marking</em> packets in the <code>PREROUTING</code> or <code>INPUT</code> phase</li>
+</ul>
 </section>
 
   

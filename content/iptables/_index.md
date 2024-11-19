@@ -20,6 +20,7 @@ Giovanni Ciatto
 
 - [Illustrated introduction to Linux `iptables`](https://iximiuz.com/en/posts/laymans-iptables-101/)
 - [`iptables` Processing Flowchart (Updated Often)](https://stuffphilwrites.com/2014/09/iptables-processing-flowchart/)
+- Also the English [Wikipedia page on Netfilter](https://en.wikipedia.org/wiki/Netfilter) is quite informative
 
 ---
 
@@ -70,3 +71,27 @@ Giovanni Ciatto
 - __NATting__: may be achieved by _modifying_ packets in the `POSTROUTING` phase
 - __load balancing__: may be achieved by _modifying_ packets in the `FORWARD` phase
 - __traffic shaping__: may be achieved by _marking_ packets in the `PREROUTING` or `INPUT` phase 
+
+---
+
+## Netfilter and `iptables`
+
+[Netfilter](https://en.wikipedia.org/wiki/Netfilter) is the _framework_ in the Linux kernel responsible for _handling packets_
+
+{{< image src="https://upload.wikimedia.org/wikipedia/commons/d/dd/Netfilter-components.svg" width="100%" max-h="60vh" >}}
+
+- it allows for attaching _custom_ logic to specific _points_ in the _packet processing_ flow
+- you can do so, via _high-level_ user-space tools, such as `iptables`
+
+---
+
+## Four important aspects of Netfilter/`iptables`
+
+1. __Chain__: a _list_ of _rules_ to be _applied_ to a packet to _determine_ its _fate_
+    + they are usually named after the _phase_ in the _packet processing_ flow they are attached to (e.g. `INPUT`, `FORWARD`, `OUTPUT`, `PREROUTING`, `POSTROUTING`)
+
+2. __Rule__: TBD
+
+3. __Target__: TBD
+
+4. __Table__: TBD

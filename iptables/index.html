@@ -122,25 +122,244 @@
 <li>you can do so, via <em>high-level</em> user-space tools, such as <code>iptables</code></li>
 </ul>
 </section><section>
-<h2 id="four-important-aspects-of-netfilteriptables">Four important aspects of Netfilter/<code>iptables</code></h2>
+<h2 id="important-aspects-of-netfilteriptables-pt-1">Important aspects of Netfilter/<code>iptables</code> (pt. 1)</h2>
 <ol>
 <li>
-<p><strong>Chain</strong>: a <em>list</em> of <em>rules</em> to be <em>applied</em> to a packet to <em>determine</em> its <em>fate</em></p>
+<p><strong>Chain</strong>: a <em>list</em> of <em>rules</em> to be <em>applied</em> to a packet to <em>determine</em> its <em>fate</em>, with <em>decreasing</em> priority</p>
 <ul>
-<li>they are usually named after the <em>phase</em> in the <em>packet processing</em> flow they are attached to (e.g. <code>INPUT</code>, <code>FORWARD</code>, <code>OUTPUT</code>, <code>PREROUTING</code>, <code>POSTROUTING</code>)</li>
+<li>they are usually named after the <em>phase</em> in the <em>packet processing</em> flow they are attached to
+<ul>
+<li>e.g. <code>INPUT</code>, <code>FORWARD</code>, <code>OUTPUT</code>, <code>PREROUTING</code>, <code>POSTROUTING</code></li>
+</ul>
+</li>
 </ul>
 </li>
 <li>
-<p><strong>Rule</strong>: TBD</p>
+<p><strong>Rule</strong> (of a chain): a <em>decision</em> on what to do with a packet <em>matching</em> a given <em>criterion</em></p>
 </li>
 <li>
-<p><strong>Target</strong>: TBD</p>
+<p><strong>Matching criteria</strong> (of a rule): are <em>conditions</em> a packet must <em>satisfy</em> to be <em>matched</em> by a rule</p>
+<ul>
+<li>they could be like <code>--source</code>, <code>--destination</code>, <code>--protocol</code>, <code>--sport</code>, <code>--dport</code>, etc.</li>
+</ul>
 </li>
 <li>
-<p><strong>Table</strong>: TBD</p>
+<p><strong>Target</strong> (of a rule): rules’ decisions are called “targets”</p>
+<ul>
+<li>they could be like <code>ACCEPT</code>, <code>DROP</code>, <code>LOG</code>, <code>RETURN</code> to some prior chain, or <em>jump</em> to another chain</li>
+</ul>
+</li>
+<li>
+<p><strong>Policy</strong> (of a chain): the <em>default</em> action to be taken if no rule in the <em>matches</em> a packet</p>
 </li>
 </ol>
-</section>
+</section><section>
+<h2 id="important-aspects-of-netfilteriptables-pt-2">Important aspects of Netfilter/<code>iptables</code> (pt. 2)</h2>
+<blockquote>
+<p><strong>Suggestion</strong>: think about</p>
+<ul>
+<li>chains as <em>functions</em> accepting packets as <em>arguments</em>, and returning a <em>decision</em></li>
+<li>rules as <em>if-then-else</em> statements</li>
+<li>policies as the <em>else</em> part of an <em>if-then-else</em> statement</li>
+</ul>
+</blockquote>
+
+
+
+
+
+<img src="./chains.png" alt="" style="width: 100%; max-width: 95vw; max-height: 60vh; object-fit: contain;">
+
+</section><section>
+<h2 id="important-aspects-of-netfilteriptables-pt-3">Important aspects of Netfilter/<code>iptables</code> (pt. 3)</h2>
+<ol start="5">
+<li><strong>Tables</strong>: predefined <em>groups</em> of <em>chains</em> with a specific <em>purpose</em>
+<ul>
+<li><code>filter</code>: contains chains for <em>filtering</em> packets</li>
+<li><code>nat</code>: contains chains for <em>translating</em> packets’ addresses/ports</li>
+<li><code>mangle</code>: contains chains for <em>modifying</em> packets</li>
+<li><code>raw</code>: contains chains for low-level <em>packet processing</em></li>
+<li><code>security</code>: contains chains for <em>SELinux</em> (SE $\equiv$ Security-Enhanced) rules</li>
+</ul>
+</li>
+</ol>
+</section><section>
+<h2 id="default-chains-per-table">Default chains, per table</h2>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: right">Table</th>
+          <th style="text-align: left">Chains</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: right"><strong>filter</strong></td>
+          <td style="text-align: left"><code>INPUT</code>, <code>OUTPUT</code>, <code>FORWARD</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: right"><strong>nat</strong></td>
+          <td style="text-align: left"><code>PREROUTING</code>, <code>POSTROUTING</code>, <code>OUTPUT</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: right"><strong>mangle</strong></td>
+          <td style="text-align: left"><code>PREROUTING</code>, <code>INPUT</code>, <code>FORWARD</code>, <code>OUTPUT</code>, <code>POSTROUTING</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: right"><strong>raw</strong></td>
+          <td style="text-align: left"><code>PREROUTING</code>, <code>OUTPUT</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: right"><strong>security</strong></td>
+          <td style="text-align: left"><code>INPUT</code>, <code>OUTPUT</code>, <code>FORWARD</code></td>
+      </tr>
+  </tbody>
+</table>
+<br>
+<ul>
+<li><code>INPUT</code>: handles packets <em>directed to</em> the local system</li>
+<li><code>OUTPUT</code>: handles packets <em>originating from</em> the local system</li>
+<li><code>FORWARD</code>: handles packets <em>routed through</em> the system</li>
+<li><code>PREROUTING</code>: handles packets <em>before</em> they are routed</li>
+<li><code>POSTROUTING</code>: handles packets <em>after</em> they are routed</li>
+</ul>
+</section><section>
+<h2 id="default-flow-pt-1">Default flow (pt. 1)</h2>
+<h3 id="overview">Overview</h3>
+
+
+
+
+
+<img src="./linux-processing.webp" alt="" style="width: 100%; max-width: 95vw; max-height: 80vh; object-fit: contain;">
+
+<p>think about chains as <em>hooks</em> to which you can <em>attach</em> your <em>custom</em> logic</p>
+</section><section>
+<h2 id="default-flow-pt-2">Default flow (pt. 2)</h2>
+<h3 id="input-and-output-flows">Input and output flows</h3>
+
+
+
+
+
+<img src="./flow-node.png" alt="" style="width: 100%; max-width: 95vw; max-height: 80vh; object-fit: contain;">
+
+</section><section>
+<h2 id="default-flow-pt-3">Default flow (pt. 3)</h2>
+<h3 id="input-and-output-flows-1">Input and output flows</h3>
+
+
+
+
+
+<img src="./flow-router.png" alt="" style="width: 100%; max-width: 95vw; max-height: 80vh; object-fit: contain;">
+
+</section><section>
+<h2 id="admissible-targets-per-table-pt-1">Admissible targets, per table (pt. 1)</h2>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: right">Table</th>
+          <th style="text-align: left">Target</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: right"><strong>filter</strong></td>
+          <td style="text-align: left"><code>ACCEPT</code>*, <code>DROP</code>*, <code>REJECT</code>*, <code>LOG</code>, <code>RETURN</code>, <code>ULOG</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: right"><strong>nat</strong></td>
+          <td style="text-align: left"><code>DNAT</code>, <code>SNAT</code>, <code>MASQUERADE</code>, <code>REDIRECT</code>, <code>RETURN</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: right"><strong>mangle</strong></td>
+          <td style="text-align: left"><code>MARK</code>, <code>TOS</code>, <code>DSCP</code>, <code>TTL</code>, <code>SECMARK</code>, <code>CONNMARK</code>, <code>RETURN</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: right"><strong>raw</strong></td>
+          <td style="text-align: left"><code>NOTRACK</code>, <code>RETURN</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: right"><strong>security</strong></td>
+          <td style="text-align: left"><code>SECMARK</code>, <code>RETURN</code></td>
+      </tr>
+  </tbody>
+</table>
+<p>* interrupts the <em>processing</em> of the <em>current</em> packet</p>
+</section><section>
+<h2 id="admissible-targets-per-table-pt-2">Admissible targets, per table (pt. 2)</h2>
+
+<div class="div w-100">
+    <div class="row "><div class="col align-middle " style="text-align: center;"><ul>
+<li><code>ACCEPT</code>: <em>accept</em> the packet</li>
+<li><code>CONNMARK</code>: <em>enables</em> a packet for <strong>connection tracking</strong></li>
+<li><code>DNAT</code>: changes the <em>destination</em> address of a packet</li>
+<li><code>DROP</code>: <em>drop</em> the packet</li>
+<li><code>DSCP</code>: sets the Differentiated Services Code Point (<em>DSCP</em>) header of the packet</li>
+<li><code>LOG</code>**: logs the packet details to the <em>system log</em></li>
+<li><code>MARK</code>**: marks the packet for further processing (e.g., for QoS)</li>
+<li><code>MASQUERADE</code>: dynamically modifies the source IP address/port based on the outgoing interface’s IP (used for dynamic IPs)</li>
+</ul>
+</div>
+<div class="col align-middle " style="text-align: center;"><ul>
+<li><code>NOTRACK</code>: <em>disables</em> connection tracking for a packet</li>
+<li><code>REDIRECT</code>: <em>redirects</em> the packet to a different <em>port</em> on the <em>same machine</em></li>
+<li><code>REJECT</code>: <em>drops</em> the packet and sends an <em>error response</em> back</li>
+<li><code>RETURN</code>: jump back to the <em>calling</em> chain</li>
+<li><code>SECMARK</code>: <em>marks</em> packets for use with <em>security</em> modules</li>
+<li><code>SNAT</code>: changes the <em>source</em> address of a packet</li>
+<li><code>TOS</code>: sets the <em>Type of Service</em> (<em>TOS</em>) header of the packet</li>
+<li><code>TTL</code>: sets the <em>Time to Live</em> (<em>TTL</em>) header of the packet</li>
+<li><code>ULOG</code>: logs the packet details to <em>userspace</em></li>
+</ul>
+</div>
+</div>
+</div>
+</section><section>
+<h1 id="use-cases">Use cases</h1>
+</section><section>
+<h2 id="use-case-firewalling-at-the-service-level-pt-1">Use case: Firewalling at the service level (pt. 1)</h2>
+<ul>
+<li><strong>Goal</strong>: block <em>all</em> ingoing packets, except the ones directed towards a specific <em>$port$</em></li>
+<li><strong>Assumption</strong>: the <em>$port$</em> corresponds to a <em>service</em> you want to <em>expose</em> to the Internet</li>
+<li><strong>Issue 1</strong>: ingoing packets for connections <em>initiated</em> from the local system should <em>not</em> be blocked</li>
+<li><strong>Issue 2</strong>: the loop-back interface should <em>not</em> be blocked</li>
+</ul>
+
+
+<span class="fragment ">
+  <h3 id="solution">Solution</h3>
+<ol>
+<li>Set <code>REJECT</code> as the default <em>policy</em> for the <code>INPUT</code> and <code>FORWARD</code> chains of the <code>filter</code> table</li>
+<li>Set <code>ACCEPT</code> as the <em>policy</em> for the <code>OUTPUT</code> chain of the <code>filter</code> table</li>
+<li>Add a rule to the <code>INPUT</code> chain of the <code>filter</code> table, <em>matching</em> packets directed towards the <em>$port$</em>, and <code>ACCEPT</code>ing them</li>
+<li>Add a rule to the <code>INPUT</code> chain of the <code>filter</code> table, <em>matching</em> packets for <em>established connections</em> and <code>ACCEPT</code>ing them</li>
+<li>Add a rule to the <code>INPUT</code> chain of the <code>filter</code> table, <em>matching</em> packets for the <em>loop-back</em> interface and <code>ACCEPT</code>ing them</li>
+</ol>
+
+</span>
+
+</section><section>
+<h2 id="use-case-firewalling-at-the-service-level-pt-2">Use case: Firewalling at the service level (pt. 2)</h2>
+<h3 id="code-example-for-ssh-on-port-22">Code Example (for SSH on port 22)</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Flush existing rules (optional, to start fresh)</span>
+</span></span><span style="display:flex;"><span>sudo iptables -t filter -F
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Set default policies to DROP for the INPUT and FORWARD chains, and ACCEPT for OUTPUT</span>
+</span></span><span style="display:flex;"><span>sudo iptables -t filter -P INPUT DROP
+</span></span><span style="display:flex;"><span>sudo iptables -t filter -P FORWARD DROP
+</span></span><span style="display:flex;"><span>sudo iptables -t filter -P OUTPUT ACCEPT
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Allow packets for established and related connections</span>
+</span></span><span style="display:flex;"><span>sudo iptables -t filter -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Allow incoming SSH traffic (port 22)</span>
+</span></span><span style="display:flex;"><span>sudo iptables -t filter -A INPUT -p tcp --dport <span style="color:#0000cf;font-weight:bold">22</span> -j ACCEPT
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Allow loopback traffic</span>
+</span></span><span style="display:flex;"><span>sudo iptables -t filter -A INPUT -i lo -j ACCEPT
+</span></span></code></pre></div></section>
 
   
 

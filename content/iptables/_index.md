@@ -26,7 +26,7 @@ Giovanni Ciatto
 
 ## Network packets stepping through the Linux OS
 
-{{< image src="./simplified-flow-1.png" width="100%" max-h="60vh" >}}
+{{< image src="./simplified-flow-1.png" width="100%" max-h="50vh" >}}
 
 1. __Ingoing__ packets, coming _from_ the Internet, are received by _some_ local _network interface_ (e.g., `eth0`)
     1. these may be __directed__ towards some _local process_ willing to __receive__ them
@@ -40,7 +40,7 @@ Giovanni Ciatto
 
 ## What's forwarding?
 
-{{< image src="./routing.svg" width="100%" max-h="60vh" >}}
+{{< image src="./routing.svg" width="100%" max-h="50vh" >}}
 
 - While __sending__ and __receiving__ packets is more common for _end-hosts_ (e.g. clients or servers)...
 - ... __forwarding__ is more common _infrastructural_ hosts (e.g. routers, load balancers, etc.)
@@ -49,7 +49,7 @@ Giovanni Ciatto
 
 ## The need for customization (pt. 1)
 
-{{< image src="./simplified-flow-2.png" width="100%" max-h="60vh" >}}
+{{< image src="./simplified-flow-2.png" width="100%" max-h="50vh" >}}
 
 #### One may want to __alter__ the _default_ behaviour of the Linux OS in handling packets, e.g. to perform:
 
@@ -63,7 +63,7 @@ Giovanni Ciatto
 
 ## The need for customization (pt. 2)
 
-{{< image src="./simplified-flow-2.png" width="100%" max-h="60vh" >}}
+{{< image src="./simplified-flow-2.png" width="100%" max-h="50vh" >}}
 
 #### This implies __attaching__ some _custom_ logic to specific _points_ in the _packet processing_ flow, e.g.:
 
@@ -149,7 +149,7 @@ Giovanni Ciatto
 
 ### Overview
 
-{{< image src="./linux-processing.webp" width="100%" max-h="80vh" >}}
+{{< image src="./linux-processing.webp" width="100%" max-h="50vh" >}}
 
 think about chains as _hooks_ to which you can _attach_ your _custom_ logic
 
@@ -159,7 +159,7 @@ think about chains as _hooks_ to which you can _attach_ your _custom_ logic
 
 ### Input and output flows
 
-{{< image src="./flow-node.png" width="100%" max-h="80vh" >}}
+{{< image src="./flow-node.png" width="100%" max-h="60vh" >}}
 
 ---
 
@@ -167,7 +167,7 @@ think about chains as _hooks_ to which you can _attach_ your _custom_ logic
 
 ### Input and output flows
 
-{{< image src="./flow-router.png" width="100%" max-h="80vh" >}}
+{{< image src="./flow-router.png" width="100%" max-h="60vh" >}}
 
 ---
 
@@ -234,7 +234,7 @@ This may be useful when the _IP address_ of the _client_ must be __hidden__ from
 
 (download VMs [here](https://drive.google.com/file/d/1fKIm3rqvlQpamVwZ6uDSIGP3OUFKumKP/view?usp=drive_link))
 
-{{< image src="./experimenting-env.svg" max-h="70vh" >}}
+{{< image src="./experimenting-env.svg" max-h="50vh" >}}
 
 - 3 Linux VM, running Lubuntu 20.04
 - VMs are interconnected _with each other_ into a _private_ network (`192.168.1.x`)

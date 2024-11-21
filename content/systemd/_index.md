@@ -632,7 +632,7 @@ How to use `systemctl` and `journalctl`?
 {{% col %}}
 ### Boot logs
 
-{{< image src="./logs.svg" width="100%" max-h="70vh" >}}
+{{< image src="./logs.svg" width="100%" max-h="60vh" >}}
 {{% /col %}}
 {{% col %}}
 ### Target dependencies
@@ -644,7 +644,7 @@ How to use `systemctl` and `journalctl`?
 
 (`systemd-analyze plot > plot.svg`)
 
-{{< image src="./time-plot.svg" width="100%" max-h="60vh" >}}
+{{< image src="./time-plot.svg" width="100%" max-h="50vh" >}}
 {{% /col %}}
 {{% /multicol %}}
 

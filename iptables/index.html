@@ -297,9 +297,11 @@
 <li><code>DNAT</code>: changes the <em>destination</em> address of a packet</li>
 <li><code>DROP</code>: <em>drop</em> the packet</li>
 <li><code>DSCP</code>: sets the Differentiated Services Code Point (<em>DSCP</em>) header of the packet</li>
-<li><code>LOG</code>**: logs the packet details to the <em>system log</em></li>
-<li><code>MARK</code>**: marks the packet for further processing (e.g., for QoS)</li>
-<li><code>MASQUERADE</code>: dynamically modifies the source IP address/port based on the outgoing interface’s IP (used for dynamic IPs)</li>
+<li><code>LOG</code>: logs the packet details to the <em>system log</em></li>
+<li><code>MARK</code>: marks the packet for further processing (e.g., for QoS)</li>
+<li><code>MASQUERADE</code>: changes the <em>destination</em> address/port of a packet being <em>forwarded</em>
+to match the outgoing network interface’s <em>address</em>,
+and changes back the <em>destination</em> address/port of the <em>response</em> packets</li>
 </ul>
 </div>
 <div class="col align-middle " style="text-align: center;"><ul>
@@ -317,12 +319,41 @@
 </div>
 </div>
 </section><section>
+<h2 id="about-masquerading">About masquerading</h2>
+<p>This may be useful when the <em>IP address</em> of the <em>client</em> must be <strong>hidden</strong> from the <em>server</em> (or vice versa)</p>
+<p><img src="./masquerading.svg" alt=""></p>
+<ul>
+<li>In steps (1) and (2), the router performs <strong>masquerading</strong> on the <em>outgoing</em> packets of the <em>client</em></li>
+<li>In steps (3) and (4), the router performs <strong>de-masquerading</strong> on the <em>incoming</em> packets from the <em>server</em></li>
+</ul>
+</section><section>
 <h1 id="use-cases">Use cases</h1>
 </section><section>
-<h2 id="use-case-firewalling-at-the-service-level-pt-1">Use case: Firewalling at the service level (pt. 1)</h2>
+<h2 id="experimental-setup">Experimental setup</h2>
+<p>(download VMs <a href="https://drive.google.com/file/d/1fKIm3rqvlQpamVwZ6uDSIGP3OUFKumKP/view?usp=drive_link">here</a>)</p>
+
+
+
+
+
+<img src="./experimenting-env.svg" alt="" style="max-width: 95vw; max-height: 70vh; object-fit: contain;">
+
+<ul>
+<li>3 Linux VM, running Lubuntu 20.04</li>
+<li>VMs are interconnected <em>with each other</em> into a <em>private</em> network (<code>192.168.1.x</code>)</li>
+<li>VMs are also connected to the <em>Internet</em> via the host, which is acting as the <em>gateway</em> (<code>10.0.2.x</code>)</li>
+<li><em>Port-forwarding</em> is set up on the host to allow <em>SSH</em> access to the VMs
+<ul>
+<li>e.g. on ports <code>3022</code>, <code>3023</code>, and <code>3024</code></li>
+</ul>
+</li>
+</ul>
+</section><section>
+<h2 id="use-case-firewalling-at-the-_service_-level-pt-1">Use case: Firewalling at the <em>service</em> level (pt. 1)</h2>
 <ul>
 <li><strong>Goal</strong>: block <em>all</em> ingoing packets, except the ones directed towards a specific <em>$port$</em></li>
 <li><strong>Assumption</strong>: the <em>$port$</em> corresponds to a <em>service</em> you want to <em>expose</em> to the Internet</li>
+<li><strong>Motivation</strong>: reduce the <em>attack surface</em> of the system, by allowing only <em>specific</em> services</li>
 <li><strong>Issue 1</strong>: ingoing packets for connections <em>initiated</em> from the local system should <em>not</em> be blocked</li>
 <li><strong>Issue 2</strong>: the loop-back interface should <em>not</em> be blocked</li>
 </ul>
@@ -341,7 +372,7 @@
 </span>
 
 </section><section>
-<h2 id="use-case-firewalling-at-the-service-level-pt-2">Use case: Firewalling at the service level (pt. 2)</h2>
+<h2 id="use-case-firewalling-at-the-_service_-level-pt-2">Use case: Firewalling at the <em>service</em> level (pt. 2)</h2>
 <h3 id="code-example-for-ssh-on-port-22">Code Example (for SSH on port 22)</h3>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Flush existing rules (optional, to start fresh)</span>
 </span></span><span style="display:flex;"><span>sudo iptables -t filter -F
@@ -359,7 +390,264 @@
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Allow loopback traffic</span>
 </span></span><span style="display:flex;"><span>sudo iptables -t filter -A INPUT -i lo -j ACCEPT
-</span></span></code></pre></div></section>
+</span></span></code></pre></div><h4 id="important-remarks">Important Remarks</h4>
+<ol>
+<li>Do <strong>not</strong> run the commands <em>one at a time</em>: this would most likely make your system unusable (by blocking all incoming packets first)</li>
+<li>In any moment, use <code>sudo iptables -t filter -L</code> to <em>inspect</em> the current rules in table <code>filter</code></li>
+</ol>
+</section><section>
+<h2 id="use-case-firewalling-at-the-_service_-level-pt-3">Use case: Firewalling at the <em>service</em> level (pt. 3)</h2>
+<h3 id="defensive-way-to-execute-the-code">Defensive way to execute the code</h3>
+<ol>
+<li>
+<p>Run <code>nano firewall.sh</code> and paste the following code:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Flush existing rules (optional, to start fresh)</span>
+</span></span><span style="display:flex;"><span>iptables -t filter -F
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Allow loopback traffic</span>
+</span></span><span style="display:flex;"><span>iptables -t filter -A INPUT -i lo -j ACCEPT
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Allow incoming SSH traffic (port 22)</span>
+</span></span><span style="display:flex;"><span>iptables -t filter -A INPUT -p tcp --dport <span style="color:#0000cf;font-weight:bold">22</span> -j ACCEPT
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Allow packets for established and related connections</span>
+</span></span><span style="display:flex;"><span>iptables -t filter -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Set default policies to DROP for the INPUT and FORWARD chains, and ACCEPT for OUTPUT</span>
+</span></span><span style="display:flex;"><span>iptables -t filter -P INPUT DROP
+</span></span><span style="display:flex;"><span>iptables -t filter -P FORWARD DROP
+</span></span><span style="display:flex;"><span>iptables -t filter -P OUTPUT ACCEPT
+</span></span></code></pre></div><ul>
+<li>notice that accept lines are <em>before</em> the drop lines (to avoid blocking yourself out)</li>
+</ul>
+</li>
+<li>
+<p>Run <code>sudo sh firewall.sh</code> to <em>apply</em> the rules</p>
+</li>
+<li>
+<p>Ensure the rules are as expected by reading them with <code>sudo iptables -t filter -L</code></p>
+</li>
+</ol>
+</section><section>
+<h2 id="use-case-firewalling-at-the-_service_-level-pt-4">Use case: Firewalling at the <em>service</em> level (pt. 4)</h2>
+<h3 id="manual-tests">Manual tests</h3>
+<ol>
+<li>Try to <em>SSH</em> into the machine from another one, on the default port (22)
+<ul>
+<li><code>ssh user@machine</code></li>
+<li><strong>this should work</strong></li>
+</ul>
+</li>
+<li>Try to <em>SSH</em> into the machine from another one, on a different port (e.g., 2222), after reconfiguring the <em>SSH</em> server accordingly
+<ol>
+<li><code>sudo nano /etc/ssh/sshd_config</code> and change the <code>Port</code> directive</li>
+<li><code>sudo cp /lib/systemd/system/ssh.socket /etc/systemd/system/</code></li>
+<li><code>sudo nano /etc/systemd/system/ssh.socket</code> and change the <code>ListenStream</code> directive</li>
+<li><code>sudo systemctl daemon-reload</code></li>
+<li><code>sudo systemctl restart ssh.socket ssh.service</code></li>
+<li>(from another machine) <code>ssh -p 2222 user@machine</code></li>
+</ol>
+<ul>
+<li><strong>this should <em>not</em> work</strong> (contacting the server on any port other than 22 should be blocked)</li>
+</ul>
+</li>
+<li>Try to browse the Web from the machine
+<ol>
+<li><code>w3m http://www.google.it</code></li>
+<li><strong>this should work</strong> (incoming packets for established connections should be allowed)</li>
+</ol>
+</li>
+</ol>
+</section><section>
+<h2 id="use-case-firewalling-at-the-_ip_-level-pt-1">Use case: Firewalling at the <em>IP</em> level (pt. 1)</h2>
+<ul>
+<li><strong>Goal</strong>: block <em>all</em> ingoing packets, except the ones coming from a specific <em>IP address</em> <strong>range</strong></li>
+<li><strong>Assumption</strong>: the <em>IP address</em> in the allowed range are <em>trusted</em> ones</li>
+<li><strong>Motivation</strong>: access control based on <em>IP addresses</em></li>
+<li><strong>Issue 1</strong>: ingoing packets for connections <em>initiated</em> from the local system should <em>not</em> be blocked</li>
+<li><strong>Issue 2</strong>: the loop-back interface should <em>not</em> be blocked</li>
+</ul>
+
+
+<span class="fragment ">
+  <h3 id="solution">Solution</h3>
+<ol>
+<li>Set <code>DROP</code> as the default <em>policy</em> for the <code>INPUT</code> and <code>FORWARD</code> chains of the <code>filter</code> table</li>
+<li>Set <code>ACCEPT</code> as the <em>policy</em> for the <code>OUTPUT</code> chain of the <code>filter</code> table</li>
+<li>Add a rule to the <code>INPUT</code> chain of the <code>filter</code> table, <em>matching</em> packets coming from the <em>trusted</em> <em>IP address</em> range, and <code>ACCEPT</code>ing them</li>
+<li>Add a rule to the <code>INPUT</code> chain of the <code>filter</code> table, <em>matching</em> packets for <em>established connections</em> and <code>ACCEPT</code>ing them</li>
+<li>Add a rule to the <code>INPUT</code> chain of the <code>filter</code> table, <em>matching</em> packets for the <em>loop-back</em> interface and <code>ACCEPT</code>ing them</li>
+</ol>
+
+</span>
+
+</section><section>
+<h2 id="use-case-firewalling-at-the-_ip_-level-pt-2">Use case: Firewalling at the <em>IP</em> level (pt. 2)</h2>
+<h3 id="code-example-for-a-specific-ip-range">Code Example (for a specific IP range)</h3>
+<ol>
+<li>
+<p>Run <code>nano firewall.sh</code> and paste the following code:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Flush existing rules (optional, to start fresh)</span>
+</span></span><span style="display:flex;"><span>iptables -t filter -F
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Allow all traffic on the loopback interface (local system communication)</span>
+</span></span><span style="display:flex;"><span>iptables -t filter -A INPUT -i lo -j ACCEPT
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Allow incoming packets from the trusted IP range (e.g., 10.0.2.x)</span>
+</span></span><span style="display:flex;"><span>iptables -t filter -A INPUT -s 10.0.2.0/24 -j ACCEPT
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Allow incoming packets for established and related connections</span>
+</span></span><span style="display:flex;"><span>iptables -t filter -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Set default policies to DROP for INPUT and FORWARD chains, and ACCEPT for OUTPUT</span>
+</span></span><span style="display:flex;"><span>iptables -t filter -P INPUT DROP
+</span></span><span style="display:flex;"><span>iptables -t filter -P FORWARD DROP
+</span></span><span style="display:flex;"><span>iptables -t filter -P OUTPUT ACCEPT
+</span></span></code></pre></div></li>
+<li>
+<p>Run <code>sudo sh firewall.sh</code> to <em>apply</em> the rules</p>
+</li>
+<li>
+<p>Ensure the rules are as expected by reading them with <code>sudo iptables -t filter -L</code></p>
+</li>
+</ol>
+</section><section>
+<h2 id="use-case-firewalling-at-the-_ip_-level-pt-3">Use case: Firewalling at the <em>IP</em> level (pt. 3)</h2>
+<h3 id="manual-tests-1">Manual tests</h3>
+<ol>
+<li>Try to <em>SSH</em> into the machine from a machine in the <em>trusted</em> <em>IP address</em> range
+<ol>
+<li>use <code>ip -o -f inet address show</code> to verify the machine has an IP address in the range <code>10.0.2.x</code></li>
+<li><code>ssh user@machine</code></li>
+<li><strong>this should work</strong></li>
+</ol>
+</li>
+<li>Try to <em>SSH</em> into the machine from a machine <strong>not</strong> in the <em>trusted</em> <em>IP address</em> range
+<ol>
+<li>use <code>ip -o -f inet address show</code> to verify the machine has <em>no</em> IP address in the range <code>10.0.2.x</code></li>
+<li><code>ssh user@machine</code></li>
+<li><strong>this should <em>not</em> work</strong> (contacting the server from any IP address other than <code>10.0.2.x</code> should be blocked)</li>
+</ol>
+</li>
+<li>Try to browse the Web from the machine
+<ol>
+<li><code>w3m http://www.google.it</code></li>
+<li><strong>this should work</strong> (incoming packets for established connections should be allowed)</li>
+</ol>
+</li>
+</ol>
+</section><section>
+<h2 id="use-case-load-balancing-a-service-pt-1">Use case: Load balancing a service (pt. 1)</h2>
+<ul>
+<li><strong>Goal</strong>: let a service be <em>replicated</em> on <em>multiple machines</em>, and distribute incoming packets among them</li>
+<li><strong>Assumption</strong>: there are 3 machines, <code>vm1</code> acting as the <em>load balancer</em>, while <code>vm2</code> and <code>vm3</code> act as <em>backends</em>
+<ul>
+<li>the service should be exposed on port <code>80</code> on <code>vm1</code>, while it is running on port <code>8080</code> on <code>vm2</code> and <code>vm3</code></li>
+</ul>
+</li>
+<li><strong>Motivation</strong>: redundancy, scalability, and fault tolerance</li>
+<li><strong>Remark</strong>: it would be better to use containers, and/or a dedicated <em>load balancer</em>, but this is a <em>didactic</em> example</li>
+</ul>
+</section><section>
+<h2 id="use-case-load-balancing-a-service-pt-2">Use case: Load balancing a service (pt. 2)</h2>
+<h3 id="solution">Solution</h3>
+<ol start="0">
+<li>Enable <em>IP forwarding</em> on the load balancer <code>vm1</code></li>
+<li>Add a new rule to the <code>PREROUTING</code> chain of the <code>nat</code> table:
+<ul>
+<li><em>matching</em> incoming packets on port <code>80</code> for protocol <em>TCP</em></li>
+<li>(in particular, <em>half of</em> the ones corresponding to <em>new connections</em>)</li>
+<li>redirecting (<code>DNAT</code>) them to the backend <code>vm2</code> on port <code>8080</code></li>
+</ul>
+</li>
+<li>Add another new rule to the <code>PREROUTING</code> chain of the <code>nat</code> table:
+<ul>
+<li><em>matching</em> incoming packets on port <code>80</code> for protocol <em>TCP</em></li>
+<li>(in particular, corresponding to <em>new connections</em>)</li>
+<li>redirecting (<code>DNAT</code>) them to the backend <code>vm3</code> on port <code>8080</code></li>
+<li>(implicitly handles the <em>other half</em> of the packets)</li>
+</ul>
+</li>
+<li>Add <em>2 more</em> rules (one per backend) to the <code>POSTROUTING</code> chain of the <code>nat</code> table:
+<ul>
+<li><em>matching</em> packets <em>directed</em> to the backends <code>vm2</code> and <code>vm3</code> on port <code>8080</code></li>
+<li>masquerading (<code>MASQUERADE</code>) traffic directed <em>to</em> them</li>
+<li>(implies <em>de</em>masquerading the <em>response</em> packets coming <em>from</em> them)</li>
+</ul>
+</li>
+</ol>
+</section><section>
+<h2 id="use-case-load-balancing-a-service-pt-3">Use case: Load balancing a service (pt. 3)</h2>
+<h3 id="code-example-for-a-simple-round-robin-load-balancer">Code Example (for a simple round-robin load balancer)</h3>
+<ol>
+<li>
+<p>Run <code>nano loadbalancer.sh</code> and paste the following code:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Enable IP forwarding by writing non-zero value to /proc/sys/net/ipv4/ip_forward</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">echo</span> <span style="color:#0000cf;font-weight:bold">1</span> <span style="color:#000;font-weight:bold">|</span> /proc/sys/net/ipv4/ip_forward
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Flush existing NAT rules (optional, to start fresh)</span>
+</span></span><span style="display:flex;"><span>iptables -t nat -F
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Whenever a new connection comes in on port 80, </span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># redirect it to the backend 192.168.1.2:8080 if it's an even packet...</span>
+</span></span><span style="display:flex;"><span>iptables -t nat -A PREROUTING <span style="color:#4e9a06">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06"></span>    -p tcp --dport <span style="color:#0000cf;font-weight:bold">80</span> <span style="color:#4e9a06">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06"></span>    -m conntrack --ctstate NEW <span style="color:#4e9a06">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06"></span>    -m statistic --mode nth --every <span style="color:#0000cf;font-weight:bold">2</span> --packet <span style="color:#0000cf;font-weight:bold">0</span> <span style="color:#4e9a06">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06"></span>    -j DNAT --to-destination 192.168.1.2:8080 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># ... otherwise, redirect it to the backend 192.168.1.3:8080</span>
+</span></span><span style="display:flex;"><span>iptables -t nat -A PREROUTING <span style="color:#4e9a06">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06"></span>    -p tcp --dport <span style="color:#0000cf;font-weight:bold">80</span> <span style="color:#4e9a06">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06"></span>    -m conntrack --ctstate NEW <span style="color:#4e9a06">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06"></span>    -j DNAT --to-destination 192.168.1.3:8080
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Ensure that the backens' responses are correctly routed back to the client</span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># as if they were coming from the load balancer</span>
+</span></span><span style="display:flex;"><span>iptables -t nat -A POSTROUTING -p tcp -d 192.168.1.2 --dport <span style="color:#0000cf;font-weight:bold">8080</span> -j MASQUERADE
+</span></span><span style="display:flex;"><span>iptables -t nat -A POSTROUTING -p tcp -d 192.168.1.3 --dport <span style="color:#0000cf;font-weight:bold">8080</span> -j MASQUERADE
+</span></span></code></pre></div></li>
+<li>
+<p>Run <code>sudo sh loadbalancer.sh</code> to <em>apply</em> the rules</p>
+</li>
+<li>
+<p>Ensure the rules are as expected by reading them with <code>sudo iptables -t nat -L</code></p>
+</li>
+</ol>
+</section><section>
+<h2 id="use-case-load-balancing-a-service-pt-5">Use case: Load balancing a service (pt. 5)</h2>
+<h3 id="manual-tests-2">Manual tests</h3>
+<ol>
+<li>
+<p>Start a Web service on port <code>8080</code> on <code>vm2</code> and <code>vm3</code></p>
+<ul>
+<li>better for the service to return the <em>hostname</em> of the machine it is running on
+<ul>
+<li>e.g. the <a href="https://github.com/gciatto/hit-counter">hit-counter</a> project</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Contact the load balancer <em>from another machine</em>, and check the <em>hostname</em> returned</p>
+<ol>
+<li><code>curl http://vm1</code></li>
+<li>reload the page <em>several times</em></li>
+<li><strong>this should alternate between <code>vm2</code> and <code>vm3</code></strong></li>
+</ol>
+</li>
+<li>
+<p>Why you cannot use <code>localhost</code> to test the load balancer?</p>
+<ul>
+<li><code>curl http://localhost</code> on <code>vm1</code> would always <strong>fail</strong>, as the packets are <em>not</em> being <em>routed</em>
+<ul>
+<li>hence not passing through the <code>PREROUTING</code> chain</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</section>
 
   
 
